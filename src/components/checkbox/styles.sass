@@ -1,0 +1,66 @@
+@import "../../colors"
+
+.checkbox
+    cursor: pointer
+    display: flex
+    justify-content: center
+    align-items: center
+    width: 100%
+
+    &.primary
+        background-color: $grey
+        padding: 15px
+        border-radius: 5px
+        display: flex
+        justify-content: space-between
+        align-items: center
+
+    .checkbox-icon
+        display: inline-block
+        max-height: 0
+        max-width: 0
+        line-height: 0
+        padding: 7px
+        border: 1px solid $black
+        border-radius: 6px
+        position: relative
+        transition: all 350ms cubic-bezier(0.76, 0, 0.24, 1)
+        transform: scale(.8)
+
+        > .material-symbols-outlined
+            max-width: 100%
+            max-height: 100%
+            width: 0
+            padding: 7px
+            border-radius: 6px
+            position: absolute
+            border: 1px solid transparent
+            top: -1px
+            left: -1px
+            border-radius: 6px
+            opacity: 0
+            line-height: 0
+            transform: scale(1.5)    
+            transition: all 550ms cubic-bezier(0.76, 0, 0.24, 1)
+            display: flex
+            justify-content: center
+            align-items: center
+            font-size: 30px
+            color: $green
+
+        &.checked
+            transform: scale(1)
+            border: 1px solid $green
+
+            > .material-symbols-outlined
+                opacity: 1
+                transform: scale(.4)
+
+    &.disabled
+        opacity: .5
+
+    .children
+        &.left
+            margin-left: 10px
+        &.right
+            margin-right: 10px

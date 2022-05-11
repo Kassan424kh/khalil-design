@@ -7,6 +7,7 @@ import Button from "./components/button/button";
 import SelectOptions from "./components/select/select-options/selectOptions";
 import Textfield from "./components/textfield/textfield";
 import Headline from "./components/headline/headline";
+import Checkbox from "./components/checkbox/checkbox";
 
 messagesHooksStore();
 selectOptionsHooksStore();
@@ -45,6 +46,7 @@ export default function App() {
                 <p key="adfasdf">click me</p>
             </Select>
             <Textfield />
+            <Checkbox>test</Checkbox>
 
             <div id={"outside"} />
             <SelectOptions />
