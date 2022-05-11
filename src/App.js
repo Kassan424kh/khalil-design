@@ -5,6 +5,8 @@ import selectOptionsHooksStore from "./hooks-store/configs/selectOptionsHooksSto
 import Select from "./components/select/select";
 import Button from "./components/button/button";
 import SelectOptions from "./components/select/select-options/selectOptions";
+import Textfield from "./components/textfield/textfield";
+import Headline from "./components/headline/headline";
 
 messagesHooksStore();
 selectOptionsHooksStore();
@@ -14,6 +16,7 @@ export default function App() {
 
     return (
         <div className="App">
+            <Headline icon={"check"} text={"Editable Headline"} />
             <Button> click me </Button>
             <Select
                 enableSelectedStatusDot
@@ -41,71 +44,7 @@ export default function App() {
                 <p key="adfsasdf">click me</p>
                 <p key="adfasdf">click me</p>
             </Select>
-
-            <Select options={["Hello", "Name", "Is", "Khalil"]}>
-                <p key="adfdasdf">click me</p>
-                <p key="adfsasdf">click me</p>
-                <p key="adfasdf">click me</p>
-            </Select>
-            <div className={"another-position"}>
-                <Select
-                    options={["Hello", "Name", "Is", "Khalil"]}
-                    headerText={"test"}
-                    enableSearch
-                    searchPlaceHolder={"search me"}
-                    enableSelectAllButton
-                    left={false}
-                    right={false}
-                    top={false}
-                    bottom={false}
-                >
-                    <p key="adfdasdf">click me</p>
-                    <p key="adfsasdf">click me</p>
-                    <p key="adfasdf">click me</p>
-                </Select>
-            </div>
-
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "flex-end",
-                    alignItems: "end"
-                }}
-            >
-                <Select
-                    multiSelect
-                    showSelectedParallel
-                    headerText={"test"}
-                    options={{
-                        l:
-                            "Hello asdfasdf asdf asdf asdf asdf asdf  asdfa sdf asdf ",
-                        s: "My",
-                        k:
-                            "64_Winter Verlängerung Oktober Display Programmatic 2139VAW asdf asdf asdf ",
-                        h: "Is",
-                        o: "Khalil",
-                        ls: "ssssa ",
-                        sd: "asfffMy",
-                        kd: "kjhgName",
-                        hd: "uttrIs",
-                        od: "poooKhalil"
-                    }}
-                    enableSearch
-                    searchPlaceHolder={"search me"}
-                    enableSelectAllButton
-                    enableCloseButton
-                >
-                    <p key="adfdasdf">click me</p>
-                    <p key="adfsasdf">click me</p>
-                    <p key="adfasdf">click me</p>
-                </Select>
-                <Select options={["Hello", "Name", "Is", "Khalil"]}>
-                    <p key="adfdasdf">click me</p>
-                    <p key="adfsasdf">click me</p>
-                    <p key="adfasdf">click me</p>
-                </Select>
-            </div>
+            <Textfield />
 
             <div id={"outside"} />
             <SelectOptions />
