@@ -1,8 +1,7 @@
 @import "../../../variables"
 @import "../../../colors"
 
-.tv-tool-user
-    margin: 5px 0
+.cht-user
     width: 100%
     display: flex
     flex-direction: column
@@ -10,27 +9,26 @@
     align-items: center
     transition: all $duration $animationCurve
 
-    .tv-tool-user-image
-        width: 18px
-        height: 18px
+    .cht-user-image
+        width: 30px
+        height: 30px
         border-radius: 500px
         background-color: $white
         background-size: cover
-        border: 1px solid black
         margin: 5px 0
         transition: all $duration $animationCurve
 
-    .tv-tool-user-name
+    .cht-user-name
         display: flex
         color: $black
 
-        .tv-tool-user-name-tile
+        .cht-user-name-tile
             overflow: hidden
             white-space: nowrap
             transition: all $duration $animationCurve
             margin-right: 1px
             font-size: 12px
-            font-weight: lighter
+            font-weight: 300
 
             &.open
                 font-size: 20px
@@ -42,13 +40,13 @@
     &.open
         margin: 15px 0
 
-        .tv-tool-user-image
-            width: 65px
-            height: 65px
+        .cht-user-image
+            width: 80px
+            height: 80px
             margin-bottom: 15px
 
-        .tv-tool-user-name
-            .tv-tool-user-name-tile
+        .cht-user-name
+            .cht-user-name-tile
                 font-size: 20px
                 margin-right: 5px
 

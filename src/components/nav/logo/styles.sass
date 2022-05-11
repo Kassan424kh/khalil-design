@@ -1,14 +1,12 @@
+@import "../../../colors"
 @import "../../../variables"
 
-.tv-tool-logo
+.cht-logo
     width: 40px
     height: 40px
-    background-repeat: no-repeat
-    background-size: 60%
-    background-position: center
     position: absolute
-    top: 50px
-    left: 0
+    top: 42px
+    left: -2px
     transition: all $duration $animationCurve
     display: flex
     justify-content: center
@@ -16,21 +14,23 @@
     z-index: 2
     cursor: pointer
 
+    > svg
+        padding: 7px
+
     h3
         position: absolute
+        left: 42px
         white-space: nowrap
-        right: -50px
         opacity: 0
         transition: all $duration $animationCurve
         z-index: 0
         font-size: inherit
         margin-bottom: 0
-        color: $text-color
+        color: $black
 
     &.open
         top: 0
         left: 0
 
         h3
-            right: -60px
             opacity: 1
