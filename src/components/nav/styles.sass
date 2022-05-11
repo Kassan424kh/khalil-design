@@ -1,0 +1,367 @@
+@import "../../colors.sass"
+@import "../../variables.sass"
+
+$max-width-close: calc(98px - #{$margin * 2})
+$max-width-open: calc(320px - #{$margin * 2})
+$max-content-width: calc(350px - #{$margin * 6})
+
+.cht-navbar
+  position: fixed
+  top: 0
+  left: calc((#{$margin} + #{$max-width-close}) * -1)
+  transition: all $duration $animationCurve
+  height: 100%
+  width: max-content
+  display: flex
+  justify-content: flex-start
+  z-index: 99999999999
+  pointer-events: none
+
+  > h1, > h2, > h3, > h4, > h5, > h6
+    margin-bottom: 0
+    font-family: inherit
+    font-weight: 500
+    line-height: 1
+    color: inherit
+
+  p
+    margin: 0
+    padding: 0
+
+  .cht-nav-open-button
+    height: 100px
+    width: 30px
+    position: relative
+    top: 70px
+    left: -22px
+    background-size: contain
+    background-repeat: no-repeat
+    cursor: pointer
+    transition: all $duration $animationCurve
+    background-position-x: 0
+    pointer-events: auto
+
+    > svg
+      height: 100%
+
+      > g
+        transition: all $duration $animationCurve
+        transform: matrix(1, 0, 0, 1, -1285.8, -590.661)
+
+    &.pinned
+      cursor: default
+      pointer-events: none
+      left: -20px
+
+      > svg
+        > g
+          transition: all $duration $animationCurve
+          transform: matrix(1, 0, 0, 1, -1302.13, -590.661)
+
+
+  .cht-nav
+    width: $max-width-close
+    height: calc(100% - #{$margin * 2})
+    background-color: $nav-background-color
+    box-shadow: 0 0 30px rgba($nav-box-shadow-color, 0)
+    border: 1px solid $nav-border-color
+    margin: $margin
+    transition: left $duration $animationCurve, width $duration $animationCurve, box-shadow $duration $animationCurve
+    display: flex
+    flex-direction: column
+    align-items: center
+    justify-content: center
+    pointer-events: auto
+    border-radius: 10px
+
+    .icon-button
+      padding: 9px
+      color: $black
+      border-radius: $buttons-border-radius
+      cursor: pointer
+      transition: background-color 350ms cubic-bezier(.4, .2, 0, 1)
+      background-color: transparent
+
+      &:hover
+        background-color: $background-color
+        transition: background-color 250ms cubic-bezier(.4, .2, 0, 1)
+
+    .cht-nav-container
+      height: calc(100% - #{$margin})
+      width: calc(100% - #{$margin})
+      position: relative
+
+      .cht-nav-content
+        height: 100%
+        display: flex
+        flex-direction: column
+
+        .cht-nav-head
+          width: 100%
+          min-height: 95px
+          display: flex
+          flex-direction: column
+          justify-content: space-between
+          align-items: center
+          position: relative
+          transition: min-height $duration $animationCurve
+          overflow: hidden
+
+          .cht-nav-open-close-button
+            position: absolute
+            right: -1px
+            line-height: 0
+
+            > span
+              font-size: 20px
+
+        .cht-nav-body
+          width: 100%
+          height: 100%
+          display: flex
+          flex-direction: column
+          justify-content: space-between
+          position: relative
+
+          .top
+            box-sizing: content-box
+
+            &.list
+              overflow-y: auto
+              overflow-x: hidden
+              height: calc(100% - 145px)
+
+              > hr
+                background-color: rgba($black-rgb, .3)
+                width: calc(100% - 15px)
+                margin: 5px 0 5px (15px / 2)
+
+              .--list-item
+                width: 100%
+                display: flex
+                align-items: center
+
+                .list-item
+                  width: 100%
+
+                .hover-tooltip
+                  box-shadow: 5px 5px 20px $grey-light
+                  background-color: $nav-background-color
+                  color: $blue
+                  border-width: 1px 1px 1px 0
+                  position: absolute
+                  width: max-content
+                  height: 30px
+                  min-width: 50px
+                  padding: 0 15px 0 10px
+                  right: -15px
+                  transform: translateX(100%)
+                  z-index: 10000000000000
+                  border-radius: 5px
+                  display: flex
+                  align-items: center
+                  transition: all 250ms $animationCurve 250ms
+                  line-height: 0
+                  opacity: 0
+                  pointer-events: none
+                  font-size: 12px
+
+                  &:after
+                    content: " "
+                    display: block
+                    border-width: 0 0 1px 1px
+                    position: absolute
+                    width: 18.5px
+                    height: 18.5px
+                    transform: rotate(45deg)
+                    border-bottom-left-radius: 5px
+                    transition: all 250ms $animationCurve 250ms
+                    background-color: $nav-background-color
+                    z-index: -2
+                    top: 6.2px
+                    left: -8.8px
+
+                &:hover
+                  .hover-tooltip
+                    opacity: 1
+                    right: -30px
+
+              &.disable-toolTip
+                .--list-item
+                  &:hover
+                    .hover-tooltip
+                      right: -15px
+                      opacity: 0
+
+              .list-item
+                overflow: hidden
+                display: flex
+                justify-content: flex-start
+                align-items: center
+                padding: 9px 10px
+                background-color: transparent
+                color: $black
+                text-decoration: none
+                border-radius: $buttons-border-radius
+                transition: background-color 250ms cubic-bezier(.4, .2, 0, 1)
+                cursor: pointer
+
+                .list-item-select-icon
+                  position: absolute
+                  right: 0
+                  top: 11px
+                  color: $white
+                  border: 3px solid $white
+                  background-color: $black
+                  border-radius: 100px
+                  transform: scale(.5)
+                  opacity: 0
+                  transition: all 550ms $animationCurve
+                  font-size: 18px
+
+                &:first-child
+                  margin-top: 0
+
+                &:last-child
+                  margin-bottom: 0
+
+                .list-item-icon
+                  position: relative
+                  padding-right: $margin
+                  transition: all $duration $animationCurve
+                  font-size: 18px
+
+                .list-item-text
+                  position: relative
+                  left: 0
+                  transition: left 250ms cubic-bezier(.4, .2, 0, 1)
+                  white-space: nowrap
+                  font-size: 14px
+
+                &:hover
+                  background-color: $background-color
+                  transition: background-color 350ms cubic-bezier(.4, .2, 0, 1)
+
+                  .list-item-text
+                    left: 10px
+
+              .select
+                width: 100%
+                margin: 0
+
+                .create-new-fc
+                  height: 0
+                  width: 0
+
+                > div
+                  width: 100%
+
+                  .list-item
+                    position: relative
+
+                    .list-item-select-icon
+                      opacity: 1
+
+                &.active
+                  .list-item
+                    background-color: $background-color
+                    transition: background-color 350ms cubic-bezier(.4, .2, 0, 1)
+
+                    .list-item-text
+                      left: 10px
+
+        .bottom
+          display: flex
+          flex-wrap: wrap
+          justify-content: center
+          align-items: center
+          table-layout: fixed
+          overflow: hidden
+          transition: all $duration $animationCurve
+          width: 36px
+          height: max-content
+          gap: 5px
+
+          .action-button
+            text-decoration: none
+            display: flex
+            align-items: center
+            justify-content: center
+            line-height: 0
+            color: $black
+            white-space: nowrap
+
+            .icon-button
+              background-color: transparent
+              margin-right: 0
+              line-height: 0
+              width: 0
+              transition: margin-right $duration $animationCurve, background-color 350ms cubic-bezier(.4, .2, 0, 1)
+              font-size: 18px
+              padding: 18px
+              display: flex
+              justify-content: center
+              align-items: center
+
+            &:hover
+              .icon-button
+                background-color: $background-color
+                transition: background-color 250ms cubic-bezier(.4, .2, 0, 1)
+
+            &.logout-button
+              color: rgba(255, 0, 52, 0.8)
+
+              .icon-button
+                color: rgba(255, 0, 52, 0.8)
+
+              &:hover
+                .icon-button
+                  background-color: rgba(255, 0, 52, .06)
+
+  &.first-time-loading
+    opacity: 0
+    transform: scale(0.99)
+    animation: firstTimeLoading 1s $animationCurve forwards
+
+  &.open
+    .cht-nav
+      width: $max-width-open
+      box-shadow: 15px 15px 50px rgba($nav-box-shadow-color, .05)
+
+      .cht-nav-container
+        .cht-nav-content
+          .cht-nav-head
+            min-height: 45px
+
+          .cht-nav-body
+            .top
+              &.list
+                .list-item
+                  .list-item-select-icon
+                    top: 5px
+                    right: 5px
+                    background-color: transparent
+                    color: $black
+                    transform: scale(.7)
+                    border-color: transparent
+                    font-size: 25px
+
+                .--list-item
+                  &:hover
+                    .hover-tooltip
+                      right: -15px
+                      opacity: 0
+
+            .bottom
+              width: 100%
+              gap: 40px
+
+  &.show
+    left: 0
+    .cht-nav
+      box-shadow: 15px 15px 50px rgba($nav-box-shadow-color, .05)
+
+@keyframes firstTimeLoading
+  100%
+    transform: scale(1)
+    opacity: 1

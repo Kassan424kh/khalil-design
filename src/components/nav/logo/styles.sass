@@ -1,0 +1,36 @@
+@import "../../../variables"
+
+.tv-tool-logo
+    width: 40px
+    height: 40px
+    background-repeat: no-repeat
+    background-size: 60%
+    background-position: center
+    position: absolute
+    top: 50px
+    left: 0
+    transition: all $duration $animationCurve
+    display: flex
+    justify-content: center
+    align-items: center
+    z-index: 2
+    cursor: pointer
+
+    h3
+        position: absolute
+        white-space: nowrap
+        right: -50px
+        opacity: 0
+        transition: all $duration $animationCurve
+        z-index: 0
+        font-size: inherit
+        margin-bottom: 0
+        color: $text-color
+
+    &.open
+        top: 0
+        left: 0
+
+        h3
+            right: -60px
+            opacity: 1

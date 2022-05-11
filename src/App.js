@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import "./styles.sass";
 import messagesUpdaterConfig from "./hooks-store/configs/messages";
 import selectOptionsHooksStore from "./hooks-store/configs/selectOptionsHooksStore";
@@ -12,12 +12,18 @@ import { useStore } from "./hooks-store/store";
 import Messages from "./components/messages/messages";
 import PaginationBar from "./components/pagination-bar/paginationBar";
 import Modal from "./components/modal/modal";
+import Nav from "./components/nav/nav";
+import Theme from "./_themes";
 
 messagesUpdaterConfig();
 selectOptionsHooksStore();
 
 export default function App() {
     const [toggleSelectOptions, setToggleSelectOptions] = useState("");
+
+    useEffect(() => {
+        new Theme();
+    }, []);
 
     const dispatch = useStore(true)[1];
     const alert = async ({
@@ -43,6 +49,7 @@ export default function App() {
 
     return (
         <div className="App">
+            <Nav />
             <Headline icon={"check"} text={"Editable Headline"} />
             <Button
                 onClick={() => {

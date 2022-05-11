@@ -1,0 +1,56 @@
+@import "../../../variables"
+@import "../../../colors"
+
+.tv-tool-user
+    margin: 5px 0
+    width: 100%
+    display: flex
+    flex-direction: column
+    justify-content: center
+    align-items: center
+    transition: all $duration $animationCurve
+
+    .tv-tool-user-image
+        width: 18px
+        height: 18px
+        border-radius: 500px
+        background-color: $white
+        background-size: cover
+        border: 1px solid black
+        margin: 5px 0
+        transition: all $duration $animationCurve
+
+    .tv-tool-user-name
+        display: flex
+        color: $black
+
+        .tv-tool-user-name-tile
+            overflow: hidden
+            white-space: nowrap
+            transition: all $duration $animationCurve
+            margin-right: 1px
+            font-size: 12px
+            font-weight: lighter
+
+            &.open
+                font-size: 20px
+                margin-right: 5px
+
+            &:last-child
+                margin-right: 0
+
+    &.open
+        margin: 15px 0
+
+        .tv-tool-user-image
+            width: 65px
+            height: 65px
+            margin-bottom: 15px
+
+        .tv-tool-user-name
+            .tv-tool-user-name-tile
+                font-size: 20px
+                margin-right: 5px
+
+                &:last-child
+                    margin-right: 0
