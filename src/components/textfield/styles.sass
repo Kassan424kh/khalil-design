@@ -1,0 +1,72 @@
+@import "../../colors"
+@import "../../variables"
+
+.textfield
+  position: relative
+  display: flex
+  align-items: center
+
+  .textfield-input
+    box-sizing: content-box
+    width: calc(100% - 21px)
+    border: 1px solid rgba($blue, .15)
+    background-color: rgba($blue-light, .5)
+    padding: 0 10px
+    line-height: 40.5px
+    border-radius: 10px
+    font-size: 15px
+    color: $blue
+    transition: all 250ms cubic-bezier(.4, .2, 0, 1)
+    font-weight: 300
+
+    &.with-left-icon
+      padding-left: 43px
+
+      &-button
+        padding-left: 52px
+
+    &.with-right-icon-button
+      padding-right: 43px
+
+      &-button
+        padding-right: 52px
+
+    &:focus
+      border: 1px solid rgba($blue, .3)
+      background-color: rgba($blue-light, .2)
+      color: $black
+
+  .icon-button
+    position: absolute
+    padding: 0 !important
+    height: 43px
+    width: 43px
+    transform: scale(.8)
+
+    > span
+      color: rgba($blue, .5) !important
+      font-size: 20px
+
+    &.only-icon
+      cursor: default
+      background-color: transparent
+      box-shadow: 0 0 0 transparent
+      pointer-events: none
+
+    &.left
+      left: 0
+
+    &.right
+      right: 0
+
+  &.is-invalid
+    .textfield-input
+      border-color: $red !important
+
+  .textfield-invalid-feedback-text
+    color: $red
+    position: absolute
+    bottom: 0
+    left: 0
+    transform: translateY(200%)
+    font-size: 12px
