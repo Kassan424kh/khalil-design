@@ -577,7 +577,7 @@ const SelectOptions = () => {
                                     >
                                         <span
                                             className={
-                                                "material-icons-outlined"
+                                                "material-symbols-outlined"
                                             }
                                         >
                                             {index === 3

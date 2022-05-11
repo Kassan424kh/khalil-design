@@ -53,7 +53,7 @@ const SelectOption = (props) => {
                 }
             }}
         >
-            <span className={"select-option-icon material-icons-outlined"}>
+            <span className={"select-option-icon material-symbols-outlined"}>
                 arrow_right
             </span>
             <pre ref={props.textRef}>{props.children}</pre>

@@ -36,7 +36,7 @@ const Button = (props) => {
             {...props.args}
         >
             {props.leftIcon ? (
-                <span className="button-icon left material-icons-outlined">
+                <span className="button-icon left material-symbols-outlined">
                     {props.leftIcon}
                 </span>
             ) : null}
@@ -53,7 +53,7 @@ const Button = (props) => {
                 </div>
             ) : null}
             {props.rightIcon ? (
-                <span className="button-icon right material-icons-outlined">
+                <span className="button-icon right material-symbols-outlined">
                     {props.rightIcon}
                 </span>
             ) : null}
