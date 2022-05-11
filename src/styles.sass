@@ -1,0 +1,59 @@
+@import "colors"
+@import "variables"
+
+*
+  margin: 0
+  box-sizing: border-box
+
+  ::-webkit-scrollbar
+    cursor: pointer
+    width: 8px
+    height: 8px
+    background: rgba($black, .0)
+
+  ::-webkit-scrollbar-thumb
+      background: rgba($black, .2)
+      border-radius: 2px
+
+  &:after, &:before
+    box-sizing: border-box
+
+  &:focus
+    outline: none
+
+  &::selection
+    background: $selection-color
+    color: $black
+
+  &::-moz-selection
+    background: $selection-color
+    color: $black
+
+  &:focus
+    outline: none
+
+#root, .App
+  background-color: #fff
+
+.App
+  font-family: $font-family
+  height: 300vh
+  width: 100%
+  display: flex
+  flex-direction: column
+
+  .another-position
+    height: 100%
+    width: 300%
+    display: flex
+    justify-content: center
+    align-items: center
+    
+.disable-selecting
+  -webkit-touch-callout: none 
+  -webkit-user-select: none
+  -khtml-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0)

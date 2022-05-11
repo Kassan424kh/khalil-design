@@ -1,0 +1,169 @@
+@import "../../colors.sass"
+
+.tv-tool-button
+    padding: 20px
+    width: max-content
+    background-color: $white
+    color: $black
+    border-radius: 5px
+    font-weight: lighter
+    cursor: pointer
+    border: 1px solid transparent
+    transition: all 250ms cubic-bezier(.4,.2,0,1)
+    display: flex
+    justify-content: center
+    align-items: center
+    opacity: .9
+    font-size: 14px
+    position: relative
+    overflow: hidden
+
+    &.loading
+        cursor: wait
+
+    .loading-effect
+        height: 150%
+        width: 150px
+        pointer-events: none
+        background: transparent
+        background: linear-gradient(90deg, rgba(0,0,0,0) 8%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0) 82%)
+        position: absolute
+        top: 0
+        left: 0
+        animation: loading 2s cubic-bezier(.4,.2,0,1) infinite
+
+    &.with-shadow
+        box-shadow: 0 15px 50px rgba(0, 0, 0, .1)
+
+    &.green
+        color: $green
+
+        .button-icon
+            color: $green
+
+    &.red
+        color: $red
+
+        .button-icon
+            color: $red
+
+    &.blue
+        color: $blue
+
+        .button-icon
+            color: $blue
+
+    &.yellow
+        color: $yellow
+
+        .button-icon
+            color: $yellow
+
+
+    &:active
+        &:not(.disabled)
+            opacity: 1
+
+            &.with-shadow
+                box-shadow: 0px 10px 40px rgba(0, 0, 0, .1)
+
+    &.primary
+        background-color: $black
+        color: $white
+
+        .loading-effect
+            height: 150%
+            width: 150%
+            background: transparent
+            background: linear-gradient(90deg, rgba(255,255,255,0) 8%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 82%)
+
+        .button-icon
+            color: $white
+
+        &.grey
+            background-color: $grey
+            color: $black
+
+            .button-icon
+                color: $black
+
+        &.green
+            background-color: $green
+            color: $green-light
+
+            .button-icon
+                color: $green-light
+
+        &.red
+            background-color: $red
+            color: $red-light
+
+            .button-icon
+                color: $red-light
+
+        &.blue
+            background-color: $blue
+            color: $blue-light
+
+            .button-icon
+                color: $blue-light
+
+        &.yellow
+            background-color: $yellow
+            color: $yellow-light
+
+            .button-icon
+                color: $yellow-light
+
+    &.outlined
+        background-color: $white
+        color: $black
+        border: 1px solid rgba($black, .6)
+
+        &.grey
+            background-color: rgba($grey, .02)
+            color: $grey
+            border: 1px solid rgba($grey, .6)
+
+        &.green
+            background-color: rgba($green, .02)
+            color: $green
+            border: 1px solid rgba($green, .6)
+
+        &.red
+            background-color: rgba($red, .02)
+            color: $red
+            border: 1px solid rgba($red, .6)
+
+        &.blue
+            background-color: rgba($blue, .02)
+            color: $blue
+            border: 1px solid rgba($blue, .6)
+
+        &.yellow
+            background-color: rgba($yellow, .02)
+            color: $yellow
+            border: 1px solid rgba($yellow, .6)
+
+    &.disabled
+        opacity: .5
+        cursor: default
+
+    .button-icon
+        line-height: 0
+        height: 0
+        width: 0
+        font-size: 15px
+        display: flex
+        justify-content: center
+        align-items: center
+        color: $black
+        padding: 0
+
+    .button-content
+
+@keyframes loading
+    from
+        left: -150px
+    to
+        left: 120%

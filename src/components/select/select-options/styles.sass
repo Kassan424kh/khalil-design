@@ -1,0 +1,217 @@
+@import "../../../variables"
+@import "../../../colors"
+
+.select-options
+    font-family: $font-family
+    display: flex
+    flex-direction: column
+    justify-content: flex-start
+    padding: 15px 0 15px 15px
+    position: fixed
+    background-color: $white
+    border-radius: 10px
+    border: 1px solid $blue
+    max-width: max-content
+    min-width: 250px
+    width: max-content
+    max-height: 300px
+    box-shadow: 15px 15px 50px $blue
+    box-sizing: border-box
+    opacity: 0
+    transition: opacity 350ms cubic-bezier(.4, .2, 0, 1), transform 350ms cubic-bezier(.4, .2, 0, 1), top 0ms cubic-bezier(.4, .2, 0, 1), left 0ms cubic-bezier(.4, .2, 0, 1)
+    z-index: 9999999999
+    transform: translateY(30px)
+    overflow: hidden
+
+    > div
+        height: calc(100% - 30px)
+        display: contents
+
+    .tv-tool-button
+        box-shadow: 0 5px 20px rgba(0, 0, 0, .04) !important
+        border: 1px solid $grey !important
+        > span
+            color: rgba($black, .5)
+            -webkit-text-stroke: 0 $black
+
+    &:after
+        content: " "
+        display: block
+        position: absolute
+        background: $white
+        height: 100%
+        width: 100%
+        z-index: -1
+        top: 0
+        left: 0
+        background: linear-gradient(180deg, $blue-light -70px, transparent 0px)
+
+    .select-options-body
+        display: contents
+
+        .content
+            width: 100%
+            min-height: 100%
+            max-width: 100%
+            overflow-y: auto
+            padding-right: 15px
+            position: relative
+
+            .empty-listview-background-image
+                opacity: 0
+                position: absolute
+                height: 100%
+                width: 100%
+                top: 0
+                left: 0
+                display: flex
+                justify-content: center
+                align-items: center
+
+                > span
+                    font-size: 50px
+                    color: $grey
+
+    .select-options-headline
+        position: relative
+        width: calc(100% + 15px)
+        left: -15px
+        top: -15px
+        line-height: 50px
+        border-top-left-radius: 10px
+        border-top-right-radius: 10px
+        text-align: center
+        font-weight: bolder
+        font-size: 17px
+        color: $blue-dark
+        margin-bottom: -15px
+
+    .actions
+        display: flex
+        justify-content: space-between
+        margin-right: 15px
+        gap: 10px
+
+        .select-all-button
+            padding: 20px !important
+            max-height: 40px
+            height: 40px
+            min-width: 40px
+            width: 40px
+            border: 0
+            z-index: 21
+            opacity: 1
+            box-shadow: 0 5px 20px rgba(0, 0, 0, .04)
+            border-radius: 5px
+
+            &:active
+                box-shadow: 0 0 10px $background-color
+
+            .button-icon
+                font-size: 18px
+                width: 0
+                max-height: 0
+                line-height: 40px
+                padding: 0
+
+        .close-button
+            @extend .select-all-button
+            width: auto
+            border-color: transparent !important
+            box-shadow: 0 0 10px transparent !important
+            background-color: transparent
+            margin-right: -5px
+
+        .select-options-search-field
+            width: calc(100% - 2px)
+            border-radius: 5px
+            line-height: 40px
+            font-size: 15px
+            box-shadow: 0 5px 20px rgba(0, 0, 0, .04)
+            border: 1px solid $grey
+            margin-bottom: 15px
+            padding: 0 10px
+            position: relative
+            z-index: 20
+
+    &.with-header-text
+        &:after
+            background: linear-gradient(180deg, $blue-light 0px, transparent 70px)
+
+    &.with-search
+        &:after
+            background: linear-gradient(180deg, $blue-light -20px, transparent 70px)
+
+        &.with-header-text
+            &:after
+                background: linear-gradient(180deg, $blue-light 0px, transparent 100px)
+
+    &.show
+        opacity: 1
+        transform: translateY(0) translateX(0) scale(1) !important
+
+    &.show-selected-parallel
+        max-width: max-content
+        max-height: 450px
+        height: 100%
+
+        > div
+            height: calc(100% - 30px)
+            display: block
+
+        .select-options-body
+            height: calc(100% - 60px)
+            width: 100%
+            display: flex
+
+            .content
+                padding-right: 0
+                width: 50%
+                min-width: calc(50% - 9px)
+                transition: max-width 350ms cubic-bezier(.4, .2, 0, 1) 550ms, min-width 350ms cubic-bezier(.4, .2, 0, 1) 550ms
+
+                .empty-listview-background-image
+                    transition: opacity 750ms cubic-bezier(.4, .2, 0, 1)
+                    opacity: 1
+
+                    &.hide
+                        opacity: 0
+
+                &:first-child
+                    padding-left: 15px
+                    margin-left: -15px
+                    direction: rtl
+                    > div
+                        direction: ltr
+
+                .empty-listview-background-image
+                    right: -7.5px
+
+                &:last-child
+                    padding-right: 15px
+
+                .empty-listview-background-image
+                    left: -7.5px
+
+                &._hovered
+                    max-width: calc(80% - 18px)
+                    min-width: calc(80% - 18px)
+
+                &._not-hovered
+                    max-width: 20%
+                    min-width: 20%
+
+                &.hovered
+                    max-width: calc(80% - 18px) !important
+                    min-width: calc(80% - 18px) !important
+
+                &.not-hovered
+                    max-width: 20% !important
+                    min-width: 20% !important
+
+            .vertical-rule
+                margin: 0 15px
+                height: 100%
+                width: 1px
+                padding: 0 1px
+                background: linear-gradient(180deg, transparent 10px, $blue-light 50%, transparent 90%)
