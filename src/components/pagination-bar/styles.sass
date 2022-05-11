@@ -1,0 +1,39 @@
+@import "../../colors"
+@import "../../styles"
+
+.pagination-bar
+    padding: 15px 0
+    width: 100%
+    display: flex
+    justify-content: center
+    @extend .disable-selecting
+
+    .pagination-bar-content
+        width: 100%
+        max-width: 650px
+        display: flex
+        justify-content: space-between
+        align-items: center
+        padding: 5px
+        border-radius: 10px
+        border: 1px solid $grey
+        background-color: $white
+
+        > div
+            display: flex
+            justify-content: center
+            align-items: center
+
+            > p
+                color: $black
+
+            .select
+                margin: 0
+                margin-right: 15px
+
+            .icon-button
+                padding: 20px !important
+
+            &:first-child, &:last-child
+                justify-content: space-between
+                width: 90px

@@ -10,6 +10,7 @@ import Headline from "./components/headline/headline";
 import Checkbox from "./components/checkbox/checkbox";
 import { useStore } from "./hooks-store/store";
 import Messages from "./components/messages/messages";
+import PaginationBar from "./components/pagination-bar/paginationBar";
 
 messagesUpdaterConfig();
 selectOptionsHooksStore();
@@ -85,6 +86,7 @@ export default function App() {
             <div id={"outside"} />
             <SelectOptions />
             <Messages />
+            <PaginationBar />
         </div>
     );
 }
