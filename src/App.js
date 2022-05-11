@@ -11,6 +11,7 @@ import Checkbox from "./components/checkbox/checkbox";
 import { useStore } from "./hooks-store/store";
 import Messages from "./components/messages/messages";
 import PaginationBar from "./components/pagination-bar/paginationBar";
+import Modal from "./components/modal/modal";
 
 messagesUpdaterConfig();
 selectOptionsHooksStore();
@@ -87,6 +88,17 @@ export default function App() {
             <SelectOptions />
             <Messages />
             <PaginationBar />
+            <Modal
+                className={`copy-past-columns`}
+                style={{
+                    width: "auto",
+                    maxWidth: "550px",
+                    minWidth: "350px"
+                }}
+                show={false}
+            >
+                test
+            </Modal>
         </div>
     );
 }
