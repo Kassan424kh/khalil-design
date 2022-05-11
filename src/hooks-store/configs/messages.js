@@ -1,5 +1,6 @@
 import { initStore } from "../store";
 import { v4 as uuidv4 } from "uuid";
+import { useEffect } from "react";
 
 const configureStore = () => {
     const findMessageAfterUUID = (listOfMessages, UUID) => {
@@ -24,38 +25,46 @@ const configureStore = () => {
     const actions = {
         ADD_NEW_MESSAGE: (state, message) => {
             if (
-                message.uuid &&
-                findMessageAfterUUID(
-                    state.messages.listOfMessages,
-                    message.uuid
-                )
+                !message.page ||
+                !state.messages.currentPage ||
+                (message.page &&
+                    state.messages.currentPage &&
+                    message.page === state.messages.currentPage)
             ) {
-                state.messages.listOfMessages = updateMessageAfterUUID(
-                    state.messages.listOfMessages,
-                    message
-                );
-            } else {
-                message = {
-                    ...message,
-                    uuid: message.uuid ?? uuidv4(),
-                    closeImmediately: false,
-                    updatedTimes: 0
-                };
-                state.messages.listOfMessages = [
-                    message,
-                    ...state.messages.listOfMessages.map((message, index) => {
-                        return index < 15
-                            ? message
-                            : {
-                                  ...message,
-                                  closeImmediately: message.dismissible
-                                      ? true
-                                      : false
-                              };
-                    })
-                ];
+                if (
+                    message.uuid &&
+                    findMessageAfterUUID(
+                        state.messages.listOfMessages,
+                        message.uuid
+                    )
+                ) {
+                    state.messages.listOfMessages = updateMessageAfterUUID(
+                        state.messages.listOfMessages,
+                        message
+                    );
+                } else {
+                    message = {
+                        ...message,
+                        uuid: message.uuid ?? uuidv4(),
+                        closeImmediately: false,
+                        updatedTimes: 0
+                    };
+                    state.messages.listOfMessages = [
+                        message,
+                        ...state.messages.listOfMessages.map(
+                            (message, index) => {
+                                return index < 5
+                                    ? message
+                                    : {
+                                          ...message,
+                                          closeImmediately: !!message.dismissible
+                                      };
+                            }
+                        )
+                    ];
+                }
+                state.messages.updatedTimes = state.messages.updatedTimes + 1;
             }
-            state.messages.updatedTimes = state.messages.updatedTimes + 1;
 
             return { ...state };
         },
@@ -92,6 +101,24 @@ const configureStore = () => {
             state.messages.updatedTimes = state.messages.updatedTimes + 1;
             return { ...state };
         },
+
+        CLOSE_OTHER_PAGE_MESSAGES_IMMEDIATELY: (state, currentPage) => {
+            state.messages.currentPage = currentPage;
+            state.messages.listOfMessages = state.messages.listOfMessages.map(
+                (message) => {
+                    if (message.page !== currentPage) {
+                        return {
+                            ...message,
+                            closeImmediately: message.dismissible ? true : false
+                        };
+                    }
+                    return message;
+                }
+            );
+            state.messages.updatedTimes = state.messages.updatedTimes + 1;
+            return { ...state };
+        },
+
         DELETE_MESSAGE_BY_UUID: (state, messageUuid) => {
             state.messages.listOfMessages = state.messages.listOfMessages.filter(
                 (message) => message.uuid !== messageUuid
@@ -107,6 +134,7 @@ const configureStore = () => {
     };
     initStore(actions, {
         messages: {
+            currentPage: "",
             listOfMessages: [],
             closeMessageAutomatically: false,
             updatedTimes: 0
