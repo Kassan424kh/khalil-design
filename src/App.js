@@ -14,6 +14,7 @@ import PaginationBar from "./components/pagination-bar/paginationBar";
 import Modal from "./components/modal/modal";
 import Nav from "./components/nav/nav";
 import Theme from "./_themes";
+import Switcher from "./components/switcher/switcher";
 
 messagesUpdaterConfig();
 selectOptionsHooksStore();
@@ -106,6 +107,8 @@ export default function App() {
             >
                 test
             </Modal>
+
+            <Switcher />
         </div>
     );
 }

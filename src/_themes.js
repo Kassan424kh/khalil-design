@@ -1,4 +1,5 @@
-import Cookies from "js-cookie";
+//import ErrorImageLight from '/static/error/error_light.png'
+//import ErrorImageDark from '/static/error/error_dark.png'
 
 export default class Theme {
     static updateColorVariable = (key, newColor) =>
@@ -9,49 +10,49 @@ export default class Theme {
         Theme.updateColorVariable("--theme", dark ? "" : "light");
 
         // HEX Codes
-        Theme.updateColorVariable("--white", dark ? "#010409" : "#fff");
+        Theme.updateColorVariable("--white", dark ? "#010409" : "#EBEBEB");
         Theme.updateColorVariable("--black", dark ? "#c9d1d9" : "#333");
 
-        Theme.updateColorVariable("--grey", dark ? "#30363d" : "#eaedee");
+        Theme.updateColorVariable("--grey", dark ? "#30363d" : "#939393");
         Theme.updateColorVariable("--green", dark ? "#00d980" : "#00C071");
         Theme.updateColorVariable("--red", dark ? "#ff5a68" : "#FF4553");
         Theme.updateColorVariable("--blue", dark ? "#007aef" : "#0066C9");
         Theme.updateColorVariable("--yellow", dark ? "#ffb624" : "#ffab00");
         Theme.updateColorVariable("--orange", dark ? "#ff8724" : "#ff7300");
 
-        Theme.updateColorVariable("--grey-light", dark ? "#070707" : "#ededed");
+        Theme.updateColorVariable("--grey-light", dark ? "#070707" : "#c3c3c3");
         Theme.updateColorVariable(
             "--green-light",
-            dark ? "#002315" : "#f3fffa"
+            dark ? "#002315" : "#dbe9e3"
         );
-        Theme.updateColorVariable("--red-light", dark ? "#3b0003" : "#ffe1ea");
-        Theme.updateColorVariable("--blue-light", dark ? "#001123" : "#e6f4ff");
+        Theme.updateColorVariable("--red-light", dark ? "#3b0003" : "#e3c9d1");
+        Theme.updateColorVariable("--blue-light", dark ? "#001123" : "#cfdce6");
         Theme.updateColorVariable(
             "--yellow-light",
-            dark ? "#211600" : "#fff9f1"
+            dark ? "#211600" : "#e7e1d5"
         );
         Theme.updateColorVariable(
             "--orange-light",
-            dark ? "#1a0b00" : "#fff4eb"
+            dark ? "#1a0b00" : "#dfd4cb"
         );
 
-        Theme.updateColorVariable("--grey-dark", dark ? "#ededed" : "#616161");
-        Theme.updateColorVariable("--green-dark", dark ? "#f3fffa" : "#00492c");
-        Theme.updateColorVariable("--red-dark", dark ? "#ffebf0" : "#67010a");
-        Theme.updateColorVariable("--blue-dark", dark ? "#e6f4ff" : "#01376e");
+        Theme.updateColorVariable("--grey-dark", dark ? "#c3c3c3" : "#3e3e3e");
+        Theme.updateColorVariable("--green-dark", dark ? "#dbe9e3" : "#00492c");
+        Theme.updateColorVariable("--red-dark", dark ? "#e3c9d1" : "#67010a");
+        Theme.updateColorVariable("--blue-dark", dark ? "#cfdce6" : "#01376e");
         Theme.updateColorVariable(
             "--yellow-dark",
-            dark ? "#fff9f1" : "#312100"
+            dark ? "#e7e1d5" : "#312100"
         );
         Theme.updateColorVariable(
             "--orange-dark",
-            dark ? "#fff4eb" : "#401b00"
+            dark ? "#dfd4cb" : "#401b00"
         );
 
         // RGB
         Theme.updateColorVariable(
             "--white-rgb",
-            dark ? "1, 4, 9" : "255, 255, 255"
+            dark ? "1, 4, 9" : "235, 235, 235"
         );
         Theme.updateColorVariable(
             "--black-rgb",
@@ -134,13 +135,24 @@ export default class Theme {
         );
 
         // Else Colors
+        Theme.updateColorVariable("--base-color", dark ? "#FFC3D4" : "#FF728C");
         Theme.updateColorVariable(
-            "--selection-color",
-            dark ? "#004793" : "#80ffca"
+            "--base-color-accent",
+            dark ? "#FF9EBA" : "#FF89AB"
         );
         Theme.updateColorVariable(
+            "--base-color-rgb",
+            dark ? "255, 192, 212" : "255, 93, 139"
+        );
+        Theme.updateColorVariable(
+            "--base-color-accent-rgb",
+            dark ? "255, 158, 186" : "255, 137, 171"
+        );
+
+        Theme.updateColorVariable("--selection-color", "#FFC3D4");
+        Theme.updateColorVariable(
             "--border-color",
-            dark ? "#30363d" : "#e0e0e0"
+            dark ? "#30363d" : "#C8C8C8"
         );
         Theme.updateColorVariable(
             "--filter-text-background-color",
@@ -156,7 +168,7 @@ export default class Theme {
         );
         Theme.updateColorVariable(
             "--nav-background-color",
-            dark ? "#010409" : "#fff"
+            dark ? "#010409" : "#EBEBEB"
         );
         Theme.updateColorVariable(
             "--nav-box-shadow-color",
@@ -164,7 +176,7 @@ export default class Theme {
         );
         Theme.updateColorVariable(
             "--nav-border-color",
-            dark ? "#007aef" : "transparent"
+            dark ? "#FFC3D4" : "#C8C8C8"
         );
         Theme.updateColorVariable(
             "--text-field-button-border-color",
@@ -174,6 +186,8 @@ export default class Theme {
             "--text-field-button-border-alpha",
             dark ? "0.5" : "0"
         );
+
+        //Theme.updateColorVariable('--error-page-image', `url(${dark ? ErrorImageDark : ErrorImageLight})`)
     };
 
     static lightTheme = () => Theme.themes();
