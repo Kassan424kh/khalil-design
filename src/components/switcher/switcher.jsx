@@ -7,7 +7,8 @@ const Switcher = ({
     rightColor,
     rightIcon,
     onSwitch,
-    value
+    value,
+    vertical
 }) => {
     const [active, setActive] = useState(value);
 
@@ -17,7 +18,7 @@ const Switcher = ({
 
     return (
         <div
-            className={"switcher"}
+            className={`switcher ${vertical ? "vertical" : ""}`}
             onClick={() => {
                 setActive((a) => !a);
             }}

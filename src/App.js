@@ -108,7 +108,7 @@ export default function App() {
                 test
             </Modal>
 
-            <Switcher />
+            <Switcher vertical />
         </div>
     );
 }
