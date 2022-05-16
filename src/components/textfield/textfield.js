@@ -10,9 +10,6 @@ const TextField = (props) => {
 
     const inputValue = typeof props.value === "undefined" ? value : props.value;
 
-    const withValueLimit = ({ floatValue }) =>
-        !floatValue || (floatValue >= 0.0 && floatValue <= 999.9999);
-
     return (
         <div
             className={`textfield ${props.className ?? ""} ${

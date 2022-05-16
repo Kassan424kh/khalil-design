@@ -26,7 +26,7 @@ export default function App() {
     }, []);
 
     const dispatch = useStore(true)[1];
-    const alert = async ({
+    const alertMessage = async ({
         message,
         status,
         dismissible = true,
@@ -53,7 +53,7 @@ export default function App() {
             <Headline icon={"check"} text={"Editable Headline"} />
             <Button
                 onClick={() => {
-                    alert({
+                    alertMessage({
                         message: "test",
                         status: "success"
                     });
