@@ -13,14 +13,18 @@ const Switcher = ({
     const [active, setActive] = useState(value);
 
     useEffect(() => {
-        if (onSwitch) onSwitch(active);
-    }, [active]);
+        setActive(value);
+    }, [value]);
 
     return (
         <div
             className={`switcher ${vertical ? "vertical" : ""}`}
             onClick={() => {
-                setActive((a) => !a);
+                setActive((a) => {
+                    const _active = !a;
+                    if (onSwitch) onSwitch(_active);
+                    return _active;
+                });
             }}
         >
             <span

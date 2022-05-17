@@ -2,14 +2,12 @@ import React, { useRef } from "react";
 import { useContainerDimensions } from "../../../services/useContainerDimensions";
 import "./styles.sass";
 
-import ProfileImage from "/public//profile-image.png";
-
 const NavUser = (props) => {
     return (
         <div className={`cht-user  ${props.open ? "open" : ""}`}>
             <div
                 className={`cht-user-image`}
-                style={{ backgroundImage: `url(${ProfileImage})` }}
+                //style={{ backgroundImage: `url(${ProfileImage})` }}
             />
             <div className={"cht-user-name"}>
                 {props.userName

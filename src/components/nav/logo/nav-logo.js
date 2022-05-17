@@ -1,6 +1,5 @@
 import "./styles.sass";
 import React from "react";
-import TvToolLogoSmall from "/public/TV-Tool-render-small.png";
 
 const NavLogo = (props) => {
     return (
