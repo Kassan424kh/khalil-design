@@ -3,6 +3,7 @@ import "./styles.sass";
 import $ from "jquery";
 
 const TabsSwitcher = ({ tabs, onSwitch }) => {
+    const tabSwitcherRef = useRef();
     const tabsRef = useRef({});
     const [selectedTab, setSelectedTab] = useState();
     const [effectPositionAndSize, setEffectPositionAndSize] = useState({
@@ -11,19 +12,27 @@ const TabsSwitcher = ({ tabs, onSwitch }) => {
     });
 
     useEffect(() => {
-        if (tabsRef.current[selectedTab]) {
+        if (tabSwitcherRef.current) {
+        }
+    }, [tabSwitcherRef]);
+
+    useEffect(() => {
+        if (tabsRef.current[selectedTab] && tabSwitcherRef.current) {
+            const $tabSwitcherRef = $(
+                tabSwitcherRef.current
+            )[0].getBoundingClientRect();
             const firstTabData = $(
                 tabsRef.current[selectedTab]
             )[0].getBoundingClientRect();
             setEffectPositionAndSize({
                 width: firstTabData.width - 11,
-                left: firstTabData.left + 4
+                left: firstTabData.left + 4 - $tabSwitcherRef.left
             });
         }
-    }, [tabsRef, selectedTab]);
+    }, [tabsRef, selectedTab, tabSwitcherRef]);
 
     return (
-        <div className={`tabs-switcher`}>
+        <div className={`tabs-switcher`} ref={tabSwitcherRef}>
             {tabs
                 ? Object.entries(tabs).map(([k, v], i) => {
                       return (
@@ -46,7 +55,7 @@ const TabsSwitcher = ({ tabs, onSwitch }) => {
                                   if (onSwitch) onSwitch(k);
                               }}
                           >
-                              {k} {v}
+                              {v}
                           </div>
                       );
                   })
