@@ -119,6 +119,7 @@ export default function App() {
                     tab6: 5,
                     tab7: 5
                 }}
+                disabeldTabs={["tab3"]}
             />
         </div>
     );

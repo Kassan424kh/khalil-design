@@ -10,7 +10,7 @@ export default class Theme {
         Theme.updateColorVariable("--theme", dark ? "" : "light");
 
         // HEX Codes
-        Theme.updateColorVariable("--white", dark ? "#010409" : "#EBEBEB");
+        Theme.updateColorVariable("--white", dark ? "#050f23" : "#EBEBEB");
         Theme.updateColorVariable("--black", dark ? "#c9d1d9" : "#333");
 
         Theme.updateColorVariable("--grey", dark ? "#30363d" : "#939393");

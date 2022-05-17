@@ -2,7 +2,7 @@ import { useReducer, useRef, useState, useEffect } from "react";
 import "./styles.sass";
 import $ from "jquery";
 
-const TabsSwitcher = ({ tabs, onSwitch }) => {
+const TabsSwitcher = ({ tabs, onSwitch, disabeldTabs }) => {
     const tabSwitcherRef = useRef();
     const tabsRef = useRef({});
     const [selectedTab, setSelectedTab] = useState();
@@ -16,19 +16,25 @@ const TabsSwitcher = ({ tabs, onSwitch }) => {
         }
     }, [tabSwitcherRef]);
 
+    const firstRenderTimeout = useRef(1000);
     useEffect(() => {
-        if (tabsRef.current[selectedTab] && tabSwitcherRef.current) {
-            const $tabSwitcherRef = $(
-                tabSwitcherRef.current
-            )[0].getBoundingClientRect();
-            const firstTabData = $(
-                tabsRef.current[selectedTab]
-            )[0].getBoundingClientRect();
-            setEffectPositionAndSize({
-                width: firstTabData.width - 11,
-                left: firstTabData.left + 4 - $tabSwitcherRef.left
-            });
-        }
+        const t = setTimeout(() => {
+            if (tabsRef.current[selectedTab] && tabSwitcherRef.current) {
+                const $tabSwitcherRef = $(
+                    tabSwitcherRef.current
+                )[0].getBoundingClientRect();
+                const firstTabData = $(
+                    tabsRef.current[selectedTab]
+                )[0].getBoundingClientRect();
+                setEffectPositionAndSize({
+                    width: firstTabData.width - 11,
+                    left: firstTabData.left + 4 - $tabSwitcherRef.left
+                });
+                if (firstRenderTimeout.current) firstRenderTimeout.current = 0;
+            }
+        }, firstRenderTimeout.current);
+
+        return () => clearTimeout(t);
     }, [tabsRef, selectedTab, tabSwitcherRef]);
 
     return (
@@ -46,13 +52,23 @@ const TabsSwitcher = ({ tabs, onSwitch }) => {
                               }}
                               className={`tab ${
                                   selectedTab === k ? "selected" : ""
+                              } ${
+                                  disabeldTabs && disabeldTabs.includes(k)
+                                      ? "disabled"
+                                      : ""
                               }`}
                               onLoad={(e) => {
                                   console.log("asdf");
                               }}
                               onClick={(e) => {
-                                  setSelectedTab(k);
-                                  if (onSwitch) onSwitch(k);
+                                  if (
+                                      (disabeldTabs &&
+                                          !disabeldTabs.includes(k)) ||
+                                      !disabeldTabs
+                                  ) {
+                                      setSelectedTab(k);
+                                      if (onSwitch) onSwitch(k);
+                                  }
                               }}
                           >
                               {v}
