@@ -1,0 +1,39 @@
+@import ../../colors
+@import ../../variables
+
+
+.tabs-switcher
+    display: flex
+    justify-content: center
+    align-items: center
+    width: max-content
+    height: max-content
+    border: 1px solid $black
+    border-radius: 10px
+    position: relative
+    @include disable-selecting
+
+    .tab
+        cursor: pointer
+        height: 0
+        width: max-content
+        display: flex
+        justify-content: center
+        align-items: center
+        padding: 25px 20px
+        z-index: 2
+        transition: all 350ms cubic-bezier(.4,.2,0,1) 100ms
+        
+
+        &.selected
+            color: $white
+
+    .background-effect
+        height: calc(100% - 10px)
+        width: 50px
+        left: 5px
+        position: absolute
+        background-color: $black
+        border-radius: 5px
+        z-index: 1
+        transition: all 350ms cubic-bezier(.4,.2,0,1) 100ms

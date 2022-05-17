@@ -15,6 +15,7 @@ import Modal from "./components/modal/modal";
 import Nav from "./components/nav/nav";
 import Theme from "./_themes";
 import Switcher from "./components/switcher/switcher";
+import TabsSwitcher from "./components/tabs-switcher/tabs-switcher";
 
 messagesUpdaterConfig();
 selectOptionsHooksStore();
@@ -107,8 +108,18 @@ export default function App() {
             >
                 test
             </Modal>
-
             <Switcher vertical />
+            <TabsSwitcher
+                tabs={{
+                    tab1: 1,
+                    tab2: 2,
+                    tab3: 3,
+                    tab4: 5,
+                    tab5: 5,
+                    tab6: 5,
+                    tab7: 5
+                }}
+            />
         </div>
     );
 }
