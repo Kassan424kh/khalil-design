@@ -42,10 +42,14 @@
 
 .App
   font-family: $font-family
-  height: 300vh
+  height: 100vh
   width: 100%
   display: flex
   flex-direction: column
+  justify-content: center
+  align-items: center 
+  gap: 50px
+  padding: 50px
 
   .another-position
     height: 100%
@@ -53,6 +57,21 @@
     display: flex
     justify-content: center
     align-items: center
+  
+  .tabs-pages
+    width: 600px
+    min-width: 600px
+    max-width: 600px
+    height: 600px
+    min-width: 600px
+    max-width: 600px
+    border-radius: 10px 
+    border: 1px solid $black
+
+    .tabs-page
+      display: flex
+      justify-content: center
+      align-items: center
     
 .disable-selecting
   -webkit-touch-callout: none 

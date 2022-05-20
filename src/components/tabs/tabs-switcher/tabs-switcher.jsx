@@ -2,7 +2,7 @@ import { useReducer, useRef, useState, useEffect } from "react";
 import "./styles.sass";
 import $ from "jquery";
 
-const TabsSwitcher = ({ tabs, onSwitch, disabeldTabs }) => {
+const TabsSwitcher = ({ tabs, onSwitch, disabeldTabs, startWith }) => {
     const tabSwitcherRef = useRef();
     const tabsRef = useRef({});
     const [selectedTab, setSelectedTab] = useState();
@@ -11,12 +11,7 @@ const TabsSwitcher = ({ tabs, onSwitch, disabeldTabs }) => {
         left: "5px"
     });
 
-    useEffect(() => {
-        if (tabSwitcherRef.current) {
-        }
-    }, [tabSwitcherRef]);
-
-    const firstRenderTimeout = useRef(1000);
+    const firstRenderTimeout = useRef(250);
     useEffect(() => {
         const t = setTimeout(() => {
             if (tabsRef.current[selectedTab] && tabSwitcherRef.current) {
@@ -45,9 +40,26 @@ const TabsSwitcher = ({ tabs, onSwitch, disabeldTabs }) => {
                           <div
                               key={i}
                               ref={(r) => {
-                                  tabsRef.current[k] = r;
-                                  if (!selectedTab && i === 0) {
-                                      setSelectedTab(k);
+                                  if (!disabeldTabs.includes(k)) {
+                                      tabsRef.current[k] = r;
+                                      setSelectedTab((currentSelectedTab) => {
+                                          if (
+                                              !currentSelectedTab &&
+                                              (startWith &&
+                                              !disabeldTabs.includes(
+                                                  startWith
+                                              ) &&
+                                              Object.keys(tabs).includes(
+                                                  startWith
+                                              )
+                                                  ? startWith === k
+                                                  : true)
+                                          ) {
+                                              if (onSwitch) onSwitch(k);
+                                              return k;
+                                          }
+                                          return currentSelectedTab;
+                                      });
                                   }
                               }}
                               className={`tab ${
