@@ -5,7 +5,7 @@
   justify-content: center
   align-items: center
 
-.tv-tool-headline
+.headline
   @extend .center
   justify-content: flex-start
   position: relative
@@ -17,12 +17,12 @@
   .header-icon
     line-height: 100px
     width: 0
-    padding: 0 40px
+    padding: 4px 40px 0 17px
     font-size: 40px
+    color: $black
     @extend .center
 
-
-  .tv-tool-headline-text-input
+  .headline-text-input
     width: max-content
     position: relative
     max-width: calc(100% - 69px * 2)
@@ -67,7 +67,6 @@
       &.show
         opacity: .2
 
-
     > input
       position: absolute
       width: calc(100% + 100px)
@@ -105,8 +104,8 @@
 
     .edit-icon
       transition: all 350ms cubic-bezier(.4, .2, 0, 1)
-      background-color: $white
-      color: $black
+      background-color: $blue-light
+      color: $blue-dark
       box-shadow: 0 0 0 rgba(0, 0, 0, 0)
       border-radius: 10px
       padding: 22px
@@ -145,7 +144,13 @@
           &.check
             left: 59px
 
+
+  &.not-editable
+    .edit-icons
+      pointer-events: none
+
   &.focused
+  //---
 
   &.editable
     input

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import "./styles.sass";
 import $ from "jquery";
 import { useClickOutside } from "../../services/useClickOutside";
@@ -43,19 +43,29 @@ const Headline = (props) => {
         if (!firstTime) {
             setOldText(text);
             setTimeout(() => {
-                if (props.onSubmit) props.onSubmit();
+                if (props.onSubmit) props.onSubmit(text);
                 isSubmitted(true);
             }, 50);
         }
         isFirstTime(false);
     }, [props.save]);
 
-    useClickOutside(myRef, () => {
-        if (text !== oldText && submitted) {
-            isSubmitted(false);
+    useClickOutside(
+        myRef,
+        () => {
+            if (text !== oldText) {
+                isSubmitted(false);
+            }
+            setFocused(false);
+        },
+        [text, oldText]
+    );
+
+    useEffect(() => {
+        if (text === oldText) {
+            isSubmitted(true);
         }
-        setFocused(false);
-    });
+    }, [text, oldText]);
 
     return (
         <div
@@ -63,18 +73,20 @@ const Headline = (props) => {
             onDoubleClick={
                 props.focusOnDoubleClick && !focused ? focusInput : null
             }
-            className={`tv-tool-headline disable-selecting ${
+            className={`headline disable-selecting ${
                 props.editable && focused ? "editable" : ""
-            } ${props.error ? "danger" : ""} ${focused ? "focused" : ""} ${
+            } ${!props.editable ? "not-editable" : ""} ${
+                props.error ? "danger" : ""
+            } ${focused ? "focused" : ""} ${
                 props.className ? props.className : ""
             }`}
         >
-            {props.icon ? (
+            {props.headerIcon ? (
                 <span className={`header-icon material-symbols-outlined`}>
-                    {props.icon}
+                    {props.headerIcon}
                 </span>
             ) : null}
-            <div className={"tv-tool-headline-text-input"}>
+            <div className={"headline-text-input"}>
                 <div className={`hint-text ${props.error ? "show" : ""}`}>
                     &#x200B;
                     {props.error ? props.hintText ?? "Enter name" : props.text}
@@ -169,4 +181,4 @@ const Headline = (props) => {
     );
 };
 
-export default Headline;
+export default memo(Headline);

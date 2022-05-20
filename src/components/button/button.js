@@ -4,7 +4,7 @@ import "./styles.sass";
 const Button = (props) => {
     return (
         <div
-            className={`tv-tool-button disable-selecting${(() => {
+            className={`button disable-selecting${(() => {
                 let _classes = "";
                 if (props.primary) _classes += " primary";
                 if (props.outlined) _classes += " outlined";

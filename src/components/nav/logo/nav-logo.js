@@ -3,7 +3,7 @@ import React from "react";
 
 const NavLogo = (props) => {
     return (
-        <div className={`cht-logo ${props.open ? "open" : ""}`}>
+        <div className={`logo ${props.open ? "open" : ""}`}>
             <LogoSvg />
         </div>
     );

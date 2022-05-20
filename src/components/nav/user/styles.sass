@@ -1,7 +1,7 @@
 @import "../../../variables"
 @import "../../../colors"
 
-.cht-user
+.user
     width: 100%
     display: flex
     flex-direction: column
@@ -9,7 +9,7 @@
     align-items: center
     transition: all $duration $animationCurve
 
-    .cht-user-image
+    .user-image
         width: 30px
         height: 30px
         border-radius: 500px
@@ -18,11 +18,11 @@
         margin: 5px 0
         transition: all $duration $animationCurve
 
-    .cht-user-name
+    .user-name
         display: flex
         color: $black
 
-        .cht-user-name-tile
+        .user-name-tile
             overflow: hidden
             white-space: nowrap
             transition: all $duration $animationCurve
@@ -40,13 +40,13 @@
     &.open
         margin: 15px 0
 
-        .cht-user-image
+        .user-image
             width: 80px
             height: 80px
             margin-bottom: 15px
 
-        .cht-user-name
-            .cht-user-name-tile
+        .user-name
+            .user-name-tile
                 font-size: 20px
                 margin-right: 5px
 

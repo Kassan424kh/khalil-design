@@ -4,12 +4,12 @@ import "./styles.sass";
 
 const NavUser = (props) => {
     return (
-        <div className={`cht-user  ${props.open ? "open" : ""}`}>
+        <div className={`user  ${props.open ? "open" : ""}`}>
             <div
-                className={`cht-user-image`}
+                className={`user-image`}
                 //style={{ backgroundImage: `url(${ProfileImage})` }}
             />
-            <div className={"cht-user-name"}>
+            <div className={"user-name"}>
                 {props.userName
                     ? props.userName.split(".").map((nameTile, index) => {
                           return (
@@ -53,7 +53,7 @@ const Name = ({ index, nameTile, open }) => {
             <div
                 key={keys.openNameTile}
                 ref={(el) => (nameRef.current[keys.openNameTile] = el)}
-                className={`cht-user-name-tile`}
+                className={`user-name-tile`}
                 style={{
                     fontSize: "20px",
                     opacity: 0,
@@ -65,7 +65,7 @@ const Name = ({ index, nameTile, open }) => {
             <div
                 key={keys.closedFirstChar}
                 ref={(el) => (nameRef.current[keys.closedFirstChar] = el)}
-                className={`cht-user-name-tile`}
+                className={`user-name-tile`}
                 style={{
                     fontSize: "12px",
                     opacity: 0,
@@ -76,7 +76,7 @@ const Name = ({ index, nameTile, open }) => {
             </div>
             <div
                 key={keys.nameTile}
-                className={`cht-user-name-tile`}
+                className={`user-name-tile`}
                 style={{
                     maxWidth: open ? nameTileWidth : firstCharWidth - 0.1
                 }}

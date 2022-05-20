@@ -102,7 +102,7 @@ const Nav = (props) => {
     return (
         <div
             ref={myRef}
-            className={`cht-navbar disable-selecting ${
+            className={`navbar disable-selecting ${
                 firstTimeLoading ? "first-time-loading" : ""
             } ${show ? "show" : ""} ${open ? "open" : ""} ${
                 pinned ? "pinned" : ""
@@ -115,14 +115,12 @@ const Nav = (props) => {
             }}
             onClick={() => {}}
         >
-            <div className={`cht-nav`}>
-                <div className={"cht-nav-container"}>
-                    <div className={"cht-nav-content"}>
-                        <div className={"cht-nav-head"}>
+            <div className={`nav`}>
+                <div className={"nav-container"}>
+                    <div className={"nav-content"}>
+                        <div className={"nav-head"}>
                             <div
-                                className={
-                                    "cht-nav-open-close-button icon-button"
-                                }
+                                className={"nav-open-close-button icon-button"}
                                 onClick={() => {
                                     closeSelectOptions();
                                     localStorage.setItem(
@@ -143,7 +141,7 @@ const Nav = (props) => {
                             </a>
                         </div>
                         <NavUser open={open} userName={props.user} />
-                        <div className={"cht-nav-body"}>
+                        <div className={"nav-body"}>
                             <div
                                 className={`top list ${
                                     state.selectOptions.show &&
@@ -206,7 +204,7 @@ const Nav = (props) => {
                 </div>
             </div>
             <div
-                className={`cht-nav-open-button ${show ? "show" : ""} ${
+                className={`nav-open-button ${show ? "show" : ""} ${
                     open ? "open" : ""
                 } ${pinned ? "pinned" : ""}`}
                 onClick={() => {

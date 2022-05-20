@@ -5,7 +5,7 @@ $max-width-close: calc(98px - #{$margin * 2})
 $max-width-open: calc(320px - #{$margin * 2})
 $max-content-width: calc(350px - #{$margin * 6})
 
-.cht-navbar
+.navbar
   position: fixed
   top: 0
   left: calc((#{$margin} + #{$max-width-close}) * -1)
@@ -28,7 +28,7 @@ $max-content-width: calc(350px - #{$margin * 6})
     margin: 0
     padding: 0
 
-  .cht-nav-open-button
+  .nav-open-button
     height: 100px
     width: 30px
     position: relative
@@ -59,7 +59,7 @@ $max-content-width: calc(350px - #{$margin * 6})
           transform: matrix(1, 0, 0, 1, -1302.13, -590.661)
 
 
-  .cht-nav
+  .nav
     width: $max-width-close
     height: calc(100% - #{$margin * 2})
     background-color: $nav-background-color
@@ -86,17 +86,17 @@ $max-content-width: calc(350px - #{$margin * 6})
         background-color: $background-color
         transition: background-color 250ms cubic-bezier(.4, .2, 0, 1)
 
-    .cht-nav-container
+    .nav-container
       height: calc(100% - #{$margin})
       width: calc(100% - #{$margin})
       position: relative
 
-      .cht-nav-content
+      .nav-content
         height: 100%
         display: flex
         flex-direction: column
 
-        .cht-nav-head
+        .nav-head
           width: 100%
           min-height: 95px
           display: flex
@@ -107,7 +107,7 @@ $max-content-width: calc(350px - #{$margin * 6})
           transition: min-height $duration $animationCurve
           overflow: hidden
 
-          .cht-nav-open-close-button
+          .nav-open-close-button
             position: absolute
             right: -1px
             line-height: 0
@@ -115,7 +115,7 @@ $max-content-width: calc(350px - #{$margin * 6})
             > span
               font-size: 20px
 
-        .cht-nav-body
+        .nav-body
           width: 100%
           height: 100%
           display: flex
@@ -324,16 +324,16 @@ $max-content-width: calc(350px - #{$margin * 6})
     animation: firstTimeLoading 1s $animationCurve forwards
 
   &.open
-    .cht-nav
+    .nav
       width: $max-width-open
       box-shadow: 15px 15px 50px rgba($nav-box-shadow-color, .05)
 
-      .cht-nav-container
-        .cht-nav-content
-          .cht-nav-head
+      .nav-container
+        .nav-content
+          .nav-head
             min-height: 45px
 
-          .cht-nav-body
+          .nav-body
             .top
               &.list
                 .list-item
@@ -358,7 +358,7 @@ $max-content-width: calc(350px - #{$margin * 6})
 
   &.show
     left: 0
-    .cht-nav
+    .nav
       box-shadow: 15px 15px 50px rgba($nav-box-shadow-color, .05)
 
 @keyframes firstTimeLoading
