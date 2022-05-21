@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./styles.sass";
 
-const TabsPage = ({ children, selected, before, after }) => {
+const TabsPage = ({ children, selected, before, after, className }) => {
     const [renderChilds, setRenderChilds] = useState(selected);
 
     useEffect(() => {
@@ -21,7 +21,7 @@ const TabsPage = ({ children, selected, before, after }) => {
                 if (before) return "before";
                 else if (after) return "after";
                 return "";
-            })()}`}
+            })()} ${className ?? ""}`}
         >
             {renderChilds ? children : null}
         </div>

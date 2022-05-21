@@ -1,12 +1,17 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom";
+import { BrowserRouter as Router } from "react-router-dom";
+import { createBrowserHistory } from "history";
 
 import App from "./App";
+const history = createBrowserHistory();
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-  rootElement
+    <Router history={history}>
+        <StrictMode>
+            <App />
+        </StrictMode>
+    </Router>,
+    rootElement
 );

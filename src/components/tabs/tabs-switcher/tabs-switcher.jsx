@@ -2,7 +2,7 @@ import { useReducer, useRef, useState, useEffect } from "react";
 import "./styles.sass";
 import $ from "jquery";
 
-const TabsSwitcher = ({ tabs, onSwitch, disabeldTabs, startWith }) => {
+const TabsSwitcher = ({ tabs, onSwitch, disabledTabs, startWith }) => {
     const tabSwitcherRef = useRef();
     const tabsRef = useRef({});
     const [selectedTab, setSelectedTab] = useState();
@@ -11,7 +11,7 @@ const TabsSwitcher = ({ tabs, onSwitch, disabeldTabs, startWith }) => {
         left: "5px"
     });
 
-    const firstRenderTimeout = useRef(250);
+    const firstRenderTimeout = useRef(1000);
     useEffect(() => {
         const t = setTimeout(() => {
             if (tabsRef.current[selectedTab] && tabSwitcherRef.current) {
@@ -40,15 +40,23 @@ const TabsSwitcher = ({ tabs, onSwitch, disabeldTabs, startWith }) => {
                           <div
                               key={i}
                               ref={(r) => {
-                                  if (!disabeldTabs.includes(k)) {
+                                  if (
+                                      (disabledTabs &&
+                                          !disabledTabs.includes(k)) ||
+                                      !disabledTabs
+                                  ) {
                                       tabsRef.current[k] = r;
                                       setSelectedTab((currentSelectedTab) => {
                                           if (
                                               !currentSelectedTab &&
-                                              (startWith &&
-                                              !disabeldTabs.includes(
-                                                  startWith
-                                              ) &&
+                                              (((startWith &&
+                                                  disabledTabs &&
+                                                  !disabledTabs.includes(
+                                                      startWith
+                                                  )) ||
+                                                  (startWith &&
+                                                      !disabledTabs) ||
+                                                  !startWith) &&
                                               Object.keys(tabs).includes(
                                                   startWith
                                               )
@@ -65,18 +73,15 @@ const TabsSwitcher = ({ tabs, onSwitch, disabeldTabs, startWith }) => {
                               className={`tab ${
                                   selectedTab === k ? "selected" : ""
                               } ${
-                                  disabeldTabs && disabeldTabs.includes(k)
+                                  disabledTabs && disabledTabs.includes(k)
                                       ? "disabled"
                                       : ""
                               }`}
-                              onLoad={(e) => {
-                                  console.log("asdf");
-                              }}
                               onClick={(e) => {
                                   if (
-                                      (disabeldTabs &&
-                                          !disabeldTabs.includes(k)) ||
-                                      !disabeldTabs
+                                      (disabledTabs &&
+                                          !disabledTabs.includes(k)) ||
+                                      !disabledTabs
                                   ) {
                                       setSelectedTab(k);
                                       if (onSwitch) onSwitch(k);
