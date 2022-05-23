@@ -2,7 +2,13 @@ import { useReducer, useRef, useState, useEffect } from "react";
 import "./styles.sass";
 import $ from "jquery";
 
-const TabsSwitcher = ({ tabs, onSwitch, disabledTabs, startWith }) => {
+const TabsSwitcher = ({
+    tabs,
+    onSwitch,
+    disabledTabs,
+    startWith,
+    withSwitchArrows
+}) => {
     const tabSwitcherRef = useRef();
     const tabsRef = useRef({});
     const [selectedTab, setSelectedTab] = useState();
@@ -34,6 +40,36 @@ const TabsSwitcher = ({ tabs, onSwitch, disabledTabs, startWith }) => {
 
     return (
         <div className={`tabs-switcher`} ref={tabSwitcherRef}>
+            {withSwitchArrows ? (
+                <div
+                    className="switch-button prev"
+                    onClick={() => {
+                        setSelectedTab((currentSelectedTab) => {
+                            const tabsWithoutDisabled = Object.entries(tabs)
+                                .map((t) => t[0])
+                                .filter((t) =>
+                                    disabledTabs && disabledTabs.length
+                                        ? !disabledTabs.includes(t)
+                                        : t
+                                );
+                            const indexOfCurrentSelectedTab = tabsWithoutDisabled.indexOf(
+                                currentSelectedTab
+                            );
+                            return currentSelectedTab
+                                ? indexOfCurrentSelectedTab > 0
+                                    ? tabsWithoutDisabled[
+                                          indexOfCurrentSelectedTab - 1
+                                      ]
+                                    : tabsWithoutDisabled.at(-1)
+                                : tabsWithoutDisabled.at(-1);
+                        });
+                    }}
+                >
+                    <span className="material-symbols-outlined">
+                        chevron_left
+                    </span>
+                </div>
+            ) : null}
             {tabs
                 ? Object.entries(tabs).map(([k, v], i) => {
                       return (
@@ -99,6 +135,38 @@ const TabsSwitcher = ({ tabs, onSwitch, disabledTabs, startWith }) => {
                     ...effectPositionAndSize
                 }}
             />
+
+            {withSwitchArrows ? (
+                <div
+                    className="switch-button next"
+                    onClick={() => {
+                        setSelectedTab((currentSelectedTab) => {
+                            const tabsWithoutDisabled = Object.entries(tabs)
+                                .map((t) => t[0])
+                                .filter((t) =>
+                                    disabledTabs && disabledTabs.length
+                                        ? !disabledTabs.includes(t)
+                                        : t
+                                );
+                            const indexOfCurrentSelectedTab = tabsWithoutDisabled.indexOf(
+                                currentSelectedTab
+                            );
+                            return currentSelectedTab
+                                ? indexOfCurrentSelectedTab <
+                                  tabsWithoutDisabled.length
+                                    ? tabsWithoutDisabled[
+                                          indexOfCurrentSelectedTab + 1
+                                      ]
+                                    : tabsWithoutDisabled[0]
+                                : tabsWithoutDisabled[0];
+                        });
+                    }}
+                >
+                    <span className="material-symbols-outlined">
+                        navigate_next
+                    </span>
+                </div>
+            ) : null}
         </div>
     );
 };

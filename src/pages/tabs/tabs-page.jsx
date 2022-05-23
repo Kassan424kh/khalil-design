@@ -26,6 +26,7 @@ const Tabs = () => {
                 startWith={"tab2"}
                 disabledTabs={disabledTabs}
                 onSwitch={setSelectedTab}
+                withSwitchArrows
             />
             <TabsPages selectedTab={selectedTab}>
                 {Object.entries(tabsObject).map(([k, v], i) => {

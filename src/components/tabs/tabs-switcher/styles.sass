@@ -12,6 +12,34 @@
     position: relative
     @include disable-selecting
 
+    .switch-button
+        width: 0
+        height: 0
+        padding: 15px
+        display: flex
+        justify-content: center
+        align-items: center
+        position: absolute
+        heigth: 0
+        background-color: red
+        cursor: pointer
+        border-radius: 20px
+        border: 1px solid $black
+        background-color: $grey-light
+
+        &.prev
+            left: -15px
+            transform: translateX(-100%)
+
+        &.next
+            right: -15px
+            transform: translateX(100%)
+
+        span
+            font-size: 20px
+            position: absolute
+            line-height: 0
+
     .tab
         cursor: pointer
         height: 0
@@ -19,14 +47,14 @@
         display: flex
         justify-content: center
         align-items: center
-        padding: 25px 20px
+        padding: 22px 17px
         z-index: 2
-        transition: all 350ms cubic-bezier(.4,.2,0,1) 100ms
+        transition: all 750ms cubic-bezier(.4,.2,0,1) 100ms
         color: $black
 
         &.disabled
             cursor: no-drop
-            opacity: .3       
+            opacity: .3
 
         &.selected
             color: $white
@@ -39,4 +67,4 @@
         background-color: $black
         border-radius: 5px
         z-index: 1
-        transition: all 350ms cubic-bezier(.4,.2,0,1) 100ms
+        transition: all 750ms cubic-bezier(.4,.2,0,1) 100ms
