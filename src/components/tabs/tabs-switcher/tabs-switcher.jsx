@@ -55,13 +55,15 @@ const TabsSwitcher = ({
                             const indexOfCurrentSelectedTab = tabsWithoutDisabled.indexOf(
                                 currentSelectedTab
                             );
-                            return currentSelectedTab
+                            const _newSelected = currentSelectedTab
                                 ? indexOfCurrentSelectedTab > 0
                                     ? tabsWithoutDisabled[
                                           indexOfCurrentSelectedTab - 1
                                       ]
                                     : tabsWithoutDisabled.at(-1)
                                 : tabsWithoutDisabled.at(-1);
+                            if (onSwitch) onSwitch(_newSelected);
+                            return _newSelected;
                         });
                     }}
                 >
@@ -151,7 +153,7 @@ const TabsSwitcher = ({
                             const indexOfCurrentSelectedTab = tabsWithoutDisabled.indexOf(
                                 currentSelectedTab
                             );
-                            return currentSelectedTab
+                            const _newSelected = currentSelectedTab
                                 ? indexOfCurrentSelectedTab <
                                   tabsWithoutDisabled.length
                                     ? tabsWithoutDisabled[
@@ -159,6 +161,9 @@ const TabsSwitcher = ({
                                       ]
                                     : tabsWithoutDisabled[0]
                                 : tabsWithoutDisabled[0];
+
+                            if (onSwitch) onSwitch(_newSelected);
+                            return _newSelected;
                         });
                     }}
                 >
