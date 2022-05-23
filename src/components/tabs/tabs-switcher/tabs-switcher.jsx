@@ -155,7 +155,7 @@ const TabsSwitcher = ({
                             );
                             const _newSelected = currentSelectedTab
                                 ? indexOfCurrentSelectedTab <
-                                  tabsWithoutDisabled.length
+                                  tabsWithoutDisabled.length - 1
                                     ? tabsWithoutDisabled[
                                           indexOfCurrentSelectedTab + 1
                                       ]
