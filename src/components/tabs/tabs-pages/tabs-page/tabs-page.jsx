@@ -9,7 +9,7 @@ const TabsPage = ({ children, selected, before, after, className }) => {
             () => {
                 setRenderChilds(selected);
             },
-            selected ? 0 : 350
+            selected ? 0 : 1000
         );
         return () => clearTimeout(t);
     }, [selected]);
