@@ -28,8 +28,8 @@ const TabsSwitcher = ({
                     tabsRef.current[selectedTab]
                 )[0].getBoundingClientRect();
                 setEffectPositionAndSize({
-                    width: firstTabData.width - 11,
-                    left: firstTabData.left + 4 - $tabSwitcherRef.left
+                    width: firstTabData.width - 12,
+                    left: firstTabData.left + 5 - $tabSwitcherRef.left
                 });
                 if (firstRenderTimeout.current) firstRenderTimeout.current = 0;
             }
