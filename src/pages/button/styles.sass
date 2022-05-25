@@ -1,22 +1,22 @@
 .button-page
     display: flex
+    flex-wrap: wrap
+    justify-content: center
+    align-items: center
     gap: 20px
-    width: max-content
+    width: 100%
+
+    > div
+        display: flex
+        flex-direction: column
+        justify-content: space-between
+        align-items: center
+        gap: 20px
+        width: max-content
 
     .normal-buttons
-        display: flex
-        flex-direction: column
-        justify-content: space-between
-        align-items: center
-        gap: 20px
 
     .icon-buttons
-        display: flex
-        justify-content: space-between
-        align-items: center
-        flex-direction: column
-        gap: 20px
-        padding: 7px
 
     .normal-buttons-with-icons
         @extend .normal-buttons

@@ -12,6 +12,8 @@ const Button = (props) => {
                 if (props.disabled) _classes += " disabled";
                 if (props.withShadow) _classes += " with-shadow";
                 if (props.loading) _classes += " loading";
+                if (!props.children && (props.leftIcon || props.rightIcon))
+                    _classes += " icon-button";
                 // colors
                 if (props.green) _classes += " green";
                 else if (props.grey) _classes += " grey";
@@ -21,17 +23,6 @@ const Button = (props) => {
 
                 return _classes;
             })()}`}
-            style={{
-                padding: `${
-                    props.children && (props.leftIcon || props.rightIcon)
-                        ? "12px"
-                        : "15px"
-                } ${props.children && props.rightIcon ? "22px" : "15px"} ${
-                    props.children && (props.leftIcon || props.rightIcon)
-                        ? "12px"
-                        : "15px"
-                } ${props.children && props.leftIcon ? "20px" : "15px"}`
-            }}
             onClick={!props.disabled && !props.loading ? props.onClick : null}
             {...props.args}
         >
