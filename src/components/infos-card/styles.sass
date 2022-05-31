@@ -12,10 +12,11 @@
     border-radius: 10px
     align-items: stretch
     transition: all 350ms $animationCurve
+    position: relative
 
     .infos-card-headline
         transition: all 350ms $animationCurve
-        border: 1px solid $base-color
+        border: 1px solid $black
         display: flex
         flex-direction: column
         gap: 20px
@@ -24,11 +25,11 @@
         width: 100%
         padding: 30px 0
         font-weight: bold
-        background-color: $base-color-accent
-        color: $base-color
+        background-color: rgba($black-rgb, .1)
+        color: $black
         border-radius: 5px
         @include disable-selecting
-        font-size: 20px
+        font-size: 16px
         line-height: 0
         position: relative
 
@@ -42,7 +43,7 @@
         background-color: $white
         transition: all 350ms $animationCurve
         padding: 15px
-        border: 1px solid $base-color
+        border: 1px solid $black
         border-top: 0
         border-radius: 0 0 10px 10px
         width: calc(100% - 20px)
@@ -50,7 +51,8 @@
         overflow: hidden
 
         .data-header-text
-            color: $base-color
+            transition: all 350ms $animationCurve
+            color: $black
             font-size: 11px
             margin-bottom: 5px
             font-weight: bold
@@ -66,7 +68,16 @@
                 white-space: nowrap
                 margin-bottom: 0
     &:hover
-        transform: scale(1.05)
+        transform: scale(1.03) translateY(-10px)
+
+        .infos-card-headline
+            border-color: $base-color
+            background-color: $base-color-accent
+            color: $base-color
 
         .infos-card-data
-            box-shadow: 0 15px 50px $base-color-accent
+            border-color: $base-color
+            box-shadow: 0 15px 30px rgba($base-color-rgb, .05)
+
+            .data-header-text
+                color: $base-color
