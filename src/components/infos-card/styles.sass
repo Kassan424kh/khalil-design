@@ -6,23 +6,17 @@
     width: 250px
     max-width: 250px
     min-width: 250px
-    overflow: hidden
     display: flex
     flex-direction: column
     justify-content: center
     background-color: $white
-    border: 1px solid $black
     border-radius: 10px
-    margin-bottom: 40px
     align-items: stretch
     transition: all 350ms $animationCurve
 
-    &:hover
-        transform: scale(1.05)
-        box-shadow: 0 15px 50px $base-color-accent
-        border-color: $base-color
-
     .infos-card-headline
+        transition: all 350ms $animationCurve
+        border: 1px solid $base-color   
         display: flex
         flex-direction: column
         gap: 20px
@@ -37,6 +31,7 @@
         @include disable-selecting
         font-size: 20px
         line-height: 0
+        position: relative
 
         &.with-sub-headline
             padding: 20px 0
@@ -45,9 +40,17 @@
             font-size: 10px
 
     .infos-card-data
+        transition: all 350ms $animationCurve
         padding: 20px 10px 10px
+        border: 1px solid $base-color
+        border-top: 0
+        border-radius: 0 0 10px 10px
+        width: calc(100% - 20px)
+        margin: auto
+
 
         .data-header-text
+            
             color: $base-color
             font-size: 11px
             margin-bottom: 5px
@@ -63,3 +66,8 @@
             &.last
                 white-space: nowrap
                 margin-bottom: 0
+    &:hover
+        transform: scale(1.05)
+
+        .infos-card-data
+            box-shadow: 0 15px 50px $base-color-accent

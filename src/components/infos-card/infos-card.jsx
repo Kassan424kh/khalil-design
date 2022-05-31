@@ -1,8 +1,17 @@
+import { cloneElement } from "react";
 import "./styles.sass";
 
-const InfosCard = ({ infosObject, translationObject, className }) => {
+const InfosCard = ({
+    infosObject,
+    translationObject,
+    className,
+    editComponent
+}) => {
     return (
         <div className={`infos-card${className ? " " + className : ""}`}>
+            {editComponent
+                ? cloneElement(editComponent, { infosObject: infosObject })
+                : null}
             <div
                 className={`infos-card-headline ${
                     infosObject.subHeadline ? "with-sub-headline" : ""
