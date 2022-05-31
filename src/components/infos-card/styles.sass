@@ -1,0 +1,65 @@
+@import "../../colors.sass"
+@import "../../variables.sass"
+
+.infos-card
+    padding: 10px
+    width: 250px
+    max-width: 250px
+    min-width: 250px
+    overflow: hidden
+    display: flex
+    flex-direction: column
+    justify-content: center
+    background-color: $white
+    border: 1px solid $black
+    border-radius: 10px
+    margin-bottom: 40px
+    align-items: stretch
+    transition: all 350ms $animationCurve
+
+    &:hover
+        transform: scale(1.05)
+        box-shadow: 0 15px 50px $base-color-accent
+        border-color: $base-color
+
+    .infos-card-headline
+        display: flex
+        flex-direction: column
+        gap: 20px
+        justify-content: space-between
+        align-items: center
+        width: 100%
+        padding: 30px 0
+        font-weight: bold
+        background-color: $base-color-accent
+        color: $base-color
+        border-radius: 5px
+        @include disable-selecting
+        font-size: 20px
+        line-height: 0
+
+        &.with-sub-headline
+            padding: 20px 0
+
+        small
+            font-size: 10px
+
+    .infos-card-data
+        padding: 20px 10px 10px
+
+        .data-header-text
+            color: $base-color
+            font-size: 11px
+            margin-bottom: 5px
+            font-weight: bold
+            @include disable-selecting
+
+        .data-value
+            color: rgba($black-rgb, .8)
+            text-align: right
+            margin-bottom: 15px
+            font-size: 14px
+
+            &.last
+                white-space: nowrap
+                margin-bottom: 0

@@ -135,18 +135,18 @@ export default class Theme {
         );
 
         // Else Colors
-        Theme.updateColorVariable("--base-color", dark ? "#FFC3D4" : "#FF728C");
+        Theme.updateColorVariable("--base-color", dark ? "#f893ba" : "#FF728C");
         Theme.updateColorVariable(
             "--base-color-accent",
-            dark ? "#FF9EBA" : "#FF89AB"
+            dark ? "#34081c" : "#efdfe4"
         );
         Theme.updateColorVariable(
             "--base-color-rgb",
-            dark ? "255, 192, 212" : "255, 93, 139"
+            dark ? "248, 147, 186" : "255, 114, 140"
         );
         Theme.updateColorVariable(
             "--base-color-accent-rgb",
-            dark ? "255, 158, 186" : "255, 137, 171"
+            dark ? "52, 8, 28" : "239, 223, 228"
         );
 
         Theme.updateColorVariable("--selection-color", "#FFC3D4");
