@@ -1,37 +1,52 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Button from "../button/button";
 import "./styles.sass";
 
-const Modal = (props) => {
+const Modal = ({
+    className,
+    show,
+    style,
+    headline,
+    children,
+    cancelIcon,
+    onCancel,
+    cancelText,
+    submitLoading,
+    submitIcon,
+    onSubmit,
+    submitText
+}) => {
     return (
         <div
-            className={`modal disable-selecting ${
-                props.className ? props.className : ""
-            } ${props.show ? "open" : ""}`}
-            style={props.style}
+            className={`modal disable-selecting ${className ? className : ""} ${
+                show ? "open" : ""
+            }`}
+            style={style}
         >
             <div className={`modal-content`}>
                 <div className={"modal-headline"}>
-                    {props.headline ?? "Copy Past Forecast Columns"}
+                    {headline ?? "Copy Past Forecast Columns"}
                 </div>
 
-                <div className={"modal-body"}>{props.children}</div>
+                <div className={"modal-body"}>{children}</div>
 
                 <div className={"modal-bottom-buttons"}>
                     <Button
-                        leftIcon={props.cancelIcon ?? "clear"}
+                        className={"submit-button"}
+                        leftIcon={cancelIcon ?? "clear"}
                         red
-                        onClick={props.onCancel}
+                        onClick={onCancel}
                     >
-                        {props.cancelText ?? "Cancel"}
+                        {cancelText ?? "Cancel"}
                     </Button>
                     <Button
-                        loading={props.submitLoading}
-                        leftIcon={props.submitIcon ?? "check"}
+                        className={"cancle-button"}
+                        loading={submitLoading}
+                        leftIcon={submitIcon ?? "check"}
                         green
-                        onClick={props.onSubmit}
+                        onClick={onSubmit}
                     >
-                        {props.submitText ?? "Submit"}
+                        {submitText ?? "Submit"}
                     </Button>
                 </div>
             </div>

@@ -5,6 +5,7 @@ import Tabs from "./tabs/tabs-page";
 import ButtonPage from "./button/button-page";
 import InfosCardPage from "./infos-card/infos-card-page";
 import FloatingActionButtonsPage from "./floating-action-buttons/floating-action-buttons-page";
+import ModalPage from "./modal/modal-page";
 
 const Pages = () => {
     return (
@@ -12,6 +13,7 @@ const Pages = () => {
             <Route exact path={"/tabs"} element={<Tabs />} />
             <Route exact path={"/button"} element={<ButtonPage />} />
             <Route exact path={"/infos-card"} element={<InfosCardPage />} />
+            <Route exact path={"/modal"} element={<ModalPage />} />
             <Route
                 exact
                 path={"/floating-action-buttons"}

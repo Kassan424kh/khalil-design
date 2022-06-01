@@ -2,20 +2,21 @@
 @import "../../variables"
 
 .modal
-  padding: 15px
+  padding: 20px
   width: 350px
   max-height: 500px
   position: fixed
   box-shadow: 0 0 0 transparent
-  border-radius: 10px
+  border-radius: 20px
   top: 50%
   left: 50%
   opacity: 0
   pointer-events: none
   transform: translateX(-50%) translateY(-50%) scale(.95)
-  transition: all 750ms $animationCurve
+  transition: all 550ms $animationCurve
   background-color: $white
   z-index: 500
+  border: 1px solid $black
 
   &.open
     opacity: 1
@@ -42,12 +43,18 @@
       font-size: 20px
       color: #333
       font-weight: 500
+      @include disable_selecting
 
     .modal-body
-      margin: 15px 15px
+      margin: 15px 0 30px 0
+      font-size: 15px
 
     .modal-bottom-buttons
       width: 100%
       display: flex
       justify-content: space-between
       align-items: center
+
+      .button
+        border: 1px solid
+        border-radius: 10px
