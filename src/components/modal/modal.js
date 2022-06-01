@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../button/button";
 import "./styles.sass";
 
@@ -16,10 +16,32 @@ const Modal = ({
     onSubmit,
     submitText
 }) => {
-    return (
+    const [renderModal, setRenderModal] = useState();
+    const [showModal, setShowModal] = useState();
+
+    useEffect(() => {
+        if (!show) setShowModal(false);
+        const t = setTimeout(
+            () => {
+                setRenderModal(show);
+                if (show)
+                    setTimeout(
+                        () => {
+                            setShowModal(show);
+                        },
+                        show ? 50 : 0
+                    );
+            },
+            show ? 0 : 400
+        );
+
+        return () => clearTimeout(t);
+    }, [show]);
+
+    return renderModal ? (
         <div
             className={`modal disable-selecting ${className ? className : ""} ${
-                show ? "open" : ""
+                showModal ? "open" : ""
             }`}
             style={style}
         >
@@ -51,7 +73,7 @@ const Modal = ({
                 </div>
             </div>
         </div>
-    );
+    ) : null;
 };
 
 export default Modal;
