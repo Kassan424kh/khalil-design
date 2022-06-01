@@ -3,20 +3,34 @@ import Button from "../button/button";
 import "./styles.sass";
 import NumberFormat from "react-number-format";
 
-const TextField = (props) => {
-    const leftIconButton = props.leftIconButton ?? false;
-    const rightIconButton = props.rightIconButton ?? false;
-    const [value, setValue] = useState("");
+const TextField = ({
+    leftIconButton,
+    rightIconButton,
+    value,
+    isInvalid,
+    invalidText,
+    className,
+    beforeComponent,
+    textFieldProps,
+    onChange,
+    suffix,
+    decimalScale,
+    type,
+    afterComponent
+}) => {
+    const _leftIconButton = leftIconButton ?? false;
+    const _rightIconButton = rightIconButton ?? false;
+    const [_value, setValue] = useState("");
 
-    const inputValue = typeof props.value === "undefined" ? value : props.value;
+    const inputValue = typeof value === "undefined" ? _value : value;
 
     return (
         <div
-            className={`textfield ${props.className ?? ""} ${
-                props.isInvalid ? "is-invalid" : ""
+            className={`textfield ${className ?? ""} ${
+                isInvalid ? "is-invalid" : ""
             }`}
         >
-            {props.beforeComponent ?? null}
+            {beforeComponent ?? null}
             {leftIconButton ? (
                 <Button
                     className={`icon-button left ${
@@ -27,80 +41,79 @@ const TextField = (props) => {
                     onClick={leftIconButton.onClick}
                 />
             ) : null}
-            {props.textFieldProps && props.textFieldProps.type === "number" ? (
+            {textFieldProps && textFieldProps.type === "number" ? (
                 <NumberFormat
                     value={value ?? ""}
                     onValueChange={({ floatValue: value }) => {
-                        if (props.onChange) props.onChange(value);
-                        console.log(value);
+                        if (onChange) onChange(value);
                         setValue(value);
                     }}
-                    placeholder={props.textFieldProps.placeholder}
+                    placeholder={textFieldProps.placeholder}
                     className={`textfield-input ${
-                        leftIconButton
-                            ? leftIconButton.onClick
+                        _leftIconButton
+                            ? _leftIconButton.onClick
                                 ? "with-left-icon-button"
                                 : "with-left-icon"
                             : ""
                     } ${
-                        rightIconButton
-                            ? rightIconButton.onClick
+                        _rightIconButton
+                            ? _rightIconButton.onClick
                                 ? "with-right-icon-button"
                                 : "with-right-icon"
                             : ""
                     }`}
                     inputMode="numeric"
-                    suffix={props.suffix}
-                    decimalScale={props.decimalScale}
+                    suffix={suffix}
+                    decimalScale={decimalScale}
                     isAllowed={(values) => {
                         const { formattedValue, floatValue } = values;
                         return (
                             formattedValue === "" ||
-                            floatValue <= (props.textFieldProps.maxInt ?? 10000)
+                            floatValue <= (textFieldProps.maxInt ?? 10000)
                         );
                     }}
                 />
             ) : (
                 <input
-                    type={props.type}
+                    type={type}
                     onWheel={(event) => event.target.blur()}
-                    {...props.textFieldProps}
+                    {...textFieldProps}
                     value={inputValue ?? ""}
                     className={`textfield-input ${
-                        leftIconButton
-                            ? leftIconButton.onClick
+                        _leftIconButton
+                            ? _leftIconButton.onClick
                                 ? "with-left-icon-button"
                                 : "with-left-icon"
                             : ""
                     } ${
-                        rightIconButton
-                            ? rightIconButton.onClick
+                        _rightIconButton
+                            ? _rightIconButton.onClick
                                 ? "with-right-icon-button"
                                 : "with-right-icon"
                             : ""
                     }`}
                     onChange={({ target }) => {
-                        if (target.value !== props.value) {
-                            if (props.onChange) props.onChange(target.value);
+                        if (target.value !== value) {
+                            if (onChange) onChange(target.value);
                             setValue(target.value);
                         }
                     }}
                 />
             )}
-            {rightIconButton ? (
+            {_rightIconButton ? (
                 <Button
                     className={`icon-button right ${
-                        !rightIconButton.onClick ? "only-icon" : ""
+                        !_rightIconButton.onClick ? "only-icon" : ""
                     }`}
                     withShadow
-                    leftIcon={rightIconButton.icon}
-                    onClick={rightIconButton.onClick}
+                    leftIcon={_rightIconButton.icon}
+                    onClick={_rightIconButton.onClick}
                 />
             ) : null}
-            {props.afterComponent ?? null}
-            {props.isInvalid && props.invalidText ? (
+            {afterComponent ?? null}
+            {isInvalid && invalidText ? (
                 <p className={"textfield-invalid-feedback-text"}>
-                    {props.invalidText}
+                    {invalidText}
                 </p>
             ) : null}
         </div>
