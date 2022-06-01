@@ -12,6 +12,7 @@
     transition: all 350ms cubic-bezier(.4,.2,0,1)
     gap: 7px
     position: absolute
+    cursor: pointer
 
     .click-background
         content: ""
@@ -40,6 +41,7 @@
             font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 80
 
     &.active
+        cursor: default
         animation: bloB 3s cubic-bezier(.4,.2,0,1) infinite
 
         .button
@@ -56,7 +58,7 @@
 
                 .button-icon
                     color: $base-color
-    
+
     &:hover
         animation-play-state: paused
 
