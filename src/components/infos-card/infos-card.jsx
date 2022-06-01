@@ -1,4 +1,3 @@
-import { cloneElement } from "react";
 import "./styles.sass";
 
 const InfosCard = ({
@@ -9,9 +8,6 @@ const InfosCard = ({
 }) => {
     return (
         <div className={`infos-card${className ? " " + className : ""}`}>
-            {editComponent
-                ? cloneElement(editComponent, { infosObject: infosObject })
-                : null}
             <div
                 className={`infos-card-headline ${
                     infosObject.subHeadline ? "with-sub-headline" : ""
@@ -47,6 +43,8 @@ const InfosCard = ({
                         );
                     })}
             </div>
+
+            {editComponent ? editComponent : null}
         </div>
     );
 };
