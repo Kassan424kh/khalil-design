@@ -22,19 +22,20 @@
     z-index: 9999999999
     transform: translateY(30px)
     overflow: hidden
+    @include disable_selecting
 
     > div
         height: calc(100% - 30px)
         display: contents
 
-    .button
+    .tv-tool-button
         box-shadow: 0 5px 20px rgba(0, 0, 0, .04) !important
         border: 1px solid $grey !important
         > span
             color: rgba($black-rgb, .5)
             -webkit-text-stroke: 0 $black
 
-    &:after
+    &:before
         content: " "
         display: block
         position: absolute
@@ -123,27 +124,28 @@
             margin-right: -5px
 
         .select-options-search-field
-            width: calc(100% - 2px)
-            border-radius: 5px
-            line-height: 40px
-            font-size: 15px
-            box-shadow: 0 5px 20px rgba(0, 0, 0, .04)
-            border: 1px solid $grey
-            margin-bottom: 15px
-            padding: 0 10px
-            position: relative
-            z-index: 20
+            input
+                width: calc(100% - 2px)
+                border-radius: 5px
+                line-height: 40px
+                font-size: 15px
+                box-shadow: 0 5px 20px rgba(0, 0, 0, .04)
+                border: 1px solid $grey
+                margin-bottom: 15px
+                padding: 0 10px
+                position: relative
+                z-index: 20
 
     &.with-header-text
-        &:after
+        &:before
             background: linear-gradient(180deg, $blue-light 0px, transparent 70px)
 
     &.with-search
-        &:after
+        &:before
             background: linear-gradient(180deg, $blue-light -20px, transparent 70px)
 
         &.with-header-text
-            &:after
+            &:before
                 background: linear-gradient(180deg, $blue-light 0px, transparent 100px)
 
     &.show
@@ -156,11 +158,10 @@
         height: 100%
 
         > div
-            height: calc(100% - 30px)
             display: block
 
         .select-options-body
-            height: calc(100% - 60px)
+            height: calc(100% - 30px)
             width: 100%
             display: flex
 

@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { defaultSelectOptionsData } from "../../../hooks-store/configs/selectOptionsHooksStore";
 import { useStore } from "../../../hooks-store/store";
 import { useContainerDimensions } from "../../../services/useContainerDimensions";
 import Button from "../../button/button";
+import TextField from "../../textfield/textfield";
 import SelectOption from "./select-option/selectOption";
 import "./styles.sass";
 import { useClickOutside } from "../../../services/useClickOutside";
@@ -88,14 +89,31 @@ const SelectOptions = () => {
         selectOptionsData.options
     ]);
 
-    const foundOptions = (searchText, option, searchEveryWare = false) => {
-        return !searchText
-            .toUpperCase()
-            .split(" ")
-            .filter((word) => word)
-            .some(
-                (r) =>
-                    option[1]
+    const foundOptions = useCallback(
+        (searchText, option, searchEveryWare = false) => {
+            return !searchText
+                .toUpperCase()
+                .split(" ")
+                .filter((word) => word)
+                .some((r) => {
+                    const optionWasSelected = selectOptionsData.selectedOption.filter(
+                        (selectedOption) => selectedOption[0] === option[0]
+                    ).length;
+
+                    if (
+                        selectOptionsData.multiSelect &&
+                        selectOptionsData.showSelectedParallel &&
+                        selectOptionsData.filterOnly
+                    )
+                        if (
+                            (optionWasSelected &&
+                                selectOptionsData.filterOnly === "selected") ||
+                            (!optionWasSelected &&
+                                selectOptionsData.filterOnly === "unselected")
+                        )
+                            return true;
+
+                    return option[1]
                         .toString()
                         .toUpperCase()
                         .split(" ")
@@ -106,9 +124,11 @@ const SelectOptions = () => {
                             } else {
                                 return word.startsWith(r) ? word : "";
                             }
-                        }).length
-            );
-    };
+                        }).length;
+                });
+        },
+        [selectOptionsData.selectedOption]
+    );
 
     const stylePositionBetweenTopAndBottom = (
         topHiddenNummber,
@@ -523,18 +543,18 @@ const SelectOptions = () => {
                                     }}
                                 />
                             ) : null}
-                            <input
-                                className={"select-options-search-field"}
+                            <TextField
+                                className="select-options-search-field"
                                 value={searchText}
-                                ref={(input) => input && input.focus()}
-                                placeholder={
-                                    selectOptionsData.searchPlaceHolder ??
-                                    "finde options"
-                                }
-                                onChange={({ target }) => {
-                                    setSearchText(target.value);
+                                textFieldProps={{
+                                    ref: (input) => input && input.focus(),
+                                    placeholder:
+                                        selectOptionsData.searchPlaceHolder ??
+                                        "finde options"
                                 }}
+                                onChange={setSearchText}
                             />
+
                             {selectOptionsData.enableCloseButton &&
                             selectOptionsData.multiSelect ? (
                                 <Button

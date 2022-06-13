@@ -8,8 +8,42 @@ import { useClickOutside } from "../../services/useClickOutside";
 import _ from "underscore";
 import { useStore } from "../../hooks-store/store";
 
-const Select = (props) => {
-    const [options, setOptions] = useState([]);
+const Select = ({
+    className,
+    getSelectId,
+    open,
+    close,
+    multiSelect,
+    defaultAllSelected,
+    options,
+    updatePosition,
+    onActive,
+    onSelect,
+    selected,
+    clearAllOptions,
+    toggleAllOptions,
+    selectAllOptions,
+    enableSelectedStatusDot,
+    showSelectedParallel,
+    selectOptionsClassName,
+    headerText,
+    enableSearch,
+    filterOnly,
+    searchPlaceHolder,
+    enableSelectAllButton,
+    enableCloseButton,
+    closeButtonText,
+    top,
+    bottom,
+    left,
+    right,
+    searchEveryWare,
+    defaultOption,
+    defaultOptionText,
+    sort,
+    children
+}) => {
+    const [_options, _setOptions] = useState([]);
     const selectId = useState(uuidv4())[0];
     const [click, setClick] = useState();
     const [hover, setHover] = useState();
@@ -18,16 +52,16 @@ const Select = (props) => {
     const dispatch = useStore(false)[1];
 
     useEffect(() => {
-        if (props.getSelectId) props.getSelectId(selectId);
+        if (getSelectId) getSelectId(selectId);
     }, []);
 
     useEffect(() => {
-        if (props.open) {
+        if (open) {
             setClick(Date.now());
             setHover(Date.now());
             setShowOptions(true);
         }
-    }, [props.open]);
+    }, [open]);
 
     const closeSelectOptions = () => {
         dispatch("UPDATE_DATA", {
@@ -37,11 +71,11 @@ const Select = (props) => {
     };
 
     useEffect(() => {
-        if (props.close) {
+        if (close) {
             closeSelectOptions();
             setShowOptions(false);
         }
-    }, [props.close]);
+    }, [close]);
 
     useEffect(() => {
         if (state.selectOptions.selectId !== selectId) {
@@ -56,41 +90,38 @@ const Select = (props) => {
     ] = useState();
     const myRef = useRef([]);
     const [selectedOption, setSelectedOption] = useState(
-        props.multiSelect && props.defaultAllSelected
-            ? Object.entries(props.options).map((option) => [
-                  option[0],
-                  option[1]
-              ])
+        multiSelect && defaultAllSelected
+            ? Object.entries(_options).map((option) => [option[0], option[1]])
             : []
     );
     const [selectMouseEnter, setSelectMouseEnter] = useState(false);
     const selectButtonProperties = useContainerDimensions({
         ref: myRef,
         id: 0,
-        update: [props.updatePosition, selectMouseEnter]
+        update: [updatePosition, selectMouseEnter]
     });
 
     useEffect(() => {
-        if (JSON.stringify(props.options) !== JSON.stringify(options))
-            setOptions(props.options);
-    }, [props.options]);
+        if (JSON.stringify(options) !== JSON.stringify(_options))
+            _setOptions(options);
+    }, [options]);
 
     useEffect(() => {
-        if (props.onActive) props.onActive(showOptions);
+        if (onActive) onActive(showOptions);
     }, [showOptions]);
 
     useEffect(() => {
-        if (props.onSelect) props.onSelect(selectedOption);
+        if (onSelect) onSelect(selectedOption);
         setLastTimeUpdatedSelectedOptions(Date.now());
     }, [selectedOption]);
 
     const oldSelected = useRef([]);
     useEffect(() => {
-        if (props.selected && !_.isEqual(oldSelected.current, props.selected)) {
-            setSelectedOption(props.selected);
-            oldSelected.current = props.selected;
+        if (selected && !_.isEqual(oldSelected.current, selected)) {
+            setSelectedOption(selected);
+            oldSelected.current = selected;
         }
-    }, [props.selected]);
+    }, [selected]);
 
     let firstLoading2 = useRef(true);
     useEffect(() => {
@@ -98,35 +129,32 @@ const Select = (props) => {
             setSelectedOption([]);
         }
         if (firstLoading2.current) firstLoading2.current = false;
-    }, [props.clearAllOptions]);
+    }, [clearAllOptions]);
 
     let firstLoading3 = useRef(true);
     useEffect(() => {
-        if (!firstLoading3.current && props.multiSelect) {
+        if (!firstLoading3.current && multiSelect) {
             setSelectedOption(
-                selectedOption.length === Object.entries(props.options).length
+                selectedOption.length === Object.entries(options).length
                     ? []
-                    : Object.entries(props.options).map((option) => [
+                    : Object.entries(options).map((option) => [
                           option[0],
                           option[1]
                       ])
             );
         }
         if (firstLoading3.current) firstLoading3.current = false;
-    }, [props.toggleAllOptions]);
+    }, [toggleAllOptions]);
 
     let firstLoading4 = useRef(true);
     useEffect(() => {
-        if (!firstLoading4.current && props.multiSelect) {
+        if (!firstLoading4.current && multiSelect) {
             setSelectedOption(
-                Object.entries(props.options).map((option) => [
-                    option[0],
-                    option[1]
-                ])
+                Object.entries(options).map((option) => [option[0], option[1]])
             );
         }
         if (firstLoading4.current) firstLoading4.current = false;
-    }, [props.selectAllOptions]);
+    }, [selectAllOptions]);
 
     useClickOutside({ current: myRef.current[0] }, (e) => {
         const $selectOptions = $(".select-options");
@@ -156,9 +184,9 @@ const Select = (props) => {
             ref={(ele) => (myRef.current[0] = ele)}
             id={selectId}
             className={`select disable-selecting ${
-                props.className ? props.className : ""
+                className ? className : ""
             } ${showOptions ? " active" : ""} ${
-                selectedOption.length && props.enableSelectedStatusDot
+                selectedOption.length && enableSelectedStatusDot
                     ? "options-selected"
                     : ""
             }`}
@@ -196,44 +224,43 @@ const Select = (props) => {
                     }, 150);
                 }}
             >
-                {props.children}{" "}
+                {children}{" "}
             </div>
             {click ? (
                 <SelectOptionsDataTransmitter
                     selectId={selectId}
-                    showSelectedParallel={
-                        props.showSelectedParallel && props.multiSelect
-                    }
+                    showSelectedParallel={showSelectedParallel && multiSelect}
                     selectMouseEnter={hover}
                     clicked={click}
-                    className={props.selectOptionsClassName}
-                    headerText={props.headerText}
-                    enableSearch={props.enableSearch}
-                    searchPlaceHolder={props.searchPlaceHolder}
-                    enableSelectAllButton={props.enableSelectAllButton}
-                    enableCloseButton={props.enableCloseButton}
-                    closeButtonText={props.closeButtonText}
+                    className={selectOptionsClassName}
+                    headerText={headerText}
+                    enableSearch={enableSearch}
+                    filterOnly={filterOnly}
+                    searchPlaceHolder={searchPlaceHolder}
+                    enableSelectAllButton={enableSelectAllButton}
+                    enableCloseButton={enableCloseButton}
+                    closeButtonText={closeButtonText}
                     selectButtonProperties={selectButtonProperties}
-                    show={showOptions && !props.close}
+                    show={showOptions && !close}
                     setShow={setShowOptions}
-                    top={props.top}
-                    bottom={props.bottom}
-                    left={props.left}
-                    right={props.right}
+                    top={top}
+                    bottom={bottom}
+                    left={left}
+                    right={right}
                     updateOptionsProperties={updateOptionsProperties}
-                    options={options}
-                    multiSelect={props.multiSelect}
+                    options={_options}
+                    multiSelect={multiSelect}
                     selectedOption={selectedOption}
                     setSelectedOption={setSelectedOption}
-                    searchEveryWare={props.searchEveryWare}
+                    searchEveryWare={searchEveryWare}
                     lastTimeUpdatedSelectedOptions={
                         lastTimeUpdatedSelectedOptions
                     }
-                    defaultOption={props.defaultOption}
-                    defaultOptionText={props.defaultOptionText}
-                    updatePosition={props.updatePosition}
+                    defaultOption={defaultOption}
+                    defaultOptionText={defaultOptionText}
+                    updatePosition={updatePosition}
                     clearSelectedOptions={""}
-                    sort={props.sort}
+                    sort={sort}
                 />
             ) : null}
         </div>

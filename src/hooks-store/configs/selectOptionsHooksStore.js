@@ -7,6 +7,7 @@ export const defaultSelectOptionsData = {
         className: undefined,
         headerText: undefined,
         enableSearch: false,
+        filterOnly: undefined,
         searchPlaceHolder: null,
         enableSelectAllButton: false,
         selectButtonProperties: {

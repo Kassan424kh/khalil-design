@@ -1,7 +1,11 @@
 import "./styles.sass";
+import { useState } from "react";
+import TabsPage from "../../components/tabs/tabs-pages/tabs-page/tabs-page";
+import TabsPages from "../../components/tabs/tabs-pages/tabs-pages";
+import TabsSwitcher from "../../components/tabs/tabs-switcher/tabs-switcher";
 import InfosCard from "../../components/infos-card/infos-card";
 
-const InfosCardPage = () => {
+const LoadingAnimationPage = () => {
     const infosObject = {
         id: "4",
         headline: "headline",
@@ -33,4 +37,4 @@ const InfosCardPage = () => {
     );
 };
 
-export default InfosCardPage;
+export default LoadingAnimationPage;
