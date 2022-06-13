@@ -106,9 +106,9 @@ const SelectOptions = () => {
                         selectOptionsData.filterOnly
                     )
                         if (
-                            (optionWasSelected &&
-                                selectOptionsData.filterOnly === "selected") ||
                             (!optionWasSelected &&
+                                selectOptionsData.filterOnly === "selected") ||
+                            (optionWasSelected &&
                                 selectOptionsData.filterOnly === "unselected")
                         )
                             return true;
