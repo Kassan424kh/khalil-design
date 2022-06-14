@@ -16,7 +16,8 @@ const TextField = ({
     suffix,
     decimalScale,
     type,
-    afterComponent
+    afterComponent,
+    richText
 }) => {
     const _leftIconButton = leftIconButton ?? false;
     const _rightIconButton = rightIconButton ?? false;

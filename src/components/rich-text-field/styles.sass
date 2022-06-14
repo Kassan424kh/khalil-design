@@ -1,0 +1,64 @@
+
+@import ../../colors
+@import ../../variables
+
+.rich-text-field
+    width: max-content
+    max-width: 500px
+    height: max-content
+    max-height: 500px
+    border: 1px solid $black
+    border-radius: 0 0 10px 10px
+    cursor: text
+    position: relative
+    display: flex
+    flex-direction: column
+    justify-content: center
+    margin-top: 54px
+
+    .rich-text-field-controll-buttons
+        display: flex
+        align-items: center
+        justify-content: center
+        border: 1px solid $black
+        position: relative
+        top: 0
+        left: -1px
+        padding: 10px 
+        gap: 10px
+        transform: translateY(-100%)
+        width: max-content
+        border-radius: 10px 10px 0 0
+        border-bottom: 0
+        width: calc(100% + 2px)
+
+        .RichEditor-controls
+            display: flex
+            gap: 10px
+            justify-content: center
+            align-items: center
+            color: $black
+
+                        
+            .RichEditor-styleButton
+                font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 45
+                background-color: rgba($black-rgb, .1)
+                padding: 5px
+                border-radius: 5px
+                cursor: pointer
+
+                &.RichEditor-activeButton
+                    background-color: rgba($base-color-rgb, .1)
+                    color: $base-color
+
+    .DraftEditor-root
+        margin: 15px
+        margin-top: -40px
+        margin-right: 0
+        padding-right: 15px 
+        overflow: auto
+        width: max-content
+        min-width: 250px
+        max-width: calc(100% - 15px)
+        height: calc(100% - 30px)
+        max-height: 500px - 30px
