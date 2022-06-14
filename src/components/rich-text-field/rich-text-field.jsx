@@ -3,7 +3,7 @@ import { Editor, EditorState, RichUtils } from "draft-js";
 import "draft-js/dist/Draft.css";
 import "./styles.sass";
 
-const RichTextfield = ({ className, value, onChange }) => {
+const RichTextfield = ({ className, value, onChange, readOnly }) => {
     const ref = useRef();
     const [_value, _setValue] = useState(
         () => value ?? EditorState.createEmpty()
@@ -23,23 +23,27 @@ const RichTextfield = ({ className, value, onChange }) => {
 
     return (
         <div
-            className={`rich-text-field ${className}`}
+            className={`rich-text-field ${className} ${
+                readOnly ? "read-only" : ""
+            }`}
             onClick={() => {
                 if (ref) {
                     ref.current.focus();
                 }
             }}
         >
-            <div className="rich-text-field-control-buttons">
-                <BlockStyleControls
-                    editorState={_value}
-                    onToggle={toggleBlockType}
-                />
-                <InlineStyleControls
-                    editorState={_value}
-                    onToggle={toggleInlineStyle}
-                />
-            </div>
+            {!readOnly ? (
+                <div className="rich-text-field-control-buttons">
+                    <BlockStyleControls
+                        editorState={_value}
+                        onToggle={toggleBlockType}
+                    />
+                    <InlineStyleControls
+                        editorState={_value}
+                        onToggle={toggleInlineStyle}
+                    />
+                </div>
+            ) : null}
 
             <Editor
                 editorState={_value}
@@ -47,6 +51,7 @@ const RichTextfield = ({ className, value, onChange }) => {
                     _setValue(v);
                     if (onChange) onChange(v);
                 }}
+                readOnly={readOnly}
                 ref={ref}
             />
         </div>
