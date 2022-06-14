@@ -1,12 +1,24 @@
 import { useRef, useState } from "react";
-import { Editor, EditorState, RichUtils } from "draft-js";
+import {
+    Editor,
+    EditorState,
+    RichUtils,
+    convertFromRaw,
+    convertToRaw
+} from "draft-js";
 import "draft-js/dist/Draft.css";
 import "./styles.sass";
 
 const RichTextfield = ({ className, value, onChange, readOnly }) => {
     const ref = useRef();
-    const [_value, _setValue] = useState(
-        () => value ?? EditorState.createEmpty()
+    const [_value, _setValue] = useState(() =>
+        value
+            ? readOnly
+                ? EditorState.createWithContent(
+                      convertFromRaw(JSON.parse(value))
+                  )
+                : value
+            : EditorState.createEmpty()
     );
 
     const toggleBlockType = (blockType) => {
@@ -49,7 +61,10 @@ const RichTextfield = ({ className, value, onChange, readOnly }) => {
                 editorState={_value}
                 onChange={(v) => {
                     _setValue(v);
-                    if (onChange) onChange(v);
+                    if (onChange)
+                        onChange(
+                            JSON.stringify(convertToRaw(v.getCurrentContent()))
+                        );
                 }}
                 readOnly={readOnly}
                 ref={ref}
@@ -57,25 +72,6 @@ const RichTextfield = ({ className, value, onChange, readOnly }) => {
         </div>
     );
 };
-
-// Custom overrides for "code" style.
-const styleMap = {
-    CODE: {
-        backgroundColor: "rgba(0, 0, 0, 0.05)",
-        fontFamily: '"Inconsolata", "Menlo", "Consolas", monospace',
-        fontSize: 16,
-        padding: 2
-    }
-};
-
-function getBlockStyle(block) {
-    switch (block.getType()) {
-        case "blockquote":
-            return "RichEditor-blockquote";
-        default:
-            return null;
-    }
-}
 
 const StyleButton = ({ label, active, onToggle, style }) => {
     const _onToggle = (e) => {
