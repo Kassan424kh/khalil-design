@@ -10,15 +10,15 @@ const RichTextfield = ({ className, value, onChange }) => {
     );
 
     const toggleBlockType = (blockType) => {
-        const editdValue = RichUtils.toggleBlockType(_value, blockType);
-        _setValue(editdValue);
-        if (onChange) onChange(editdValue);
+        const editedValue = RichUtils.toggleBlockType(_value, blockType);
+        _setValue(editedValue);
+        if (onChange) onChange(editedValue);
     };
 
     const toggleInlineStyle = (inlineStyle) => {
-        const editdValue = RichUtils.toggleInlineStyle(_value, inlineStyle);
-        _setValue(editdValue);
-        if (onChange) onChange(editdValue);
+        const editedValue = RichUtils.toggleInlineStyle(_value, inlineStyle);
+        _setValue(editedValue);
+        if (onChange) onChange(editedValue);
     };
 
     return (
@@ -30,7 +30,7 @@ const RichTextfield = ({ className, value, onChange }) => {
                 }
             }}
         >
-            <div className="rich-text-field-controll-buttons">
+            <div className="rich-text-field-control-buttons">
                 <BlockStyleControls
                     editorState={_value}
                     onToggle={toggleBlockType}
