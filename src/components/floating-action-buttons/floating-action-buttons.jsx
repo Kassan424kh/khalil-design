@@ -22,8 +22,8 @@ const FloatingActionButtons = ({ actionButtons = [] }) => {
                     setActive(true);
                 }}
             />
-            {actionButtons.map((ab) => {
-                return <Button leftIcon={ab.icon} {...ab} primary />;
+            {actionButtons.map((ab, i) => {
+                return <Button key={i} leftIcon={ab.icon} {...ab} primary />;
             })}
         </div>
     );
