@@ -15,7 +15,7 @@ const InfosCard = ({
             >
                 <span>{infosObject.headline ? infosObject.headline : "-"}</span>
                 {infosObject.subHeadline ? (
-                    <small>( {infosObject.subHeadline})</small>
+                    <small>( {infosObject.subHeadline} )</small>
                 ) : null}
             </div>
             <div className="infos-card-data">
