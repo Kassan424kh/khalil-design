@@ -7,7 +7,7 @@
     background-color: $white
     color: $black
     border-radius: 5px
-    font-weight: lighter
+    font-weight: 400
     cursor: pointer
     border: 1px solid transparent
     transition: all 250ms cubic-bezier(.4,.2,0,1)
@@ -171,7 +171,13 @@
         color: $black
         padding: 0
 
-    .button-content
+    &.text
+        padding: 0
+        background-color: transparent
+        border-radius: 0
+        border: 0 solid transparent
+        opacity: 1
+        font-size: 14px
 
 @keyframes loading
     from
