@@ -17,6 +17,7 @@
     margin-top: 54px
     background-color: $white
 
+
     .rich-text-field-control-buttons
         background-color: $white
         display: flex
@@ -83,3 +84,17 @@
             min-width: inherit
             max-width: inherit
             overflow: inherit
+
+    &.without-control-buttons
+        border-radius: 10px
+        border-top: 1px solid
+        margin-top: 0
+        padding: 15px 0 15px 15px
+        
+        .DraftEditor-root
+            margin: 0
+            padding-right: 15px
+            width: 100%
+            height: max-content
+            min-width: 20px
+            max-width: inherit
