@@ -14,7 +14,7 @@ const RichTextfield = ({
   value,
   onChange,
   readOnly,
-  disableControlers
+  disableControlButtons
 }) => {
   const ref = useRef();
   const [_value, _setValue] = useState(() =>
@@ -40,7 +40,7 @@ const RichTextfield = ({
   return (
     <div
       className={`rich-text-field ${className} ${readOnly ? "read-only" : ""} ${
-        disableControlers ? "without-control-buttons" : ""
+        disableControlButtons ? "without-control-buttons" : ""
       }`}
       onClick={() => {
         if (ref) {
@@ -48,7 +48,7 @@ const RichTextfield = ({
         }
       }}
     >
-      {!readOnly && !disableControlers ? (
+      {!readOnly && !disableControlButtons ? (
         <div className="rich-text-field-control-buttons">
           <BlockStyleControls editorState={_value} onToggle={toggleBlockType} />
           <InlineStyleControls
