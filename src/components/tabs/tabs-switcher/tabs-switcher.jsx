@@ -17,6 +17,10 @@ const TabsSwitcher = ({
     left: "5px"
   });
 
+  useEffect(() => {
+    setSelectedTab(startWith);
+  }, [startWith]);
+
   const firstRenderTimeout = useRef(1000);
   useEffect(() => {
     const t = setTimeout(() => {
