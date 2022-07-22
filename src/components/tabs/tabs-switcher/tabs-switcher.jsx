@@ -117,7 +117,7 @@ const TabsSwitcher = ({
           })
         : null}
       <div
-        className={`background-effect ${selectedTab ?? ""}`}
+        className={`background-effect ${selectedTab ? `_${selectedTab}` : ""}`}
         style={{
           ...effectPositionAndSize
         }}
