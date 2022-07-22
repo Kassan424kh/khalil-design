@@ -62,6 +62,20 @@
         height: calc(100% - 30px)
         max-height: 500px - 30px
 
+    &.without-control-buttons
+        border-radius: 10px
+        border-top: 1px solid
+        margin-top: 0
+        padding: 15px 0 15px 15px
+        
+        .DraftEditor-root
+            margin: 0
+            padding-right: 15px
+            width: 100%
+            height: max-content
+            min-width: 20px
+            max-width: inherit
+
     &.read-only
         background-color: transparent
         margin: 0
@@ -84,17 +98,3 @@
             min-width: inherit
             max-width: inherit
             overflow: inherit
-
-    &.without-control-buttons
-        border-radius: 10px
-        border-top: 1px solid
-        margin-top: 0
-        padding: 15px 0 15px 15px
-        
-        .DraftEditor-root
-            margin: 0
-            padding-right: 15px
-            width: 100%
-            height: max-content
-            min-width: 20px
-            max-width: inherit

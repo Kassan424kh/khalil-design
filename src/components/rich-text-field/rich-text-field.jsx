@@ -19,9 +19,7 @@ const RichTextfield = ({
   const ref = useRef();
   const [_value, _setValue] = useState(() =>
     value
-      ? readOnly
-        ? EditorState.createWithContent(convertFromRaw(JSON.parse(value)))
-        : value
+      ? EditorState.createWithContent(convertFromRaw(JSON.parse(value)))
       : EditorState.createEmpty()
   );
 
