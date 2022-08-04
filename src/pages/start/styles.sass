@@ -1,0 +1,21 @@
+@import "../../colors"
+
+#goovey
+  animation: colorrun 350ms linear 2s infinite
+  animation-fill-mode: both
+
+@keyframes colorrun
+  0% 
+    filter: hue-rotate(0deg)
+  
+  100% 
+    filter: hue-rotate(359deg)
+  
+
+.start-page
+  font-size: 50px
+  font-family: ep-stellari-display, sans-serif
+  //-webkit-text-fill-color: transparent
+  //-webkit-text-stroke-width: 0.1px
+  filter: url(#goovey)
+  color: rgba($black-rgb, .9)
