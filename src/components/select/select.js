@@ -106,12 +106,14 @@ const Select = ({
       _setOptions(options);
   }, [options]);
 
+  const showSelectOptionsRef = useRef();
   useEffect(() => {
     if (onActive) onActive(showOptions);
+    showSelectOptionsRef.current = showOptions;
   }, [showOptions]);
 
   useEffect(() => {
-    if (onSelect) onSelect(selectedOption);
+    if (onSelect && showSelectOptionsRef.current) onSelect(selectedOption);
     setLastTimeUpdatedSelectedOptions(Date.now());
   }, [selectedOption]);
 
