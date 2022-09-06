@@ -22,7 +22,7 @@
     z-index: 9999999999
     transform: translateY(30px)
     overflow: hidden
-    @include disable_selecting
+    @include disable-selecting
 
     > div
         height: calc(100% - 30px)
@@ -124,6 +124,7 @@
             margin-right: -5px
 
         .select-options-search-field
+            width: 100%
             input
                 width: calc(100% - 2px)
                 border-radius: 5px
@@ -135,6 +136,11 @@
                 padding: 0 10px
                 position: relative
                 z-index: 20
+                background-color: $white
+
+                &:focus
+                    background-color: $white
+                    border-color: $blue
 
     &.with-header-text
         &:before
@@ -161,7 +167,7 @@
             display: block
 
         .select-options-body
-            height: calc(100% - 30px)
+            height: calc(100% - 60px)
             width: 100%
             display: flex
 
