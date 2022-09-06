@@ -1,48 +1,49 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./styles.sass";
 
-const Checkbox = (props) => {
-    const [checked, isChecked] = useState(false);
-    const [firstTime, isFirstTime] = useState(true);
+const Checkbox = ({
+  checked,
+  className,
+  primary,
+  disabled,
+  children,
+  onCheck,
+  left,
+  right
+}) => {
+  const [_checked, _isChecked] = useState(checked ?? false);
 
-    useEffect(() => {
-        if (props.onCheck && !firstTime)
-            props.onCheck(props.check !== undefined ? props.check : checked);
-
-        isFirstTime(false);
-    }, [checked, props.check]);
-
-    return (
-        <div
-            className={`checkbox disable-selecting ${props.className ?? ""}${
-                props.primary ? " primary" : ""
-            }${props.disabled ? " disabled" : ""}`}
-            onClick={() => {
-                if (props.onCheck) props.onCheck(!props.check);
-                isChecked(!checked);
-            }}
-        >
-            {props.right && !props.left ? (
-                <div className={"children right"}>{props.children}</div>
-            ) : null}
-            <span
-                className={`checkbox-icon${
-                    props.check !== undefined
-                        ? props.check && !props.disabled
-                            ? " checked"
-                            : ""
-                        : checked && !props.disabled
-                        ? " checked"
-                        : ""
-                }`}
-            >
-                <span className={"material-symbols-outlined"}>check</span>
-            </span>
-            {props.left || (!props.left && !props.right) ? (
-                <div className={"children left"}>{props.children}</div>
-            ) : null}
-        </div>
-    );
+  return (
+    <div
+      className={`checkbox disable-selecting ${className ?? ""}${
+        primary ? " primary" : ""
+      }${disabled ? " disabled" : ""}`}
+      onClick={() => {
+        if (onCheck) onCheck(!checked);
+        _isChecked(!_checked);
+      }}
+    >
+      {right && !left ? (
+        <div className={"children right"}>{children}</div>
+      ) : null}
+      <span
+        className={`checkbox-icon${
+          checked !== undefined
+            ? checked && !disabled
+              ? " checked"
+              : ""
+            : _checked && !disabled
+            ? " checked"
+            : ""
+        }`}
+      >
+        <span className={"material-icons-outlined"}>check</span>
+      </span>
+      {left || (!left && !right) ? (
+        <div className={"children left"}>{children}</div>
+      ) : null}
+    </div>
+  );
 };
 
 export default Checkbox;
