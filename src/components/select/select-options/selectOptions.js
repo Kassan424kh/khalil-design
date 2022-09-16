@@ -109,6 +109,28 @@ const SelectOptions = () => {
             )
               return true;
 
+          // return true if there are matching parts in the publisher name which is passed as additional filter information
+          if (
+            state.selectOptions.additionalFilterInformation &&
+            option[0] in state.selectOptions.additionalFilterInformation
+          )
+            if (
+              state.selectOptions.additionalFilterInformation[option[0]]
+                .toString()
+                .toUpperCase()
+                .split(" ")
+                .filter((word) => {
+                  if (searchEveryWare) {
+                    const regex = new RegExp(r, "g");
+                    return word && word.match(regex);
+                  } else {
+                    return word.startsWith(r) ? word : "";
+                  }
+                }).length
+            )
+              return true;
+
+          // return true if there are matching parts of the media name
           return option[1]
             .toString()
             .toUpperCase()
@@ -532,13 +554,12 @@ const SelectOptions = () => {
                 </>
               ) : null}
               <TextField
+                inputRef={(r) => r && r.focus()}
                 className="select-options-search-field"
                 value={searchText}
-                textFieldProps={{
-                  ref: (input) => input && input.focus(),
-                  placeholder:
-                    selectOptionsData.searchPlaceHolder ?? "finde options"
-                }}
+                placeholder={
+                  selectOptionsData.searchPlaceHolder ?? "finde options"
+                }
                 onChange={setSearchText}
               />
 
@@ -557,7 +578,7 @@ const SelectOptions = () => {
           ) : null}
         </div>
 
-        <div className={`select-options-body`}>
+        <div className={`select-options-body`} data-cy={"select-options-body"}>
           {(selectOptionsData.showSelectedParallel ? [1, 2, 3] : [1]).map(
             (index) => {
               return index !== 2 ? (
