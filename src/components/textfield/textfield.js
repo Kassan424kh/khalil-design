@@ -1,23 +1,23 @@
-import React, { memo, useState } from "react";
+import React, { forwardRef, memo, useEffect, useRef, useState } from "react";
 import Button from "../button/button";
 import "./styles.sass";
 import NumberFormat from "react-number-format";
 
 const TextField = ({
-  ref,
   leftIconButton,
   rightIconButton,
   value,
-  isInvalid,
-  invalidText,
   className,
+  isInvalid,
   beforeComponent,
+  isPercent,
+  type,
   onChange,
+  afterComponent,
+  invalidText,
+  inputRef,
   suffix,
   decimalScale,
-  type,
-  afterComponent,
-  richText,
   ...props
 }) => {
   const _leftIconButton = leftIconButton ?? false;
@@ -26,6 +26,9 @@ const TextField = ({
 
   const inputValue = typeof value === "undefined" ? _value : value;
 
+  const withValueLimit = ({ floatValue }) =>
+    !floatValue || (floatValue >= 0.0 && floatValue <= 999.9999);
+
   return (
     <div
       className={`textfield ${className ?? ""} ${
@@ -33,19 +36,20 @@ const TextField = ({
       }`}
     >
       {beforeComponent ?? null}
-      {leftIconButton ? (
+      {_leftIconButton ? (
         <Button
           className={`icon-button left ${
-            !leftIconButton.onClick ? "only-icon" : ""
+            !_leftIconButton.onClick ? "only-icon" : ""
           }`}
           withShadow
-          leftIcon={leftIconButton.icon}
-          onClick={leftIconButton.onClick}
+          leftIcon={_leftIconButton.icon}
+          onClick={_leftIconButton.onClick}
         />
       ) : null}
       {type === "number" ? (
         <NumberFormat
           {...props}
+          ref={inputRef}
           value={value ?? ""}
           onValueChange={({ floatValue: value }) => {
             if (onChange) onChange(value);
@@ -77,7 +81,13 @@ const TextField = ({
       ) : type === "textarea" ? (
         <textarea
           {...props}
-          ref={ref}
+          ref={(r) => {
+            if (r) {
+              if (r && inputRef) inputRef(r);
+              r.style.height = "inherit";
+              r.style.height = `${Math.min(r.scrollHeight - 20, 350)}px`;
+            }
+          }}
           rows={1}
           onWheel={(event) => event.target.blur()}
           value={inputValue ?? ""}
@@ -108,6 +118,8 @@ const TextField = ({
         />
       ) : (
         <input
+          {...props}
+          ref={inputRef}
           type={type}
           onWheel={(event) => event.target.blur()}
           value={inputValue ?? ""}
@@ -126,20 +138,20 @@ const TextField = ({
           }`}
           onChange={({ target }) => {
             if (target.value !== value) {
-              if (onChange) onChange(target.value);
+              onChange(target.value);
               setValue(target.value);
             }
           }}
         />
       )}
-      {_rightIconButton ? (
+      {rightIconButton ? (
         <Button
           className={`icon-button right ${
-            !_rightIconButton.onClick ? "only-icon" : ""
+            !rightIconButton.onClick ? "only-icon" : ""
           }`}
           withShadow
-          leftIcon={_rightIconButton.icon}
-          onClick={_rightIconButton.onClick}
+          leftIcon={rightIconButton.icon}
+          onClick={rightIconButton.onClick}
         />
       ) : null}
       {afterComponent ?? null}
