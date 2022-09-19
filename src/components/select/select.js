@@ -127,10 +127,9 @@ const Select = ({
 
   let firstLoading2 = useRef(true);
   useEffect(() => {
-    if (!firstLoading2.current && multiSelect) {
+    if (!firstLoading2.current) {
       setSelectedOption([]);
-    }
-    if (firstLoading2.current) firstLoading2.current = false;
+    } else firstLoading2.current = false;
   }, [clearAllOptions]);
 
   let firstLoading3 = useRef(true);
