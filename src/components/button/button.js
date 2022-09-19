@@ -2,31 +2,31 @@ import React from "react";
 import "./styles.sass";
 
 const Button = ({
-  className,
   primary,
   outlined,
   text,
   disabled,
   withShadow,
   loading,
-  children,
-  leftIcon,
-  rightIcon,
   green,
   grey,
   red,
   blue,
   yellow,
+  className,
+  children,
+  leftIcon,
+  rightIcon,
   onClick,
-  args
+  ...props
 }) => {
   return (
     <div
+      {...props}
       className={`button disable-selecting${(() => {
         let _classes = "";
         if (primary) _classes += " primary";
         if (outlined) _classes += " outlined";
-        if (className) _classes += ` ${className}`;
         if (disabled) _classes += " disabled";
         if (withShadow) _classes += " with-shadow";
         if (loading) _classes += " loading";
@@ -39,15 +39,19 @@ const Button = ({
         else if (blue) _classes += " blue";
         else if (yellow) _classes += " yellow";
 
+        if (className) _classes += ` ${className}`;
         return _classes;
       })()}`}
       style={{
         padding: text
           ? `0 ${rightIcon ? "8px" : "0"} 0 ${leftIcon ? "8px" : "0"}`
-          : null
+          : `${children && (leftIcon || rightIcon) ? "10px" : "15px"} ${
+              children && rightIcon ? "20px" : "15px"
+            } ${children && (leftIcon || rightIcon) ? "10px" : "15px"} ${
+              children && leftIcon ? "20px" : "15px"
+            }`
       }}
       onClick={!disabled && !loading ? onClick : null}
-      {...args}
     >
       {leftIcon ? (
         <span className="button-icon left material-symbols-outlined">
@@ -58,8 +62,8 @@ const Button = ({
         <div
           className={"button-content"}
           style={{
-            padding: `0 ${rightIcon ? "15px" : "0"} 0 ${
-              leftIcon ? "15px" : "0"
+            padding: `0 ${rightIcon ? (text ? "15px" : "20px") : "0"} 0 ${
+              leftIcon ? (text ? "15px" : "20px") : "0"
             }`
           }}
         >
