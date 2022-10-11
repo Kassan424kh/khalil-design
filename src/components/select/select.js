@@ -16,6 +16,7 @@ const Select = ({
   multiSelect,
   defaultAllSelected,
   options,
+  additionalFilterInformation,
   updatePosition,
   onActive,
   onSelect,
@@ -41,20 +42,27 @@ const Select = ({
   defaultOption,
   defaultOptionText,
   sort,
-  children
+  children,
+  ...props
 }) => {
-  const [_options, _setOptions] = useState([]);
   const selectId = useState(uuidv4())[0];
-  const [click, setClick] = useState();
-  const [hover, setHover] = useState();
-  const [showOptions, setShowOptions] = useState(false);
+
+  // hook store
   const state = useStore()[0];
   const dispatch = useStore(false)[1];
 
+  // useState variables
+  const [_options, _setOptions] = useState([]);
+  const [click, setClick] = useState();
+  const [hover, setHover] = useState();
+  const [showOptions, setShowOptions] = useState(false);
+
+  // get select component id from outside
   useEffect(() => {
     if (getSelectId) getSelectId(selectId);
   }, []);
 
+  // open selectOptions window
   useEffect(() => {
     if (open) {
       setClick(Date.now());
@@ -63,20 +71,20 @@ const Select = ({
     }
   }, [open]);
 
-  const closeSelectOptions = () => {
-    dispatch("UPDATE_DATA", {
-      show: false,
-      lastUpdate: Date.now()
-    });
-  };
-
+  // close selectOptions window
   useEffect(() => {
     if (close) {
-      closeSelectOptions();
+      dispatch("UPDATE_DATA", {
+        show: false,
+        lastUpdate: Date.now()
+      });
       setShowOptions(false);
     }
   }, [close]);
 
+  // close selectOptions window
+  // if the id of now clicked select component
+  // is not the same like the id of this component
   useEffect(() => {
     if (state.selectOptions.selectId !== selectId) {
       setClick();
@@ -101,30 +109,44 @@ const Select = ({
     update: [updatePosition, selectMouseEnter]
   });
 
+  // set options locally
   useEffect(() => {
-    if (JSON.stringify(options) !== JSON.stringify(_options))
-      _setOptions(options);
+    _setOptions((_currentOptions) => {
+      if (options && !_.isEqual(options, _currentOptions)) return options;
+      return _currentOptions;
+    });
   }, [options]);
 
+  // get status of showOptions from outside using onActive attribute
   const showSelectOptionsRef = useRef();
   useEffect(() => {
     if (onActive) onActive(showOptions);
     showSelectOptionsRef.current = showOptions;
   }, [showOptions]);
 
+  // get selected options from outside using onSelect attribute
   useEffect(() => {
-    if (onSelect && showSelectOptionsRef.current) onSelect(selectedOption);
+    if (onSelect && showSelectOptionsRef.current) {
+      onSelect(selectedOption);
+    }
+
     setLastTimeUpdatedSelectedOptions(Date.now());
   }, [selectedOption]);
 
-  const oldSelected = useRef([]);
+  // set selectOption/s if the selected attribute was updated
+  const firstTimeOpen = useRef(true);
   useEffect(() => {
-    if (selected && !_.isEqual(oldSelected.current, selected)) {
-      setSelectedOption(selected);
-      oldSelected.current = selected;
-    }
+    if (!firstTimeOpen.current)
+      setSelectedOption((_currentSelectedOption) => {
+        if (selected && !_.isEqual(_currentSelectedOption, selected))
+          return selected;
+
+        return _currentSelectedOption;
+      });
+    else firstTimeOpen.current = false;
   }, [selected]);
 
+  // clear all selected options from outside
   let firstLoading2 = useRef(true);
   useEffect(() => {
     if (!firstLoading2.current) {
@@ -132,6 +154,7 @@ const Select = ({
     } else firstLoading2.current = false;
   }, [clearAllOptions]);
 
+  // toggle all options from outside
   let firstLoading3 = useRef(true);
   useEffect(() => {
     if (!firstLoading3.current && multiSelect) {
@@ -144,6 +167,7 @@ const Select = ({
     if (firstLoading3.current) firstLoading3.current = false;
   }, [toggleAllOptions]);
 
+  // select all options from outside
   let firstLoading4 = useRef(true);
   useEffect(() => {
     if (!firstLoading4.current && multiSelect) {
@@ -154,6 +178,7 @@ const Select = ({
     if (firstLoading4.current) firstLoading4.current = false;
   }, [selectAllOptions]);
 
+  // close selectOptions if clicked outside this select component
   useClickOutside({ current: myRef.current[0] }, (e) => {
     const $selectOptions = $(".select-options");
 
@@ -166,19 +191,16 @@ const Select = ({
     }
   });
 
+  // close selectOptions from outside using store state data
   useEffect(() => {
     if (!state.selectOptions.show) setShowOptions(false);
   }, [state.selectOptions.show]);
-
-  useEffect(() => {
-    // close selectOption if select component is unmount
-    closeSelectOptions();
-  }, []);
 
   const hoverTimeout = useRef();
   const [updateOptionsProperties, setUpdateOptionsProperties] = useState(1);
   return (
     <div
+      {...props}
       ref={(ele) => (myRef.current[0] = ele)}
       id={selectId}
       className={`select disable-selecting ${className ? className : ""} ${
@@ -247,6 +269,7 @@ const Select = ({
           right={right}
           updateOptionsProperties={updateOptionsProperties}
           options={_options}
+          additionalFilterInformation={additionalFilterInformation}
           multiSelect={multiSelect}
           selectedOption={selectedOption}
           setSelectedOption={setSelectedOption}
@@ -263,4 +286,4 @@ const Select = ({
   );
 };
 
-export default memo(Select);
+export default Select;
