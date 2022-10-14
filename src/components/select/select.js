@@ -124,26 +124,15 @@ const Select = ({
     showSelectOptionsRef.current = showOptions;
   }, [showOptions]);
 
-  // get selected options from outside using onSelect attribute
-  useEffect(() => {
-    if (onSelect && showSelectOptionsRef.current) {
-      onSelect(selectedOption);
-    }
-
-    setLastTimeUpdatedSelectedOptions(Date.now());
-  }, [selectedOption]);
-
   // set selectOption/s if the selected attribute was updated
-  const firstTimeOpen = useRef(true);
   useEffect(() => {
-    if (!firstTimeOpen.current)
-      setSelectedOption((_currentSelectedOption) => {
-        if (selected && !_.isEqual(_currentSelectedOption, selected))
-          return selected;
-
-        return _currentSelectedOption;
-      });
-    else firstTimeOpen.current = false;
+    setSelectedOption((_currentSelectedOption) => {
+      if (selected && !_.isEqual(_currentSelectedOption, selected)) {
+        setLastTimeUpdatedSelectedOptions(Date.now());
+        return selected;
+      }
+      return _currentSelectedOption;
+    });
   }, [selected]);
 
   // clear all selected options from outside
@@ -272,7 +261,10 @@ const Select = ({
           additionalFilterInformation={additionalFilterInformation}
           multiSelect={multiSelect}
           selectedOption={selectedOption}
-          setSelectedOption={setSelectedOption}
+          setSelectedOption={(_so) => {
+            setSelectedOption(_so);
+            if (onSelect) onSelect(_so);
+          }}
           searchEveryWare={searchEveryWare}
           lastTimeUpdatedSelectedOptions={lastTimeUpdatedSelectedOptions}
           defaultOption={defaultOption}
