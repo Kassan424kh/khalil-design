@@ -9,8 +9,6 @@ const SelectPage = () => {
       <Select
         enableSearch
         filterOnly={"unselected"}
-        multiSelect
-        showSelectedParallel
         enableCloseButton
         enableSelectAllButton
         options={options}

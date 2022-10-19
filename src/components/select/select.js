@@ -263,7 +263,7 @@ const Select = ({
           selectedOption={selectedOption}
           setSelectedOption={(_so) => {
             setSelectedOption(_so);
-            if (onSelect) onSelect(_so);
+            if (onSelect && !_.isEqual(_so, selected)) onSelect(_so);
           }}
           searchEveryWare={searchEveryWare}
           lastTimeUpdatedSelectedOptions={lastTimeUpdatedSelectedOptions}

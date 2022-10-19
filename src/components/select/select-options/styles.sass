@@ -157,6 +157,18 @@
     &.show
         opacity: 1
         transform: translateY(0) translateX(0) scale(1) !important
+        
+
+    &.single-select
+        .select-option
+            &.selected
+                position: sticky
+                top: 0
+                bottom: 0
+                background-color: $white
+                z-index: 20
+
+    &.multi-select
 
     &.show-selected-parallel
         max-width: max-content

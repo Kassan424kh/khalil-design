@@ -443,7 +443,7 @@ const SelectOptions = () => {
         selectOptionsData.headerText ? "with-header-text" : ""
       } ${selectOptionsData.className ?? ""} ${
         selectOptionsData.showSelectedParallel ? "show-selected-parallel" : ""
-      }`}
+      } ${selectOptionsData.multiSelect ? "multi-select" : "single-select"}`}
       style={{
         pointerEvents: selectOptionsData.show ? "all" : "none",
         top: stylePositionBetweenTopAndBottom(
