@@ -1,6 +1,6 @@
-import {useRef, useEffect} from "react";
+import { useRef, useEffect } from 'react'
 
-export const useClickOutside = (ref, callback) => {
+export const useClickOutside = (ref, callback, deps = []) => {
     const callbackRef = useRef()
     callbackRef.current = callback
 
@@ -12,10 +12,10 @@ export const useClickOutside = (ref, callback) => {
         }
 
         // Bind the event listener
-        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutside)
         return () => {
             // Unbind the event listener on clean up
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [callbackRef, ref]);
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [callbackRef, ref, ...deps])
 }

@@ -1,27 +1,27 @@
-import { useState, useEffect, useLayoutEffect, useRef } from "react";
-import $ from "jquery";
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
+import $ from 'jquery'
 
 export const getDimensions = ({ id = undefined, ref }) => {
-    const $window = $(window);
-    const scrollLeft = $window.scrollLeft();
-    const scrollTop = $window.scrollTop();
-    const windowHeight = $window.height();
-    const windowWidth = $window.width();
+    const $window = $(window)
+    const scrollLeft = $window.scrollLeft()
+    const scrollTop = $window.scrollTop()
+    const windowHeight = $window.height()
+    const windowWidth = $window.width()
 
-    const $element = $(id ? ref.current[id] : ref.current);
-    const offset = $element[0].getBoundingClientRect();
+    const $element = $(id ? ref.current[id] : ref.current)
+    const offset = $element[0]?.getBoundingClientRect()
 
     const left = offset ? offset.left - scrollLeft : 0,
         right = offset ? offset.right - scrollLeft : 0,
         top = offset ? offset.top - scrollTop : 0,
         bottom = offset ? offset.bottom - scrollTop : 0,
         width = $element.outerWidth(),
-        height = $element.outerHeight();
+        height = $element.outerHeight()
     //
-    let leftHidden = left < 0,
+    const leftHidden = left < 0,
         rightHidden = left + width > windowWidth,
         topHidden = top < 0,
-        bottomHidden = top + height > windowHeight;
+        bottomHidden = top + height > windowHeight
 
     return {
         width: width,
@@ -37,8 +37,8 @@ export const getDimensions = ({ id = undefined, ref }) => {
         windowWidth: windowWidth,
         windowHeight: windowHeight,
         offset: offset
-    };
-};
+    }
+}
 
 // Calculate Element width and hight using useRef and jQuery
 export const useContainerDimensions = ({
@@ -63,66 +63,64 @@ export const useContainerDimensions = ({
         topHidden: false,
         bottomHidden: false,
         offset: undefined
-    });
+    })
 
-    const [uT, setUT] = useState(5);
+    const [uT, setUT] = useState(5)
 
-    const timeout = useRef();
+    const timeout = useRef()
 
     useLayoutEffect(() => {
-        const $window = $(window);
-        const $document = $(document);
+        const $window = $(window)
+        const $document = $(document)
 
         const handleResize = () => {
-            clearTimeout(timeout.current);
+            clearTimeout(timeout.current)
             timeout.current = setTimeout(() => {
                 if (ref.current) {
-                    setDimensions(
-                        Object.assign({}, getDimensions({ id, ref }))
-                    );
+                    setDimensions(Object.assign({}, getDimensions({ id, ref })))
                 }
-            }, duration);
-        };
-
-        if (!withoutResize) {
-            $window.off("resize", handleResize);
-        }
-        if (!withoutScroll) {
-            $document.off("mousewheel  scroll", handleResize);
+            }, duration)
         }
 
         if (!withoutResize) {
-            $window.on("resize", handleResize);
+            $window.off('resize', handleResize)
         }
         if (!withoutScroll) {
-            $document.on("mousewheel scroll", handleResize);
+            $document.off('mousewheel  scroll', handleResize)
+        }
+
+        if (!withoutResize) {
+            $window.on('resize', handleResize)
+        }
+        if (!withoutScroll) {
+            $document.on('mousewheel scroll', handleResize)
         }
         return () => {
             if (!withoutResize) {
-                $window.off("resize", handleResize);
+                $window.off('resize', handleResize)
             }
             if (!withoutScroll) {
-                $document.off("mousewheel  scroll", handleResize);
+                $document.off('mousewheel  scroll', handleResize)
             }
-            clearTimeout(timeout.current);
-        };
-    }, [ref.current ?? undefined]);
+            clearTimeout(timeout.current)
+        }
+    }, [ref.current ?? undefined])
 
     useEffect(() => {
-        setUT(2);
-    }, update ?? []);
+        setUT(2)
+    }, update ?? [])
 
     useEffect(() => {
         if (uT < 1) {
-            return;
+            return
         }
 
         if (ref.current) {
-            setDimensions(getDimensions({ id, ref }));
+            setDimensions(getDimensions({ id, ref }))
         }
 
-        setUT(uT - 1);
-    }, [uT]);
+        setUT(uT - 1)
+    }, [uT])
 
-    return dimensions;
-};
+    return dimensions
+}

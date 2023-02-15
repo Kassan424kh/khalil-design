@@ -6,19 +6,17 @@
     justify-content: center
     align-items: center
     pointer-events: auto
-    width: max-content
-    margin: 3px
 
     &:after
-        $box-size: 4px
+        $box-size: 2.5px
         content: ""
         display: block
         width: 0
         height: 0
         padding: $box-size
         position: absolute
-        top: -$box-size
-        left: -$box-size
+        top: $box-size * 2
+        left: $box-size * 2
         background-color: $blue
         border-radius: 10px
         opacity: 0

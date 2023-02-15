@@ -9,23 +9,21 @@
     padding: 15px 0 15px 15px
     position: fixed
     background-color: $white
-    border-radius: 10px
+    border-radius: 15px
     border: 1px solid $blue
-    max-width: max-content
     min-width: 250px
     width: max-content
     max-height: 300px
-    box-shadow: 15px 15px 50px $blue
+    box-shadow: 0 15px 50px rgba(#000, .1)
     box-sizing: border-box
     opacity: 0
-    transition: opacity 350ms cubic-bezier(.4, .2, 0, 1), transform 350ms cubic-bezier(.4, .2, 0, 1), top 0ms cubic-bezier(.4, .2, 0, 1), left 0ms cubic-bezier(.4, .2, 0, 1)
     z-index: 9999999999
-    transform: translateY(30px)
     overflow: hidden
-    @include disable_selecting
+    @include disable-selecting
+    pointer-events: none
 
     > div
-        height: calc(100% - 30px)
+        height: 100%
         display: contents
 
     .tv-tool-button
@@ -73,84 +71,137 @@
                     font-size: 50px
                     color: $grey
 
+
     .select-options-headline
         position: relative
         width: calc(100% + 15px)
         left: -15px
         top: -15px
+        overflow: hidden
         line-height: 50px
-        border-top-left-radius: 10px
-        border-top-right-radius: 10px
         text-align: center
         font-weight: bolder
         font-size: 17px
         color: $blue-dark
-        margin-bottom: -15px
-
-    .actions
+        margin-bottom: 0
         display: flex
-        justify-content: space-between
-        margin-right: 15px
-        gap: 10px
+        justify-content: center
+        align-items: center
 
-        .select-all-button
-            padding: 20px !important
-            max-height: 40px
-            height: 40px
-            min-width: 40px
-            width: 40px
-            border: 0
-            z-index: 21
-            opacity: 1
-            box-shadow: 0 5px 20px rgba(0, 0, 0, .04)
-            border-radius: 5px
+        > span
+            width: 100%
 
-            &:active
-                box-shadow: 0 0 10px $background-color
-
-            .button-icon
-                font-size: 18px
-                width: 0
-                max-height: 0
-                line-height: 40px
-                padding: 0
-
-        .close-button
-            @extend .select-all-button
-            width: auto
-            border-color: transparent !important
-            box-shadow: 0 0 10px transparent !important
-            background-color: transparent
-            margin-right: -5px
-
-        .select-options-search-field
-            input
-                width: calc(100% - 2px)
-                border-radius: 5px
-                line-height: 40px
-                font-size: 15px
-                box-shadow: 0 5px 20px rgba(0, 0, 0, .04)
-                border: 1px solid $grey
-                margin-bottom: 15px
-                padding: 0 10px
-                position: relative
-                z-index: 20
-
-    &.with-header-text
+    &.show-gradient-effect
         &:before
             background: linear-gradient(180deg, $blue-light 0px, transparent 70px)
 
-    &.with-search
-        &:before
-            background: linear-gradient(180deg, $blue-light -20px, transparent 70px)
+    .select-options-actions
+        display: flex
+        justify-content: space-between
+        margin-right: 15px
+        overflow: hidden
 
-        &.with-header-text
+        .select-options-search-field
+            width: 100%
+            height: max-content
+            min-height: max-content
+            margin-bottom: 15px
+            position: relative
+
+            &:focus
+                background-color: $white
+                border-color: $blue
+
+            .select-all-buttons
+                display: flex
+                justify-content: center
+                align-items: center
+                position: absolute
+                border-radius: 10px
+                border: 1px solid transparent
+                border-left-color: $grey
+                overflow: hidden
+                z-index: 22
+
+                .select-all-button
+                    padding: 20px !important
+                    box-shadow: 0 0 0 transparent !important
+                    background-color: transparent !important
+                    max-height: 0
+                    height: 0
+                    min-width: 0
+                    width: 0
+                    border: 0
+                    z-index: 21
+                    opacity: 1
+                    position: relative
+                    border-width: 0
+                    border-radius: 0
+
+                    &:active
+                        box-shadow: 0 0 10px $background-color
+
+                    .button-icon
+                        font-size: 15px
+                        width: 0
+                        max-height: 0
+                        line-height: 40px
+                        padding: 0
+                        color: $black
+
+                    &:first-child
+                        border-left-width: 1px !important
+
+            &.hide
+                opacity: 0
+                pointer-events: none
+
+            input
+                width: calc(100% - 2px)
+                line-height: 40px
+                font-size: 15px
+                border: 1px solid $grey
+                position: relative
+                z-index: 20
+                background-color: $white
+                padding-right: 10px
+                padding-left: 95px
+                border-radius: 10px
+                margin-right: 10px
+
+            .close-button
+                @extend .select-all-button
+                box-shadow: 0 0 0 transparent !important
+                padding: 20px 30px !important
+                width: auto
+                right: 0
+                z-index: 22
+                border-radius: 10px
+                color: $black
+                font-weight: normal
+                line-height: 0
+
+        &.with-search
+
             &:before
-                background: linear-gradient(180deg, $blue-light 0px, transparent 100px)
+                background: linear-gradient(180deg, $blue-light -20px, transparent 70px)
 
-    &.show
-        opacity: 1
-        transform: translateY(0) translateX(0) scale(1) !important
+            &.with-header-text
+                &:before
+                    background: linear-gradient(180deg, $blue-light 0px, transparent 100px)
+
+
+    &.single-select
+        .select-option
+            &.selected
+                position: sticky
+                top: 0
+                bottom: 0
+                background-color: $white
+                z-index: 20
+
+
+    &.multi-select
 
     &.show-selected-parallel
         max-width: max-content
@@ -161,15 +212,25 @@
             display: block
 
         .select-options-body
-            height: calc(100% - 30px)
+            height: calc(100% - 95px)
             width: 100%
             display: flex
+
+            &.header-text-is-not-enabled
+                height: calc(100% - 60px)
 
             .content
                 padding-right: 0
                 width: 50%
                 min-width: calc(50% - 9px)
                 transition: max-width 350ms cubic-bezier(.4, .2, 0, 1) 550ms, min-width 350ms cubic-bezier(.4, .2, 0, 1) 550ms
+
+                .search-field-parallel-view
+                    position: sticky
+                    top: 0
+                    z-index: 20
+                    background-color: $white
+                    padding-bottom: 15px
 
                 .empty-listview-background-image
                     transition: opacity 750ms cubic-bezier(.4, .2, 0, 1)

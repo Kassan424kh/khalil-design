@@ -1,64 +1,73 @@
-import React from "react";
-import "./styles.sass";
+import React, { useRef } from 'react'
+import './styles.sass'
+import Select from '../../select'
 
-const SelectOption = (props) => {
-    return (
+const SelectOption = ({
+    id,
+    defaultOption,
+    hide,
+    selectedOption,
+    multiSelect,
+    setSelectedOption,
+    children,
+    setDisableSelecting,
+    setShowOptions,
+    textRef,
+    selectOptionsIndex
+}) => {
+    const pauseClickTime = useRef(Date.now())
+
+    const selectOption = (
         <div
-            className={`select-option${
-                props.defaultOption ? " default-option" : ""
-            }${props.hide ? " hide-option" : ""}${
-                props.selectedOption &&
+            className={`select-option${defaultOption ? ' default-option' : ''}${hide ? ' hide-option' : ''}${
+                selectedOption &&
                 (() => {
-                    if (props.selectedOption.length)
-                        return props.multiSelect
+                    if (selectedOption.length)
+                        return multiSelect
                             ? (() => {
-                                  const foundSelectedOption = props.selectedOption.filter(
-                                      (option) => {
-                                          return option[0] === props.id;
-                                      }
-                                  )[0];
-                                  return foundSelectedOption
-                                      ? foundSelectedOption[0] === props.id
-                                      : false;
+                                  const foundSelectedOption = selectedOption.filter(option => {
+                                      return option[0] === id
+                                  })[0]
+                                  return foundSelectedOption ? foundSelectedOption[0] === id : false
                               })()
-                            : props.selectedOption[0] === props.id;
-                    else return false;
+                            : selectedOption[0] === id
+                    else return false
                 })() &&
-                !props.defaultOption
-                    ? " selected"
-                    : ""
+                !defaultOption
+                    ? ' selected'
+                    : ''
             }`}
             onClick={() => {
-                if (!props.defaultOption) {
-                    props.setSelectedOption(
-                        props.multiSelect
-                            ? props.selectedOption.filter(
-                                  (option) => option[0] === props.id
-                              ).length
-                                ? props.selectedOption.filter(
-                                      (option) => option[0] !== props.id
-                                  )
-                                : [
-                                      ...props.selectedOption,
-                                      [props.id, props.children]
-                                  ]
-                            : [props.id, props.children]
-                    );
-                }
-                props.setDisableSelecting(true);
-                if (!props.multiSelect) {
-                    setTimeout(() => {
-                        props.setShowOptions(false);
-                    }, 450);
+                if (Date.now() > pauseClickTime.current) {
+                    if (!defaultOption && setSelectedOption) {
+                        setSelectedOption(
+                            multiSelect
+                                ? selectedOption.filter(option => option[0] === id).length
+                                    ? selectedOption.filter(option => option[0] !== id)
+                                    : [...selectedOption, [id, children]]
+                                : [id, children]
+                        )
+                    }
+                    setDisableSelecting(true)
+                    if (!multiSelect) {
+                        setTimeout(() => {
+                            //setShowOptions(false)
+                        }, 450)
+                    }
+                    pauseClickTime.current = Date.now() + 350
                 }
             }}
         >
-            <span className={"select-option-icon material-symbols-outlined"}>
-                arrow_right
-            </span>
-            <pre ref={props.textRef}>{props.children}</pre>
+            <span className={'select-option-icon material-icons-outlined'}>arrow_right</span>
+            <pre ref={textRef}>{children}</pre>
         </div>
-    );
-};
+    )
 
-export default SelectOption;
+    return (
+        <Select className={"submenu-selector"} options={[1, 2, 3]} index={String(parseInt(selectOptionsIndex) + 1)}>
+            {selectOption}
+        </Select>
+    )
+}
+
+export default SelectOption

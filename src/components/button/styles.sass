@@ -1,13 +1,13 @@
 @import "../../colors.sass"
 @import "../../variables.sass"
 
-.button
-    padding: 12px 15px 12px 20px
+.tv-tool-button
+    padding: 10px
     width: max-content
     background-color: $white
     color: $black
     border-radius: 5px
-    font-weight: 400
+    font-weight: 300
     cursor: pointer
     border: 1px solid transparent
     transition: all 250ms cubic-bezier(.4,.2,0,1)
@@ -15,13 +15,11 @@
     justify-content: center
     align-items: center
     opacity: .9
-    font-size: 14px
+    font-size: 13px
     position: relative
     overflow: hidden
+    letter-spacing: 1px
     @include disable-selecting
-
-    &.icon-button
-        padding: 15px
 
     &.loading
         cursor: wait
@@ -31,17 +29,32 @@
         width: 150px
         pointer-events: none
         background: transparent
-        background: linear-gradient(90deg, rgba(0,0,0,0) 8%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0) 82%)
+        background: linear-gradient(90deg, rgba($black-rgb,0) 8%, rgba($black-rgb,0.2) 50%, rgba($black-rgb,0) 82%)
         position: absolute
         top: 0
         left: 0
         animation: loading 2s cubic-bezier(.4,.2,0,1) infinite
 
     &.with-shadow
-        box-shadow: 0 15px 50px rgba(0, 0, 0, .1)
+        box-shadow: 0 15px 50px rgba(0, 0, 0, .05)
+
+
+
+    &.grey
+        color: $grey
+
+        .loading-effect
+            background: linear-gradient(90deg, rgba($grey-rgb,0) 8%, rgba($grey-rgb,0.2) 50%, rgba($grey-rgb,0) 82%)
+
+
+        .button-icon
+            color: $grey
 
     &.green
         color: $green
+
+        .loading-effect
+            background: linear-gradient(90deg, rgba($green-rgb,0) 8%, rgba($green-rgb,0.2) 50%, rgba($green-rgb,0) 82%)
 
         .button-icon
             color: $green
@@ -49,11 +62,17 @@
     &.red
         color: $red
 
+        .loading-effect
+            background: linear-gradient(90deg, rgba($red-rgb,0) 8%, rgba($red-rgb,0.2) 50%, rgba($red-rgb,0) 82%)
+
         .button-icon
             color: $red
 
     &.blue
         color: $blue
+
+        .loading-effect
+            background: linear-gradient(90deg, rgba($blue-rgb,0) 8%, rgba($blue-rgb,0.2) 50%, rgba($blue-rgb,0) 82%)
 
         .button-icon
             color: $blue
@@ -61,27 +80,29 @@
     &.yellow
         color: $yellow
 
+        .loading-effect
+            background: linear-gradient(90deg, rgba($yellow-rgb,0) 8%, rgba($yellow-rgb,0.2) 50%, rgba($yellow-rgb,0) 82%)
+
         .button-icon
             color: $yellow
-
 
     &:active
         &:not(.disabled)
             opacity: 1
 
             &.with-shadow
-                box-shadow: 0px 10px 40px rgba(0, 0, 0, .1)
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0)
 
     &.primary
         background-color: $black
         color: $white
-        border: 1px solid $black
+        font-weight: 500
 
         .loading-effect
             height: 150%
             width: 150%
             background: transparent
-            background: linear-gradient(90deg, rgba(255,255,255,0) 8%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 82%)
+            background: linear-gradient(90deg, rgba(255,255,255,0) 8%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 82%)
 
         .button-icon
             color: $white
@@ -89,7 +110,6 @@
         &.grey
             background-color: $grey
             color: $black
-            border: 1px solid $grey
 
             .button-icon
                 color: $black
@@ -97,7 +117,6 @@
         &.green
             background-color: $green
             color: $green-light
-            border: 1px solid $green
 
             .button-icon
                 color: $green-light
@@ -105,7 +124,6 @@
         &.red
             background-color: $red
             color: $red-light
-            border: 1px solid $red
 
             .button-icon
                 color: $red-light
@@ -113,7 +131,6 @@
         &.blue
             background-color: $blue
             color: $blue-light
-            border: 1px solid $blue
 
             .button-icon
                 color: $blue-light
@@ -121,7 +138,6 @@
         &.yellow
             background-color: $yellow
             color: $yellow-light
-            border: 1px solid $yellow
 
             .button-icon
                 color: $yellow-light
@@ -129,11 +145,11 @@
     &.outlined
         background-color: $white
         color: $black
-        border: 1px solid rgba($black-rgb, .6)
+        border: 1px solid $black
 
         &.grey
             background-color: rgba($grey-rgb, .02)
-            color: $grey
+            color: $black
             border: 1px solid rgba($grey-rgb, .6)
 
         &.green
@@ -161,6 +177,7 @@
         cursor: default
 
     .button-icon
+        pointer-events: none
         line-height: 0
         height: 0
         width: 0
@@ -170,14 +187,6 @@
         align-items: center
         color: $black
         padding: 0
-
-    &.text
-        padding: 0
-        background-color: transparent
-        border-radius: 0
-        border: 0 solid transparent
-        opacity: 1
-        font-size: 14px
 
 @keyframes loading
     from

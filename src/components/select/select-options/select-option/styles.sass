@@ -1,11 +1,15 @@
 @import "../../../../colors"
 
+.submenu-selector
+    > div
+        display: contents
+
 .select-option
     padding: 10px
     color: rgba(0, 0, 0, .8)
     background-color: transparent
     transition: all 350ms cubic-bezier(.4, .2, 0, 1)
-    border-radius: 5px
+    border-radius: 10px
     display: flex
     justify-content: flex-start
     align-items: center
@@ -18,12 +22,12 @@
     > pre
         padding-right: 10px
         font-size: 14px
-        color: #888
+        color: rgba($black-rgb, .6)
         overflow: hidden
 
     &.default-option
         > pre
-            color: #888
+            color: rgba($black-rgb, .6)
 
     &.hide-option
         height: 0
@@ -42,11 +46,12 @@
     &:hover
         > pre
             color: $black
-        background-color: rgba(0, 0, 0, .02)
+        background-color: rgba($black-rgb, .05)
 
     &.selected
         padding-left: 25px
         width: 100%
+
         > pre
             color: $black
 

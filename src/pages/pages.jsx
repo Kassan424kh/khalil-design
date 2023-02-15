@@ -13,6 +13,7 @@ import RichTextfieldPage from "./rich-textfield/rich-textfield-page";
 const Pages = () => {
     return (
         <Routes>
+            <Route exact path={"/"} element={<SelectPage />} />
             <Route exact path={"/tabs"} element={<Tabs />} />
             <Route exact path={"/button"} element={<ButtonPage />} />
             <Route exact path={"/infos-card"} element={<InfosCardPage />} />
