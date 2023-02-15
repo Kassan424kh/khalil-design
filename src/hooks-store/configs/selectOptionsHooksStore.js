@@ -62,10 +62,28 @@ const configureStore = () => {
             })
             return oldState
         },
+        DELETE_SUB_SELECT_OPTIONS: (oldState, index) => {
+            if (index !== "0") delete oldState.selectOptions[index]
+            return oldState
+        },
+        DELETE_ALL_SUB_SELECT_OPTIONS: (oldState) => {
+            Object.keys(oldState.selectOptions).forEach(soIndex => {
+                if (soIndex !== "0") delete oldState.selectOptions[soIndex]
+            })
+            return oldState
+        },
+        CLOSE_SELECT_OPTION: (oldState, index) => {
+            oldState.selectOptions[index] = {
+                ...oldState.selectOptions[index],
+                show: false,
+                lastUpdate: Date.now()
+            }
+            return oldState
+        },
         UPDATE_DATA: (prevState, data) => {
             const dataIncludeIndex = Object.keys(data).includes("index")
-            if (!dataIncludeIndex ){
-                console.error ("`selectOptionsHooksStore.js` => `UPDATE_DATA` data object don't incluedes `index` key")
+            if (!dataIncludeIndex) {
+                console.error("`selectOptionsHooksStore.js` => `UPDATE_DATA` data object don't incluedes `index` key")
                 return prevState
             }
 

@@ -62,9 +62,9 @@ const Select = ({
     const selectId = useState(uuidv4())[0]
 
     // hook store
-    const {selectOptions: selectOptionsOnStore} = useStore()[0]
-    const selectOptionsDataAfterIndex = selectOptionsOnStore[index]
-    const dispatch = useStore(false)[1]
+    const [{ selectOptions }, dispatch] = useStore()
+    const {show: showOnStore, selectId: selectIdOnStore} = selectOptions[index] ?? {show: false, selectId: uuidv4()}
+
 
     // useState variables
     const [_options, _setOptions] = useState([])
@@ -92,6 +92,12 @@ const Select = ({
         if (close) {
             dispatch('CLOASE_ALL_SELECT_OPTIONS')
             setShowOptions(false)
+            const t = setTimeout(() => {
+                dispatch('CLOASE_ALL_SELECT_OPTIONS')
+                dispatch('DELETE_ALL_SUB_SELECT_OPTIONS')
+            }, 150)
+
+            return () => clearTimeout(t)
         }
     }, [close])
 
@@ -99,11 +105,11 @@ const Select = ({
     // if the id of now clicked select component
     // is not the same like the id of this component
     useEffect(() => {
-        if (selectOptionsDataAfterIndex?.selectId !== selectId) {
+        if (selectIdOnStore !== selectId) {
             setClick()
             setShowOptions(false)
         }
-    }, [selectOptionsDataAfterIndex?.selectId])
+    }, [selectIdOnStore])
 
     const [lastTimeUpdatedSelectedOptions, setLastTimeUpdatedSelectedOptions] = useState()
     const myRef = useRef([])
@@ -200,8 +206,8 @@ const Select = ({
 
     // close selectOptions from outside using store state data
     useEffect(() => {
-        if (!selectOptionsDataAfterIndex?.show) setShowOptions(false)
-    }, [selectOptionsDataAfterIndex?.show])
+        if (!showOnStore) setShowOptions(false) // TODO: fix closing the first selectOptionWindow
+    }, [showOnStore])
 
     const hoverTimeout = useRef()
     const [updateOptionsProperties, setUpdateOptionsProperties] = useState(1)
@@ -209,13 +215,12 @@ const Select = ({
         <div
             {...props}
             ref={ele => (myRef.current[0] = ele)}
-            className={`select disable-selecting ${className ? className : ''} ${showOptions ? ' active' : ''} ${
-                selectedOption.length &&
-                Object.keys(_options).filter(_optionKey => _optionKey === selectedOption[0]).length &&
-                enableSelectedStatusDot
+            className={`select disable-selecting ${className ? className : ''} ${showOptions ? ' active' : ''} ${selectedOption.length &&
+                    Object.keys(_options).filter(_optionKey => _optionKey === selectedOption[0]).length &&
+                    enableSelectedStatusDot
                     ? 'options-selected'
                     : ''
-            }`}
+                }`}
             id={selectId}
             onMouseEnter={() => {
                 setSelectMouseEnter(true)

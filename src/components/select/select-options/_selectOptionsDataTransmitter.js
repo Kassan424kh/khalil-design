@@ -36,8 +36,7 @@ const SelectOptionsDataTransmitter = ({
     index
 }) => {
     const [disableSelecting, setDisableSelecting] = useState(false)
-    const state = useStore(true)[0]
-    const dispatch = useStore(false)[1]
+    const [state, dispatch] = useStore()
     const [openDirections, setOpenDirections] = useState({
         top: top !== undefined ? top : true,
         bottom: bottom !== undefined ? bottom : true,

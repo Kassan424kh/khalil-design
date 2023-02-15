@@ -9,8 +9,7 @@ const Messages = () => {
     const [show, setShow] = useState(false);
     const [showUngroupButton, setShowUngroupButton] = useState(false);
     const [hoverTimeout, setHoverTimeout] = useState();
-    const dispatch = useStore(false)[1];
-    const state = useStore(true)[0];
+    const [state, dispatch] = useStore();
 
     const messageTypes = {
         SUCCESS: "success",

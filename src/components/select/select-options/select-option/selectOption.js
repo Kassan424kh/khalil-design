@@ -64,7 +64,7 @@ const SelectOption = ({
     )
 
     return (
-        <Select className={"submenu-selector"} options={[1, 2, 3]} index={String(parseInt(selectOptionsIndex) + 1)}>
+        <Select className={"submenu-selector"} options={[1, 2, 3]} index={String(parseInt(selectOptionsIndex) + 1)} enableSearch>
             {selectOption}
         </Select>
     )

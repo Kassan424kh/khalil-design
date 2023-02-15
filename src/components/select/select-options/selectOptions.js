@@ -12,14 +12,18 @@ import _ from 'underscore'
 import gsap from 'gsap'
 
 const SelectOptions = ({ index = "0" }) => {
-    const {selectOptions: selectOptionsOnStore} = useStore()[0]
+    const [{selectOptions: selectOptionsOnStore}, dispatch] = useStore()
     const selectOptionsDataAfterIndex = selectOptionsOnStore[index]
-    const dispatch = useStore(false)[1]
+    const lengthAllSelectOptions = Object.values(selectOptionsOnStore).length
+    const thisSelectIsActiveNow = String(lengthAllSelectOptions - 1) <= index
     const [selectOptionsData, setSelectOptionsData] = useState(defaultSelectOptionsData.selectOptions[0])
     const [updateSelectOptionsTimes, setUpdateSelectOptionsTimes] = useState(0)
 
     const closeSelectOptions = () => {
-        dispatch('CLOASE_ALL_SELECT_OPTIONS')
+        if (index === "0") {
+            dispatch('CLOSE_SELECT_OPTION', index)
+        }
+        else dispatch('DELETE_SUB_SELECT_OPTIONS', index)
     }
 
     const [searchText, setSearchText] = useState('')
@@ -367,6 +371,7 @@ const SelectOptions = ({ index = "0" }) => {
     }, [selectOptionsData])
 
     // update selectOptionsData state after check if there is a real change
+    const prevLengthAllSelectOptions = useRef(1)
     useEffect(() => {
         setSelectOptionsData(currentSelectOptionsData => {
             if (JSON.stringify({
@@ -385,18 +390,19 @@ const SelectOptions = ({ index = "0" }) => {
                     ...currentSelectOptionsData.selectButtonProperties,
                     offset: null
                 }
-            })) {
+            }) || lengthAllSelectOptions != prevLengthAllSelectOptions.current) {
                 if (selectOptionsData.selectId !== selectOptionsDataAfterIndex.selectId || !selectOptionsDataAfterIndex.show) {
                     setSearchText('')
                 }
-                
-                console.log(selectOptionsDataAfterIndex)
+                console.log(selectOptionsOnStore)
+                console.log(prevLengthAllSelectOptions.current, lengthAllSelectOptions)
+                prevLengthAllSelectOptions.current = lengthAllSelectOptions
                 return selectOptionsDataAfterIndex
             }
             return currentSelectOptionsData
         })
         
-    }, [selectOptionsDataAfterIndex])
+    }, [selectOptionsDataAfterIndex, lengthAllSelectOptions])
 
     const searchFieldRef = useRef()
     useEffect(() => {
@@ -447,7 +453,7 @@ const SelectOptions = ({ index = "0" }) => {
                 maxHeight: selectOptionsData.enableSearch ? selectOptionsActionsScrollHeight : 0,
                 opacity: selectOptionsData.enableSearch ? 1 : 0,
                 paddingTop: selectOptionsData.enableSearch ? 1 : 0,
-                pointerEvents: wasShown && selectOptionsData.enableSearch ? 'auto' : 'none',
+                pointerEvents: wasShown && selectOptionsData.enableSearch && thisSelectIsActiveNow ? 'auto' : 'none',
                 duration: 0.15,
                 delay: 0.05
             })
@@ -460,7 +466,7 @@ const SelectOptions = ({ index = "0" }) => {
 
             gsap.to(`.select-options[index="${index}"] .select-options-actions .select-options-search-field input`, {
                 opacity: selectOptionsData.showSelectedParallel ? 0 : 1,
-                pointerEvents: !wasShown || selectOptionsData.showSelectedParallel ? 'none' : 'auto',
+                pointerEvents: !wasShown || selectOptionsData.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
                 duration: 0.15,
                 delay: 0.05,
             })
@@ -471,7 +477,7 @@ const SelectOptions = ({ index = "0" }) => {
                     borderColor: selectOptionsData.showSelectedParallel ? 'var(--grey)' : 'transparent',
                     borderTopRightRadius: selectOptionsData.showSelectedParallel ? 10 : 0,
                     borderBottomRightRadius: selectOptionsData.showSelectedParallel ? 10 : 0,
-                    pointerEvents: wasShown && enableSelectAllButton ? 'auto' : 'none',
+                    pointerEvents: wasShown && enableSelectAllButton && thisSelectIsActiveNow ? 'auto' : 'none',
                     opacity: enableSelectAllButton ? 1 : 0,
                     translateX: enableSelectAllButton ? 0 : -20,
                     duration: 0.15,
@@ -483,7 +489,7 @@ const SelectOptions = ({ index = "0" }) => {
             )
         }, 20)
         return () => clearTimeout(animateTimeout.current)
-    }, [selectButtonProperties, selectOptionsData])
+    }, [selectButtonProperties, selectOptionsData, lengthAllSelectOptions])
 
     const getNextXY = () => {
         const optionsProperties = getDimensions({
@@ -540,31 +546,37 @@ const SelectOptions = ({ index = "0" }) => {
                 const distance = Math.sqrt(
                     Math.pow(parseFloat(prevX) - parseFloat(x), 2) + Math.pow(parseFloat(prevY) - parseFloat(y), 2)
                 )
-                const distanceToSeconds = Math.min(Math.max((distance / 50) * 0.04, 0.15), 0.35)
+                const distanceToSeconds = Math.min(Math.max((distance / 50) * 0.04, 0.1), 0.25)
 
                 gsap.to(`.select-options[index="${index}"]`, {
                     x: x,
                     y: y,
-                    scale: selectOptionsData.show ? 1 : 0.99,
                     minWidth: Math.max(maxOptionTextWidth + 10, 250),
-                    opacity: selectOptionsData.show ? 1 : 0,
-                    pointerEvents: selectOptionsData.show ? 'auto' : 'none',
-                    duration: selectOptionsData.show && !firstTimeRender.current ? distanceToSeconds : 0,
+                    duration: selectOptionsData.show ? distanceToSeconds : 0,
                     onComplete: () => {
-                        prevData.current = {
-                            closed: !selectOptionsData.show,
-                            showSelectedParallel: selectOptionsData.showSelectedParallel,
-                            x: x,
-                            y: y
-                        }
-                        firstTimeRender.current = false
+                        gsap.to(`.select-options[index="${index}"]`, {
+                            opacity: selectOptionsData.show ? thisSelectIsActiveNow ? 1 : .8 : 0,
+                            filter: `blur(${selectOptionsData.show  && thisSelectIsActiveNow ? 0 : 2}px)`,
+                            pointerEvents: selectOptionsData.show && thisSelectIsActiveNow ? 'auto' : 'none',
+                            duration: selectOptionsData.show ? distanceToSeconds : 0,
+                            delay: .35,
+                            onComplete: () => {
+                                prevData.current = {
+                                    closed: !selectOptionsData.show,
+                                    showSelectedParallel: selectOptionsData.showSelectedParallel,
+                                    x: x,
+                                    y: y
+                                }
+                                firstTimeRender.current = false
+                            }
+                        })
                     }
                 })
             },
-            prevShowSelectedParallel ? 350 : 0
+            prevShowSelectedParallel ? 100 : 0
         )
         return () => clearTimeout(t)
-    }, [updateSelectOptionsTimes])
+    }, [updateSelectOptionsTimes, lengthAllSelectOptions])
 
     return (
         <div
@@ -592,7 +604,7 @@ const SelectOptions = ({ index = "0" }) => {
                     index={index}
                 >
                     <TextField
-                        inputRef={selectOptionsData.showSelectedParallel || !selectOptionsData.enableSearch ? null : r => r && r.focus()}
+                        inputRef={selectOptionsData.showSelectedParallel || !selectOptionsData.enableSearch || !thisSelectIsActiveNow ? null : r => r && r.focus()}
                         className={`select-options-search-field`}
                         beforeComponent={
                             <div className={'select-all-buttons'}>
@@ -632,7 +644,9 @@ const SelectOptions = ({ index = "0" }) => {
                             </div>
                         }
                         afterComponent={
-                            <Button className={'close-button'} onClick={closeSelectOptions}>
+                            <Button className={'close-button'} onClick={() => {
+                                closeSelectOptions()
+                            }}>
                                 {selectOptionsData.closeButtonText ?? 'done'}
                             </Button>
                         }
@@ -670,7 +684,7 @@ const SelectOptions = ({ index = "0" }) => {
                                 {selectOptionsData.showSelectedParallel ? (
                                     <TextField
                                         className="search-field-parallel-view"
-                                        inputRef={viewport === 3 || !selectOptionsData.enableSearch ? null : r => (searchFieldRef.current = r)}
+                                        inputRef={viewport === 3 || !selectOptionsData.enableSearch || !thisSelectIsActiveNow ? null : r => (searchFieldRef.current = r)}
                                         value={viewport === 1 ? searchTextUnselectedTail : searchTextSelectedTail}
                                         placeholder={selectOptionsData.searchPlaceHolder ?? 'finde options'}
                                         onChange={_searchText => {

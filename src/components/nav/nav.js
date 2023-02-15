@@ -8,8 +8,7 @@ import { useStore } from "../../hooks-store/store";
 import Theme from "../../_themes";
 
 const Nav = (props) => {
-    const dispatch = useStore(false)[1];
-    const state = useStore()[0];
+    const [state, dispatch] = useStore()
     const myRef = useRef();
     const [firstTimeLoading, setFirstTimeLoading] = useState(true);
     const [pinned, setPinned] = useState(

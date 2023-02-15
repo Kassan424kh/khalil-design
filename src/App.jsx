@@ -21,14 +21,12 @@ messagesUpdaterConfig();
 selectOptionsHooksStore();
 
 export default function App() {
-    const { showLoadingSpinner, selectOptions } = useStore()[0]
+    const [{ showLoadingSpinner, selectOptions }, dispatch] = useStore()
     
     // set Theme
     useEffect(() => {
         new Theme()
     }, [])
-
-    const dispatch = useStore(true)[1];
     const alertMessage = async ({
         message,
         status,
