@@ -196,18 +196,14 @@ const Select = ({
 
     // close selectOptions if clicked outside this select component
     useClickOutside({ current: myRef.current[0] }, e => {
-        const $selectOptions = $('.select-options')
+        const $selectOptions = $(`.select-options`)
 
         // if the target of the click isn't the container nor a descendant of the container
         if (!$selectOptions.is(e.target) && $selectOptions.has(e.target).length === 0) {
-            setShowOptions(false)
+            dispatch('DELETE_ALL_SUB_SELECT_OPTIONS')
+            dispatch('CLOSE_SELECT_OPTION', index)
         }
     })
-
-    // close selectOptions from outside using store state data
-    useEffect(() => {
-        if (!showOnStore) setShowOptions(false) // TODO: fix closing the first selectOptionWindow
-    }, [showOnStore])
 
     const hoverTimeout = useRef()
     const [updateOptionsProperties, setUpdateOptionsProperties] = useState(1)
@@ -222,6 +218,7 @@ const Select = ({
                     : ''
                 }`}
             id={selectId}
+            index={index}
             onMouseEnter={() => {
                 setSelectMouseEnter(true)
                 setHover(Date.now())

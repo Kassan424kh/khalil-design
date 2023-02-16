@@ -52,34 +52,6 @@ export const defaultSelectOptionsData = {
 
 const configureStore = () => {
     const actions = {
-        CLOASE_ALL_SELECT_OPTIONS: oldState => {
-            Object.keys(oldState.selectOptions).map(soKey => {
-                oldState.selectOptions[soKey] = {
-                    ...oldState.selectOptions[soKey],
-                    show: false,
-                    lastUpdate: Date.now()
-                }
-            })
-            return oldState
-        },
-        DELETE_SUB_SELECT_OPTIONS: (oldState, index) => {
-            if (index !== "0") delete oldState.selectOptions[index]
-            return oldState
-        },
-        DELETE_ALL_SUB_SELECT_OPTIONS: (oldState) => {
-            Object.keys(oldState.selectOptions).forEach(soIndex => {
-                if (soIndex !== "0") delete oldState.selectOptions[soIndex]
-            })
-            return oldState
-        },
-        CLOSE_SELECT_OPTION: (oldState, index) => {
-            oldState.selectOptions[index] = {
-                ...oldState.selectOptions[index],
-                show: false,
-                lastUpdate: Date.now()
-            }
-            return oldState
-        },
         UPDATE_DATA: (prevState, data) => {
             const dataIncludeIndex = Object.keys(data).includes("index")
             if (!dataIncludeIndex) {
@@ -115,6 +87,34 @@ const configureStore = () => {
             return newDataNotEqualToOldData
                 ? nextState
                 : prevState
+        },
+        CLOASE_ALL_SELECT_OPTIONS: prevState => {
+            const nextState = deepCopy(prevState)
+            Object.keys(nextState.selectOptions).map(soKey => {
+                nextState.selectOptions[soKey]["show"] = false
+                nextState.selectOptions[soKey]["lastUpdate"] = Date.now()
+            })
+            return nextState
+        },
+        CLOSE_SELECT_OPTION: (prevState, index) => {
+            const nextState = deepCopy(prevState)
+            Object.keys(nextState.selectOptions).forEach(soKey => {
+                if (soKey === index ) {
+                    nextState.selectOptions[index]["show"] = false
+                    nextState.selectOptions[index]["lastUpdate"] = Date.now()
+                }
+            })
+            return nextState
+        },
+        DELETE_SUB_SELECT_OPTIONS: (prevState, index) => {
+            if (index !== "0") delete prevState.selectOptions[index]
+            return prevState
+        },
+        DELETE_ALL_SUB_SELECT_OPTIONS: (prevState) => {
+            Object.keys(prevState.selectOptions).forEach(soIndex => {
+                if (soIndex !== "0") delete prevState.selectOptions[soIndex]
+            })
+            return prevState
         }
     }
     initStore(actions, defaultSelectOptionsData)

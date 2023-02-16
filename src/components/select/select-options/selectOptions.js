@@ -12,10 +12,10 @@ import _ from 'underscore'
 import gsap from 'gsap'
 
 const SelectOptions = ({ index = "0" }) => {
-    const [{selectOptions: selectOptionsOnStore}, dispatch] = useStore()
+    const [{ selectOptions: selectOptionsOnStore }, dispatch] = useStore()
     const selectOptionsDataAfterIndex = selectOptionsOnStore[index]
     const lengthAllSelectOptions = Object.values(selectOptionsOnStore).length
-    const thisSelectIsActiveNow = String(lengthAllSelectOptions - 1) <= index
+    const thisSelectIsActiveNow = lengthAllSelectOptions - 1 <= index
     const [selectOptionsData, setSelectOptionsData] = useState(defaultSelectOptionsData.selectOptions[0])
     const [updateSelectOptionsTimes, setUpdateSelectOptionsTimes] = useState(0)
 
@@ -401,7 +401,7 @@ const SelectOptions = ({ index = "0" }) => {
             }
             return currentSelectOptionsData
         })
-        
+
     }, [selectOptionsDataAfterIndex, lengthAllSelectOptions])
 
     const searchFieldRef = useRef()
@@ -422,7 +422,7 @@ const SelectOptions = ({ index = "0" }) => {
 
     const animateTimeout = useRef()
     const prevData = useRef({
-        closed: true,
+        wasClosed: true,
         showSelectedParallel: false,
         x: 0,
         y: 0
@@ -487,7 +487,7 @@ const SelectOptions = ({ index = "0" }) => {
                     }
                 }
             )
-        }, 20)
+        }, 150)
         return () => clearTimeout(animateTimeout.current)
     }, [selectButtonProperties, selectOptionsData, lengthAllSelectOptions])
 
@@ -497,8 +497,7 @@ const SelectOptions = ({ index = "0" }) => {
         })
         const x = moveHorizontal(
             optionsProperties,
-            `${
-                selectButtonProperties.offset ? selectButtonProperties.offset.left + selectButtonProperties.width : 0
+            `${selectButtonProperties.offset ? selectButtonProperties.offset.left + selectButtonProperties.width : 0
             }px`,
             `${selectButtonProperties.offset ? selectButtonProperties.offset.left - optionsProperties.width : 0}px`,
             selectButtonProperties.offset
@@ -508,84 +507,87 @@ const SelectOptions = ({ index = "0" }) => {
 
         const y = moveVertikal(
             optionsProperties,
-            `${
-                selectButtonProperties.offset ? selectButtonProperties.offset.top + selectButtonProperties.height : 0
+            `${selectButtonProperties.offset ? selectButtonProperties.offset.top + selectButtonProperties.height / 2 : 0
             }px`,
-            `${selectButtonProperties.offset ? selectButtonProperties.offset.top - optionsProperties.height : 0}px`,
+            `${selectButtonProperties.offset ? selectButtonProperties.offset.top - optionsProperties.height - selectButtonProperties.height / 2 : 0}px`,
             `${selectButtonProperties.top}px`
         )
         return { x, y }
     }
 
+    const firstRenderTimeout = useRef()
     const firstTimeRender = useRef(true)
     useEffect(() => {
-        const { x: prevX, y: prevY, showSelectedParallel: prevShowSelectedParallel } = prevData.current
-        let nextXY = getNextXY()
+        if (firstRenderTimeout.current) clearTimeout(firstRenderTimeout.current)
+        const { x: prevX, y: prevY, showSelectedParallel: prevShowSelectedParallel, wasClosed } = prevData.current
 
-        if (prevShowSelectedParallel) {
-            gsap.to(`.select-options[index="${index}"]`, {
-                minWidth: Math.max(maxOptionTextWidth + 10, 250),
-                duration: 0,
-                onComplete: () => {
-                    setTimeout(() => {
+        firstRenderTimeout.current = setTimeout(() => {
+            let nextXY = getNextXY()
+            const { x, y } = nextXY
+            const distance = Math.sqrt(
+                Math.pow(parseFloat(prevX) - parseFloat(x), 2) + Math.pow(parseFloat(prevY) - parseFloat(y), 2)
+            )
+            const distanceToSeconds = Math.min(Math.max((distance / 50) * 0.04, 0.1), 0.25)
+
+
+            const _toggleSelectOptions = () => {
+                gsap.to(`.select-options[index="${index}"]`, {
+                    opacity: selectOptionsData.show ? 1 : 0,
+                    filter: `blur(${selectOptionsData.show && thisSelectIsActiveNow ? 0 : 2}px)`,
+                    pointerEvents: selectOptionsData.show && thisSelectIsActiveNow ? 'auto' : 'none',
+                    duration: distanceToSeconds,
+                    onComplete: () => {
+                        prevData.current = {
+                            wasClosed: !selectOptionsData.show,
+                            showSelectedParallel: selectOptionsData.showSelectedParallel,
+                            x: x,
+                            y: y
+                        }
+                        firstTimeRender.current = false
+                    }
+                })
+            }
+
+            if (prevShowSelectedParallel || wasClosed) {
+                gsap.to(`.select-options[index="${index}"]`, {
+                    minWidth: Math.max(maxOptionTextWidth + 10, 250),
+                    duration: 0,
+                    onComplete: () => {
                         nextXY = getNextXY()
-                        const { x, _ } = nextXY
+                        const { x, y } = nextXY
                         gsap.to(`.select-options[index="${index}"]`, {
                             x: x,
-                            duration: 0.1
-                        })
-                    }, 20)
-                }
-            })
-        }
-
-        const { x, y } = nextXY
-
-        const t = setTimeout(
-            () => {
-                const distance = Math.sqrt(
-                    Math.pow(parseFloat(prevX) - parseFloat(x), 2) + Math.pow(parseFloat(prevY) - parseFloat(y), 2)
-                )
-                const distanceToSeconds = Math.min(Math.max((distance / 50) * 0.04, 0.1), 0.25)
-
-                gsap.to(`.select-options[index="${index}"]`, {
-                    x: x,
-                    y: y,
-                    minWidth: Math.max(maxOptionTextWidth + 10, 250),
-                    duration: selectOptionsData.show ? distanceToSeconds : 0,
-                    onComplete: () => {
-                        gsap.to(`.select-options[index="${index}"]`, {
-                            opacity: selectOptionsData.show ? thisSelectIsActiveNow ? 1 : .8 : 0,
-                            filter: `blur(${selectOptionsData.show  && thisSelectIsActiveNow ? 0 : 2}px)`,
-                            pointerEvents: selectOptionsData.show && thisSelectIsActiveNow ? 'auto' : 'none',
-                            duration: selectOptionsData.show ? distanceToSeconds : 0,
-                            delay: .35,
+                            y: y,
+                            duration: 0.1,
                             onComplete: () => {
-                                prevData.current = {
-                                    closed: !selectOptionsData.show,
-                                    showSelectedParallel: selectOptionsData.showSelectedParallel,
-                                    x: x,
-                                    y: y
-                                }
-                                firstTimeRender.current = false
+                                _toggleSelectOptions()
                             }
                         })
                     }
                 })
-            },
-            prevShowSelectedParallel ? 100 : 0
-        )
-        return () => clearTimeout(t)
-    }, [updateSelectOptionsTimes, lengthAllSelectOptions])
+            } else {
+                gsap.to(`.select-options[index="${index}"]`, {
+                    x: x,
+                    y: y,
+                    minWidth: Math.max(maxOptionTextWidth + 10, 250),
+                    duration: selectOptionsData.show && !wasClosed ? distanceToSeconds : 0,
+                    onComplete: () => {
+                        _toggleSelectOptions()
+                    }
+                })
+            }
+        }, wasClosed ? 500 : 150)
+
+        return () => clearTimeout(firstRenderTimeout.current)
+
+    }, [updateSelectOptionsTimes, selectOptionsData])
 
     return (
         <div
             ref={myRef}
-            className={`select-options disable-selecting${
-                selectOptionsData.headerText || selectOptionsData.enableSearch ? ' show-gradient-effect' : ''
-            } ${selectOptionsData.className ?? ''}${
-                selectOptionsData.showSelectedParallel ? ' show-selected-parallel' : ''
-            }${selectOptionsData.multiSelect ? ' multi-select' : ' single-select'}`}
+            className={`select-options disable-selecting${selectOptionsData.headerText || selectOptionsData.enableSearch ? ' show-gradient-effect' : ''
+                } ${selectOptionsData.className ?? ''}${selectOptionsData.showSelectedParallel ? ' show-selected-parallel' : ''
+                }${selectOptionsData.multiSelect ? ' multi-select' : ' single-select'}`}
             index={index}
         >
             <div>
@@ -594,13 +596,11 @@ const SelectOptions = ({ index = "0" }) => {
                 </div>
 
                 <div
-                    className={`select-options-actions${
-                        selectOptionsData.enableSearch
-                            ? ` with-search${
-                                  selectOptionsData.enableSelectAllButton ? ' with-select-all-buttons' : ''
-                              }${selectOptionsData.enableCloseButton ? ' with-close-button' : ''}`
-                            : ''
-                    }`}
+                    className={`select-options-actions${selectOptionsData.enableSearch
+                        ? ` with-search${selectOptionsData.enableSelectAllButton ? ' with-select-all-buttons' : ''
+                        }${selectOptionsData.enableCloseButton ? ' with-close-button' : ''}`
+                        : ''
+                        }`}
                     index={index}
                 >
                     <TextField
@@ -620,9 +620,9 @@ const SelectOptions = ({ index = "0" }) => {
 
                                                 return _searchedText !== ''
                                                     ? !foundOptions(_searchedText, option) ||
-                                                          selectOptionsData.selectedOption
-                                                              .map(o => o[0])
-                                                              .includes(option[0])
+                                                    selectOptionsData.selectedOption
+                                                        .map(o => o[0])
+                                                        .includes(option[0])
                                                     : true
                                             })
                                         )
@@ -635,8 +635,8 @@ const SelectOptions = ({ index = "0" }) => {
                                         selectOptionsData.setSelectedOption(
                                             selectOptionsData.showSelectedParallel && searchTextSelectedTail !== ''
                                                 ? selectOptionsData.selectedOption.filter(_selectedOption =>
-                                                      foundOptions(searchTextSelectedTail, _selectedOption)
-                                                  )
+                                                    foundOptions(searchTextSelectedTail, _selectedOption)
+                                                )
                                                 : []
                                         )
                                     }}
@@ -645,7 +645,10 @@ const SelectOptions = ({ index = "0" }) => {
                         }
                         afterComponent={
                             <Button className={'close-button'} onClick={() => {
+
+                                dispatch('CLOSE_SELECT_OPTION', index)
                                 closeSelectOptions()
+
                             }}>
                                 {selectOptionsData.closeButtonText ?? 'done'}
                             </Button>
@@ -656,9 +659,8 @@ const SelectOptions = ({ index = "0" }) => {
                     />
                 </div>
                 <div
-                    className={`select-options-body${
-                        !selectOptionsData.headerText ? ' header-text-is-not-enabled' : ''
-                    }`}
+                    className={`select-options-body${!selectOptionsData.headerText ? ' header-text-is-not-enabled' : ''
+                        }`}
                     data-cy={'select-options-body'}
                 >
                     {(selectOptionsData.showSelectedParallel ? [1, 2, 3] : [1]).map(viewport => {
@@ -666,15 +668,14 @@ const SelectOptions = ({ index = "0" }) => {
                             <div key={viewport} className={`content ${viewport}-ct`}>
                                 {selectOptionsData.showSelectedParallel ? (
                                     <div
-                                        className={`empty-listview-background-image ${
-                                            (selectOptionsData.selectedOption &&
-                                                selectOptionsData.selectedOption.length !==
-                                                    Object.entries(selectOptionsData.options).length &&
-                                                viewport === 1) ||
+                                        className={`empty-listview-background-image ${(selectOptionsData.selectedOption &&
+                                            selectOptionsData.selectedOption.length !==
+                                            Object.entries(selectOptionsData.options).length &&
+                                            viewport === 1) ||
                                             (selectOptionsData.selectedOption.length && viewport === 3)
-                                                ? 'hide'
-                                                : ''
-                                        }`}
+                                            ? 'hide'
+                                            : ''
+                                            }`}
                                     >
                                         <span className={'material-icons-outlined'}>
                                             {viewport === 3 ? 'done_all' : 'remove_done'}
@@ -737,14 +738,14 @@ const SelectOptions = ({ index = "0" }) => {
                                                 if (selectOptionsData.selectedOption.length)
                                                     return selectOptionsData.multiSelect
                                                         ? (() => {
-                                                              const foundSelectedOption =
-                                                                  selectOptionsData.selectedOption.filter(_option => {
-                                                                      return _option[0] === option[0]
-                                                                  })[0]
-                                                              return foundSelectedOption
-                                                                  ? foundSelectedOption[0] === option[0]
-                                                                  : false
-                                                          })()
+                                                            const foundSelectedOption =
+                                                                selectOptionsData.selectedOption.filter(_option => {
+                                                                    return _option[0] === option[0]
+                                                                })[0]
+                                                            return foundSelectedOption
+                                                                ? foundSelectedOption[0] === option[0]
+                                                                : false
+                                                        })()
                                                         : selectOptionsData.selectedOption[0] === option[0]
                                                 else return false
                                             })()
@@ -768,26 +769,26 @@ const SelectOptions = ({ index = "0" }) => {
                                                             ? searchTextUnselectedTail
                                                             : searchTextSelectedTail
                                                         : searchText) ||
-                                                    (selectOptionsData.showSelectedParallel &&
-                                                        ((wasSelected && viewport === 1) ||
-                                                            (!wasSelected && viewport === 3)))
+                                                        (selectOptionsData.showSelectedParallel &&
+                                                            ((wasSelected && viewport === 1) ||
+                                                                (!wasSelected && viewport === 3)))
                                                         ? (foundOptions(
-                                                              selectOptionsData.showSelectedParallel
-                                                                  ? viewport === 1
-                                                                      ? searchTextUnselectedTail
-                                                                      : searchTextSelectedTail
-                                                                  : searchText,
-                                                              option,
-                                                              selectOptionsData.searchEveryWare
-                                                          ) &&
-                                                              (selectOptionsData.showSelectedParallel
-                                                                  ? viewport === 1
-                                                                      ? !wasSelected
-                                                                      : wasSelected
-                                                                  : true)) ||
-                                                          (selectOptionsData.showSelectedParallel &&
-                                                              ((wasSelected && viewport === 1) ||
-                                                                  (!wasSelected && viewport === 3)))
+                                                            selectOptionsData.showSelectedParallel
+                                                                ? viewport === 1
+                                                                    ? searchTextUnselectedTail
+                                                                    : searchTextSelectedTail
+                                                                : searchText,
+                                                            option,
+                                                            selectOptionsData.searchEveryWare
+                                                        ) &&
+                                                            (selectOptionsData.showSelectedParallel
+                                                                ? viewport === 1
+                                                                    ? !wasSelected
+                                                                    : wasSelected
+                                                                : true)) ||
+                                                        (selectOptionsData.showSelectedParallel &&
+                                                            ((wasSelected && viewport === 1) ||
+                                                                (!wasSelected && viewport === 3)))
                                                         : false
                                                 }
                                             >
