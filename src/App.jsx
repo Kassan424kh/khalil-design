@@ -22,7 +22,7 @@ selectOptionsHooksStore();
 
 export default function App() {
     const [{ showLoadingSpinner, selectOptions }, dispatch] = useStore()
-    
+
     // set Theme
     useEffect(() => {
         new Theme()
@@ -54,11 +54,12 @@ export default function App() {
             <SelectOptions />
             {Object.keys(selectOptions).length > 1
                 ? Object.keys(selectOptions).map((_, selectOptionsIndex) =>
-                      selectOptionsIndex !== 0 ? (
-                          <SelectOptions key={selectOptionsIndex} index={String(selectOptionsIndex)} />
-                      ) : null
-                  )
+                    selectOptionsIndex !== 0 ? (
+                        <SelectOptions key={selectOptionsIndex} index={String(selectOptionsIndex)} />
+                    ) : null
+                )
                 : null}
         </div>
+
     );
 }

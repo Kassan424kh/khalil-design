@@ -474,7 +474,6 @@ const SelectOptions = ({ index = "0" }) => {
             gsap.to(
                 `.select-options[index="${index}"] .select-options-actions .select-options-search-field .select-all-buttons`,
                 {
-                    borderColor: selectOptionsData.showSelectedParallel ? 'var(--grey)' : 'transparent',
                     borderTopRightRadius: selectOptionsData.showSelectedParallel ? 10 : 0,
                     borderBottomRightRadius: selectOptionsData.showSelectedParallel ? 10 : 0,
                     pointerEvents: wasShown && enableSelectAllButton && thisSelectIsActiveNow ? 'auto' : 'none',
@@ -507,9 +506,9 @@ const SelectOptions = ({ index = "0" }) => {
 
         const y = moveVertikal(
             optionsProperties,
-            `${selectButtonProperties.offset ? selectButtonProperties.offset.top + selectButtonProperties.height / 2 : 0
+            `${selectButtonProperties.offset ? selectButtonProperties.offset.top + selectButtonProperties.height : 0
             }px`,
-            `${selectButtonProperties.offset ? selectButtonProperties.offset.top - optionsProperties.height - selectButtonProperties.height / 2 : 0}px`,
+            `${selectButtonProperties.offset ? selectButtonProperties.offset.top - optionsProperties.height - selectButtonProperties.height : 0}px`,
             `${selectButtonProperties.top}px`
         )
         return { x, y }
@@ -665,24 +664,8 @@ const SelectOptions = ({ index = "0" }) => {
                 >
                     {(selectOptionsData.showSelectedParallel ? [1, 2, 3] : [1]).map(viewport => {
                         return viewport !== 2 ? (
-                            <div key={viewport} className={`content ${viewport}-ct`}>
-                                {selectOptionsData.showSelectedParallel ? (
-                                    <div
-                                        className={`empty-listview-background-image ${(selectOptionsData.selectedOption &&
-                                            selectOptionsData.selectedOption.length !==
-                                            Object.entries(selectOptionsData.options).length &&
-                                            viewport === 1) ||
-                                            (selectOptionsData.selectedOption.length && viewport === 3)
-                                            ? 'hide'
-                                            : ''
-                                            }`}
-                                    >
-                                        <span className={'material-icons-outlined'}>
-                                            {viewport === 3 ? 'done_all' : 'remove_done'}
-                                        </span>
-                                    </div>
-                                ) : null}
-                                {selectOptionsData.showSelectedParallel ? (
+                            <div className={"select-options-column"}>
+{selectOptionsData.showSelectedParallel ? (
                                     <TextField
                                         className="search-field-parallel-view"
                                         inputRef={viewport === 3 || !selectOptionsData.enableSearch || !thisSelectIsActiveNow ? null : r => (searchFieldRef.current = r)}
@@ -698,6 +681,24 @@ const SelectOptions = ({ index = "0" }) => {
                                             }
                                         }}
                                     />
+                                ) : null}
+
+<div key={viewport} className={`content ${viewport}-ct`}>
+                                {selectOptionsData.showSelectedParallel ? (
+                                    <div
+                                        className={`empty-listview-background-image ${(selectOptionsData.selectedOption &&
+                                            selectOptionsData.selectedOption.length !==
+                                            Object.entries(selectOptionsData.options).length &&
+                                            viewport === 1) ||
+                                            (selectOptionsData.selectedOption.length && viewport === 3)
+                                            ? 'hide'
+                                            : ''
+                                            }`}
+                                    >
+                                        <span className={'material-icons-outlined'}>
+                                            {viewport === 3 ? 'done_all' : 'remove_done'}
+                                        </span>
+                                    </div>
                                 ) : null}
                                 {selectOptionsData.defaultOption && viewport === 1 ? (
                                     <SelectOption
@@ -762,7 +763,7 @@ const SelectOptions = ({ index = "0" }) => {
                                                 multiSelect={selectOptionsData.multiSelect}
                                                 selectedOption={selectOptionsData.selectedOption}
                                                 setShowOptions={closeSelectOptions}
-                                                //setSelectedOption={selectOptionsData.setSelectedOption}
+                                                setSelectedOption={selectOptionsData.setSelectedOption}
                                                 hide={
                                                     (selectOptionsData.showSelectedParallel
                                                         ? viewport === 1
@@ -797,6 +798,7 @@ const SelectOptions = ({ index = "0" }) => {
                                         )
                                     })}
                                 </div>
+                            </div>
                             </div>
                         ) : (
                             <div key={viewport} className={'vertical-rule'} />

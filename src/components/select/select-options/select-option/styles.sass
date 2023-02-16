@@ -6,7 +6,7 @@
         display: contents
 
 .select-option
-    padding: 10px
+    padding: 10px 15px
     color: rgba(0, 0, 0, .8)
     background-color: transparent
     transition: all 350ms cubic-bezier(.4, .2, 0, 1)
@@ -21,7 +21,7 @@
     box-sizing: border-box
 
     > pre
-        padding-right: 10px
+        padding-right: 15px
         font-size: 14px
         color: rgba($black-rgb, .6)
         overflow: hidden
@@ -43,11 +43,19 @@
         position: absolute
         left: -20px
         opacity: 0
+        
+        &.submenu
+            opacity: 1
+            right: 2.5px
+            color: $black
+            left: auto
+            font-size: 15px
+            opacity: .8
 
     &:hover
         > pre
             color: $black
-        background-color: rgba($black-rgb, .05)
+        background-color: rgba($black-rgb, .1)
 
     &.selected
         padding-left: 25px
@@ -59,3 +67,8 @@
         .select-option-icon
             opacity: 1
             left: 2.5px
+
+            &.submenu
+                opacity: .8
+                right: 2.5px
+                left: auto

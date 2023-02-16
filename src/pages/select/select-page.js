@@ -2,10 +2,8 @@ import "./styles.sass";
 import Select from "../../components/select/select";
 
 const SelectPage = () => {
-    const options = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
     return (
-        <div className="page infos-card-page">
+        <div className="page">
             <Select
                 enableSearch
                 filterOnly={"unselected"}
@@ -13,7 +11,14 @@ const SelectPage = () => {
                 showSelectedParallel
                 enableCloseButton
                 enableSelectAllButton
-                options={options}
+                options={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+            >
+                click me to open select options
+            </Select>
+            <Select
+                enableSearch
+                enableSelectAllButton
+                options={{ "1": "asdf1", "2": "asdf2", "3": ["asdf3", [1, 2, [3, [55, 55, 66]]]] }}
             >
                 click me to open select options
             </Select>

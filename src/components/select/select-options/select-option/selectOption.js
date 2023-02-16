@@ -16,6 +16,7 @@ const SelectOption = ({
     selectOptionsIndex
 }) => {
     const pauseClickTime = useRef(Date.now())
+    const isSubmenu = Array.isArray(children) && children.length === 2
 
     const selectOption = (
         <div
@@ -49,9 +50,9 @@ const SelectOption = ({
                         )
                     }
                     setDisableSelecting(true)
-                    if (!multiSelect) {
+                    if (!multiSelect && !isSubmenu) {
                         setTimeout(() => {
-                            //setShowOptions(false)
+                            setShowOptions(false)
                         }, 450)
                     }
                     pauseClickTime.current = Date.now() + 350
@@ -59,14 +60,15 @@ const SelectOption = ({
             }}
         >
             <span className={'select-option-icon material-icons-outlined'}>arrow_right</span>
-            <pre ref={textRef}>{children}</pre>
+            <pre ref={textRef}>{isSubmenu ? children[0] : children}</pre>
+            {isSubmenu && !multiSelect ? <span className={'select-option-icon submenu material-icons'}>checklist</span> : null}
         </div>
     )
 
     return (
-        <Select className={"submenu-selector"} options={[1, 2, 3]} index={String(parseInt(selectOptionsIndex) + 1)} enableSearch>
+        isSubmenu && !multiSelect ? <Select className={"submenu-selector"} options={children[1]} index={String(parseInt(selectOptionsIndex) + 1)} enableSearch>
             {selectOption}
-        </Select>
+        </Select> : selectOption
     )
 }
 

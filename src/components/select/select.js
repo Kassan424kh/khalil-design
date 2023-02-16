@@ -63,7 +63,7 @@ const Select = ({
 
     // hook store
     const [{ selectOptions }, dispatch] = useStore()
-    const {show: showOnStore, selectId: selectIdOnStore} = selectOptions[index] ?? {show: false, selectId: uuidv4()}
+    const { show: showOnStore, selectId: selectIdOnStore } = selectOptions[index] ?? { show: false, selectId: uuidv4() }
 
 
     // useState variables
@@ -127,7 +127,9 @@ const Select = ({
     // this useEffect is usefull to update state after only realy new object
     useEffect(() => {
         _setOptions(_currentOptions => {
-            if (options && !_.isEqual(options, _currentOptions)) return options
+            if (options && !_.isEqual(options, _currentOptions)) {
+                return options
+            }
             return _currentOptions
         })
     }, [options])
@@ -196,10 +198,14 @@ const Select = ({
 
     // close selectOptions if clicked outside this select component
     useClickOutside({ current: myRef.current[0] }, e => {
+        const $select = $(`.select`)
         const $selectOptions = $(`.select-options`)
 
         // if the target of the click isn't the container nor a descendant of the container
-        if (!$selectOptions.is(e.target) && $selectOptions.has(e.target).length === 0) {
+        if (
+            ((!$selectOptions.is(e.target) && $selectOptions.has(e.target).length === 0) &&
+                (!$select.is(e.target) && $select.has(e.target).length === 0))
+        ) {
             dispatch('DELETE_ALL_SUB_SELECT_OPTIONS')
             dispatch('CLOSE_SELECT_OPTION', index)
         }
@@ -212,10 +218,10 @@ const Select = ({
             {...props}
             ref={ele => (myRef.current[0] = ele)}
             className={`select disable-selecting ${className ? className : ''} ${showOptions ? ' active' : ''} ${selectedOption.length &&
-                    Object.keys(_options).filter(_optionKey => _optionKey === selectedOption[0]).length &&
-                    enableSelectedStatusDot
-                    ? 'options-selected'
-                    : ''
+                Object.keys(_options).filter(_optionKey => _optionKey === selectedOption[0]).length &&
+                enableSelectedStatusDot
+                ? 'options-selected'
+                : ''
                 }`}
             id={selectId}
             index={index}
