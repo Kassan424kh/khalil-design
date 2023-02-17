@@ -45,7 +45,7 @@
         z-index: -1
         top: 0
         left: 0
-        background: linear-gradient(180deg, transparent  -51px, var(--white) 70px), repeating-linear-gradient(45deg, var(--blue) 1px, var(--blue) 2px, transparent 2px, transparent 7px)
+        background: linear-gradient(180deg, transparent  -51px, $white 70px), repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
 
     .select-options-body
         display: contents
@@ -61,7 +61,7 @@
             .empty-listview-background-image
                 opacity: 0
                 position: absolute
-                height: 100%
+                height: calc(100% + 15px)
                 width: 100%
                 top: 0
                 left: 0
@@ -72,7 +72,6 @@
                 > span
                     font-size: 50px
                     color: $grey
-
 
     .select-options-headline
         position: relative
@@ -96,6 +95,23 @@
     &.show-gradient-effect
         &:before
             background: linear-gradient(180deg, transparent  -51px, $white 70px), repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
+
+        &.with-search
+            &:before
+                background: linear-gradient(180deg, transparent  -51px, $white 70px), repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
+
+        &.with-header-text
+            &:before
+                background: linear-gradient(180deg, transparent  -51px, $white 150px), repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
+
+            &.with-search
+                &:before
+                    background: linear-gradient(180deg, transparent  -51px, $white 130px), repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
+
+        &.multi-select
+            &.show-selected-parallel
+                &:before
+                    background: linear-gradient(180deg, transparent  -51px, $white 150px), repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
 
     .select-options-actions
         display: flex
@@ -185,16 +201,6 @@
                 font-weight: normal
                 line-height: 0
 
-        &.with-search
-
-            &:before
-                background: linear-gradient(180deg, transparent  -51px, $white 70px), repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
-
-            &.with-header-text
-                &:before
-                    background: linear-gradient(180deg, transparent  -51px, $white 90px), repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
-
-
     &.single-select
         .select-option
             &.selected
@@ -202,7 +208,6 @@
                 top: 0
                 bottom: 0
                 z-index: 20
-
 
     &.multi-select
 
@@ -215,15 +220,14 @@
             display: block
 
         .select-options-body
-            height: calc(100% - 95px)
+            height: 90%
             width: 100%
             display: flex
-
-            &.header-text-is-not-enabled
-                height: calc(100% - 60px)
+            align-items: flex-end
+            padding-bottom: 15px
 
             .select-options-column
-                height: calc(100% - 60px)
+                height: 100%
                 width: 50%
 
                 .search-field-parallel-view
@@ -245,7 +249,9 @@
                 .content
                     padding-right: 0
                     width: 100%
-                    height: 100%
+                    min-height: calc(100% - 56px)
+                    max-height: calc(100% - 56px)
+                    height: calc(100% - 56px)
                     margin-top: 15px
                     overflow-y: scroll
                     transition: max-width 350ms cubic-bezier(.4, .2, 0, 1) 550ms, min-width 350ms cubic-bezier(.4, .2, 0, 1) 550ms
@@ -253,13 +259,12 @@
                     .empty-listview-background-image
                         transition: opacity 750ms cubic-bezier(.4, .2, 0, 1)
                         opacity: 1
+                        top: -15px
+                        left: -7.5px
+                        right: -7.5px
 
                         &.hide
                             opacity: 0
-                        
-                    .empty-listview-background-image
-                        left: -7.5px
-                        right: -7.5px
 
                     &._hovered
                         max-width: calc(80% - 18px)
@@ -277,8 +282,6 @@
                         max-width: 20% !important
                         min-width: 20% !important
 
-                
-
                 &:first-child
                     .content
                         padding-left: 15px
@@ -294,11 +297,11 @@
                     .content
                         padding-right: 15px
 
-
-
             .vertical-rule
                 margin: 0 15px
                 height: 100%
+                position: relative
+                bottom: 0
                 width: 1px
                 padding: 0 1px
-                background: linear-gradient(180deg, transparent 10px, $blue-light 50%, transparent 90%)
+                background: linear-gradient(180deg, transparent 60px, rgba($blue-rgb, .2) calc(50% + 60px), transparent 100%)

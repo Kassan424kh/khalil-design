@@ -18,6 +18,7 @@ const SelectPage = () => {
             <Select
                 enableSearch
                 enableSelectAllButton
+                headerText={"asdfasdf"}
                 options={{ "1": "asdf1", "2": "asdf2", "3": ["asdf3", [1, 2, [3, [55, 55, 66]]]] }}
             >
                 click me to open select options

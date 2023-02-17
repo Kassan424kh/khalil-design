@@ -532,7 +532,7 @@ const SelectOptions = ({ index = "0" }) => {
             const _toggleSelectOptions = () => {
                 gsap.to(`.select-options[index="${index}"]`, {
                     opacity: selectOptionsData.show ? 1 : 0,
-                    filter: `blur(${selectOptionsData.show && thisSelectIsActiveNow ? 0 : 2}px)`,
+                    filter: `blur(${selectOptionsData.show && thisSelectIsActiveNow ? 0 : 1}px)`,
                     pointerEvents: selectOptionsData.show && thisSelectIsActiveNow ? 'auto' : 'none',
                     duration: distanceToSeconds,
                     onComplete: () => {
@@ -581,25 +581,33 @@ const SelectOptions = ({ index = "0" }) => {
 
     }, [updateSelectOptionsTimes, selectOptionsData])
 
+    const [headline, setHeadline] = useState(selectOptionsData.headerText)
+    useEffect(() => {
+        const t = setTimeout(() => {
+            setHeadline(selectOptionsData.headerText)
+        }, selectOptionsData.headerText ? 0 : 360)
+        return () => clearTimeout(t)
+    }, [selectOptionsData.headerText])
+
     return (
         <div
             ref={myRef}
             className={`select-options disable-selecting${selectOptionsData.headerText || selectOptionsData.enableSearch ? ' show-gradient-effect' : ''
                 } ${selectOptionsData.className ?? ''}${selectOptionsData.showSelectedParallel ? ' show-selected-parallel' : ''
-                }${selectOptionsData.multiSelect ? ' multi-select' : ' single-select'}`}
+                }${selectOptionsData.multiSelect ? ' multi-select' : ' single-select'}${selectOptionsData.headerText ? ' with-header-text' : ''}${selectOptionsData.enableSearch
+                    ? ` with-search${selectOptionsData.enableSelectAllButton ? ' with-select-all-buttons' : ''
+                    }${selectOptionsData.enableCloseButton ? ' with-close-button' : ''}`
+                    : ''
+                }`}
             index={index}
         >
             <div>
                 <div className={`select-options-headline`} index={index}>
-                    <span>{selectOptionsData.headerText ?? '-'}</span>
+                    <span>{headline}</span>
                 </div>
 
                 <div
-                    className={`select-options-actions${selectOptionsData.enableSearch
-                        ? ` with-search${selectOptionsData.enableSelectAllButton ? ' with-select-all-buttons' : ''
-                        }${selectOptionsData.enableCloseButton ? ' with-close-button' : ''}`
-                        : ''
-                        }`}
+                    className={`select-options-actions`}
                     index={index}
                 >
                     <TextField
@@ -665,7 +673,7 @@ const SelectOptions = ({ index = "0" }) => {
                     {(selectOptionsData.showSelectedParallel ? [1, 2, 3] : [1]).map(viewport => {
                         return viewport !== 2 ? (
                             <div className={"select-options-column"}>
-{selectOptionsData.showSelectedParallel ? (
+                                {selectOptionsData.showSelectedParallel ? (
                                     <TextField
                                         className="search-field-parallel-view"
                                         inputRef={viewport === 3 || !selectOptionsData.enableSearch || !thisSelectIsActiveNow ? null : r => (searchFieldRef.current = r)}
@@ -683,122 +691,122 @@ const SelectOptions = ({ index = "0" }) => {
                                     />
                                 ) : null}
 
-<div key={viewport} className={`content ${viewport}-ct`}>
-                                {selectOptionsData.showSelectedParallel ? (
-                                    <div
-                                        className={`empty-listview-background-image ${(selectOptionsData.selectedOption &&
-                                            selectOptionsData.selectedOption.length !==
-                                            Object.entries(selectOptionsData.options).length &&
-                                            viewport === 1) ||
-                                            (selectOptionsData.selectedOption.length && viewport === 3)
-                                            ? 'hide'
-                                            : ''
-                                            }`}
-                                    >
-                                        <span className={'material-icons-outlined'}>
-                                            {viewport === 3 ? 'done_all' : 'remove_done'}
-                                        </span>
-                                    </div>
-                                ) : null}
-                                {selectOptionsData.defaultOption && viewport === 1 ? (
-                                    <SelectOption
-                                        options={selectOptionsData.options}
-                                        id={''}
-                                        disableSelecting={selectOptionsData.disableSelecting}
-                                        setDisableSelecting={selectOptionsData.setDisableSelecting}
-                                        selectedOption={selectOptionsData}
-                                        setShowOptions={selectOptionsData.setShowOptions}
-                                        setSelectedOption={selectOptionsData.setSelectedOption}
-                                        hide={selectOptionsData.searchText}
-                                        defaultOption
-                                    >
-                                        {selectOptionsData.defaultOptionText ?? 'Select a option'}
-                                    </SelectOption>
-                                ) : null}
-                                <div>
-                                    {(() => {
-                                        const optionsListNotSorted = Object.entries(selectOptionsData.options)
-                                        try {
-                                            const DescSorted = _.sortBy(optionsListNotSorted, o => o[1]?.toUpperCase())
+                                <div key={viewport} className={`content ${viewport}-ct`}>
+                                    {selectOptionsData.showSelectedParallel ? (
+                                        <div
+                                            className={`empty-listview-background-image ${(selectOptionsData.selectedOption &&
+                                                selectOptionsData.selectedOption.length !==
+                                                Object.entries(selectOptionsData.options).length &&
+                                                viewport === 1) ||
+                                                (selectOptionsData.selectedOption.length && viewport === 3)
+                                                ? 'hide'
+                                                : ''
+                                                }`}
+                                        >
+                                            <span className={'material-icons-outlined'}>
+                                                {viewport === 3 ? 'done_all' : 'remove_done'}
+                                            </span>
+                                        </div>
+                                    ) : null}
+                                    {selectOptionsData.defaultOption && viewport === 1 ? (
+                                        <SelectOption
+                                            options={selectOptionsData.options}
+                                            id={''}
+                                            disableSelecting={selectOptionsData.disableSelecting}
+                                            setDisableSelecting={selectOptionsData.setDisableSelecting}
+                                            selectedOption={selectOptionsData}
+                                            setShowOptions={selectOptionsData.setShowOptions}
+                                            setSelectedOption={selectOptionsData.setSelectedOption}
+                                            hide={selectOptionsData.searchText}
+                                            defaultOption
+                                        >
+                                            {selectOptionsData.defaultOptionText ?? 'Select a option'}
+                                        </SelectOption>
+                                    ) : null}
+                                    <div>
+                                        {(() => {
+                                            const optionsListNotSorted = Object.entries(selectOptionsData.options)
+                                            try {
+                                                const DescSorted = _.sortBy(optionsListNotSorted, o => o[1]?.toUpperCase())
 
-                                            switch (selectOptionsData.sort) {
-                                                case 'DESC':
-                                                    return DescSorted
-                                                case 'ASC':
-                                                    return DescSorted.reverse()
-                                                default:
-                                                    return optionsListNotSorted
-                                            }
-                                        } catch (e) {
-                                            return optionsListNotSorted
-                                        }
-                                    })().map((option, oIndex) => {
-                                        const wasSelected =
-                                            selectOptionsData.selectedOption &&
-                                            (() => {
-                                                if (selectOptionsData.selectedOption.length)
-                                                    return selectOptionsData.multiSelect
-                                                        ? (() => {
-                                                            const foundSelectedOption =
-                                                                selectOptionsData.selectedOption.filter(_option => {
-                                                                    return _option[0] === option[0]
-                                                                })[0]
-                                                            return foundSelectedOption
-                                                                ? foundSelectedOption[0] === option[0]
-                                                                : false
-                                                        })()
-                                                        : selectOptionsData.selectedOption[0] === option[0]
-                                                else return false
-                                            })()
-
-                                        return (
-                                            <SelectOption
-                                                options={selectOptionsData.options}
-                                                selectOptionsIndex={index}
-                                                textRef={ref => (optionTextRefs.current[`${oIndex}`] = ref)}
-                                                key={option[0]}
-                                                id={option[0]}
-                                                disableSelecting={selectOptionsData.disableSelecting}
-                                                setDisableSelecting={selectOptionsData.setDisableSelecting}
-                                                multiSelect={selectOptionsData.multiSelect}
-                                                selectedOption={selectOptionsData.selectedOption}
-                                                setShowOptions={closeSelectOptions}
-                                                setSelectedOption={selectOptionsData.setSelectedOption}
-                                                hide={
-                                                    (selectOptionsData.showSelectedParallel
-                                                        ? viewport === 1
-                                                            ? searchTextUnselectedTail
-                                                            : searchTextSelectedTail
-                                                        : searchText) ||
-                                                        (selectOptionsData.showSelectedParallel &&
-                                                            ((wasSelected && viewport === 1) ||
-                                                                (!wasSelected && viewport === 3)))
-                                                        ? (foundOptions(
-                                                            selectOptionsData.showSelectedParallel
-                                                                ? viewport === 1
-                                                                    ? searchTextUnselectedTail
-                                                                    : searchTextSelectedTail
-                                                                : searchText,
-                                                            option,
-                                                            selectOptionsData.searchEveryWare
-                                                        ) &&
-                                                            (selectOptionsData.showSelectedParallel
-                                                                ? viewport === 1
-                                                                    ? !wasSelected
-                                                                    : wasSelected
-                                                                : true)) ||
-                                                        (selectOptionsData.showSelectedParallel &&
-                                                            ((wasSelected && viewport === 1) ||
-                                                                (!wasSelected && viewport === 3)))
-                                                        : false
+                                                switch (selectOptionsData.sort) {
+                                                    case 'DESC':
+                                                        return DescSorted
+                                                    case 'ASC':
+                                                        return DescSorted.reverse()
+                                                    default:
+                                                        return optionsListNotSorted
                                                 }
-                                            >
-                                                {option[1]}
-                                            </SelectOption>
-                                        )
-                                    })}
+                                            } catch (e) {
+                                                return optionsListNotSorted
+                                            }
+                                        })().map((option, oIndex) => {
+                                            const wasSelected =
+                                                selectOptionsData.selectedOption &&
+                                                (() => {
+                                                    if (selectOptionsData.selectedOption.length)
+                                                        return selectOptionsData.multiSelect
+                                                            ? (() => {
+                                                                const foundSelectedOption =
+                                                                    selectOptionsData.selectedOption.filter(_option => {
+                                                                        return _option[0] === option[0]
+                                                                    })[0]
+                                                                return foundSelectedOption
+                                                                    ? foundSelectedOption[0] === option[0]
+                                                                    : false
+                                                            })()
+                                                            : selectOptionsData.selectedOption[0] === option[0]
+                                                    else return false
+                                                })()
+
+                                            return (
+                                                <SelectOption
+                                                    options={selectOptionsData.options}
+                                                    selectOptionsIndex={index}
+                                                    textRef={ref => (optionTextRefs.current[`${oIndex}`] = ref)}
+                                                    key={option[0]}
+                                                    id={option[0]}
+                                                    disableSelecting={selectOptionsData.disableSelecting}
+                                                    setDisableSelecting={selectOptionsData.setDisableSelecting}
+                                                    multiSelect={selectOptionsData.multiSelect}
+                                                    selectedOption={selectOptionsData.selectedOption}
+                                                    setShowOptions={closeSelectOptions}
+                                                    setSelectedOption={selectOptionsData.setSelectedOption}
+                                                    hide={
+                                                        (selectOptionsData.showSelectedParallel
+                                                            ? viewport === 1
+                                                                ? searchTextUnselectedTail
+                                                                : searchTextSelectedTail
+                                                            : searchText) ||
+                                                            (selectOptionsData.showSelectedParallel &&
+                                                                ((wasSelected && viewport === 1) ||
+                                                                    (!wasSelected && viewport === 3)))
+                                                            ? (foundOptions(
+                                                                selectOptionsData.showSelectedParallel
+                                                                    ? viewport === 1
+                                                                        ? searchTextUnselectedTail
+                                                                        : searchTextSelectedTail
+                                                                    : searchText,
+                                                                option,
+                                                                selectOptionsData.searchEveryWare
+                                                            ) &&
+                                                                (selectOptionsData.showSelectedParallel
+                                                                    ? viewport === 1
+                                                                        ? !wasSelected
+                                                                        : wasSelected
+                                                                    : true)) ||
+                                                            (selectOptionsData.showSelectedParallel &&
+                                                                ((wasSelected && viewport === 1) ||
+                                                                    (!wasSelected && viewport === 3)))
+                                                            : false
+                                                    }
+                                                >
+                                                    {option[1]}
+                                                </SelectOption>
+                                            )
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
                             </div>
                         ) : (
                             <div key={viewport} className={'vertical-rule'} />
