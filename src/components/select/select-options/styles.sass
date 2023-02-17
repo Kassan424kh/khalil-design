@@ -1,6 +1,9 @@
 @import "../../../variables"
 @import "../../../colors"
 
+$background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
+
+
 .select-options
     position: fixed
     font-family: $font-family
@@ -45,7 +48,7 @@
         z-index: -1
         top: 0
         left: 0
-        background: linear-gradient(180deg, transparent  -51px, $white 70px), repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
+        background: linear-gradient(180deg, transparent  -51px, $white 70px), $background-effect-lines
 
     .select-options-body
         display: contents
@@ -94,24 +97,24 @@
 
     &.show-gradient-effect
         &:before
-            background: linear-gradient(180deg, transparent  -51px, $white 70px), repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
+            background: linear-gradient(180deg, transparent  -51px, $white 70px), $background-effect-lines
 
         &.with-search
             &:before
-                background: linear-gradient(180deg, transparent  -51px, $white 70px), repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
+                background: linear-gradient(180deg, transparent  -51px, $white 70px), $background-effect-lines
 
         &.with-header-text
             &:before
-                background: linear-gradient(180deg, transparent  -51px, $white 150px), repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
+                background: linear-gradient(180deg, transparent  -51px, $white 150px), $background-effect-lines
 
             &.with-search
                 &:before
-                    background: linear-gradient(180deg, transparent  -51px, $white 130px), repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
+                    background: linear-gradient(180deg, transparent  -51px, $white 130px), $background-effect-lines
 
         &.multi-select
             &.show-selected-parallel
                 &:before
-                    background: linear-gradient(180deg, transparent  -51px, $white 150px), repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
+                    background: linear-gradient(180deg, transparent  -51px, $white 150px), $background-effect-lines
 
     .select-options-actions
         display: flex
@@ -221,10 +224,12 @@
 
         .select-options-body
             height: 90%
-            width: 100%
+            width: calc(100% + 15px)
             display: flex
             align-items: flex-end
             padding-bottom: 15px
+            position: relative
+            left: -15px
 
             .select-options-column
                 height: 100%
@@ -247,11 +252,12 @@
                         border-radius: 10px
 
                 .content
+                    $content-height: calc(100% - 60px)
                     padding-right: 0
                     width: 100%
-                    min-height: calc(100% - 56px)
-                    max-height: calc(100% - 56px)
-                    height: calc(100% - 56px)
+                    min-height: $content-height
+                    max-height: $content-height
+                    height: $content-height
                     margin-top: 15px
                     overflow-y: scroll
                     transition: max-width 350ms cubic-bezier(.4, .2, 0, 1) 550ms, min-width 350ms cubic-bezier(.4, .2, 0, 1) 550ms
@@ -283,22 +289,24 @@
                         min-width: 20% !important
 
                 &:first-child
-                    .content
+                    .search-field-parallel-view
                         padding-left: 15px
-                        margin-left: -15px
+                        
+                    .content
                         direction: rtl
+                        padding-left: 10px
                         > div
                             direction: ltr
 
                 &:last-child
                     .search-field-parallel-view
-                        input
-                            margin-right: 15px
-                    .content
                         padding-right: 15px
+                        
+                    .content
+                        padding-right: 10px
 
             .vertical-rule
-                margin: 0 15px
+                margin: 0 10px
                 height: 100%
                 position: relative
                 bottom: 0
