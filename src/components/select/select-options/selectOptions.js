@@ -66,8 +66,8 @@ const SelectOptions = ({ index = "0" }) => {
     const myRef = useRef()
 
     const foundOptions = useCallback(
-        (searchText, option, searchEveryWare = false) => {
-            return !searchText
+        (__searchText, option, searchEveryWare = false) => {
+            return !__searchText
                 .toUpperCase()
                 .split(' ')
                 .filter(word => word)
@@ -120,10 +120,10 @@ const SelectOptions = ({ index = "0" }) => {
                             } else {
                                 return word.startsWith(r) ? word : ''
                             }
-                        }).length
+                        }).length // TODO: fix search selected on parallel view not works
                 })
         },
-        [selectOptionsData.selectedOption]
+        [selectOptionsData.selectedOption, searchText, searchTextSelectedTail, searchTextUnselectedTail]
     )
 
     const moveVertikal = (
@@ -394,8 +394,6 @@ const SelectOptions = ({ index = "0" }) => {
                 if (selectOptionsData.selectId !== selectOptionsDataAfterIndex.selectId || !selectOptionsDataAfterIndex.show) {
                     setSearchText('')
                 }
-                console.log(selectOptionsOnStore)
-                console.log(prevLengthAllSelectOptions.current, lengthAllSelectOptions)
                 prevLengthAllSelectOptions.current = lengthAllSelectOptions
                 return selectOptionsDataAfterIndex
             }
@@ -446,7 +444,7 @@ const SelectOptions = ({ index = "0" }) => {
             const selectOptionsActionsScrollHeight = $el.prop('scrollHeight')
             const wasShown = selectOptionsData.show
 
-            const enableSelectAllButton = selectOptionsData.enableSearch && selectOptionsData.enableSelectAllButton
+            const enableSelectAllButton = selectOptionsData.multiSelect && selectOptionsData.enableSearch && selectOptionsData.enableSelectAllButton
 
             gsap.to(`.select-options[index="${index}"] .select-options-actions`, {
                 minHeight: selectOptionsData.enableSearch ? selectOptionsActionsScrollHeight : 0,
@@ -465,6 +463,13 @@ const SelectOptions = ({ index = "0" }) => {
             })
 
             gsap.to(`.select-options[index="${index}"] .select-options-actions .select-options-search-field input`, {
+                opacity: selectOptionsData.showSelectedParallel ? 0 : 1,
+                pointerEvents: !wasShown || selectOptionsData.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
+                duration: 0.15,
+                delay: 0.05,
+            })
+
+            gsap.to(`.select-options[index="${index}"] .select-options-actions .select-options-search-field .clear-button`, {
                 opacity: selectOptionsData.showSelectedParallel ? 0 : 1,
                 pointerEvents: !wasShown || selectOptionsData.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
                 duration: 0.15,
@@ -508,7 +513,7 @@ const SelectOptions = ({ index = "0" }) => {
             optionsProperties,
             `${selectButtonProperties.offset ? selectButtonProperties.offset.top + selectButtonProperties.height : 0
             }px`,
-            `${selectButtonProperties.offset ? selectButtonProperties.offset.top - optionsProperties.height - selectButtonProperties.height : 0}px`,
+            `${selectButtonProperties.offset ? selectButtonProperties.offset.top - optionsProperties.height : 0}px`,
             `${selectButtonProperties.top}px`
         )
         return { x, y }
@@ -579,7 +584,7 @@ const SelectOptions = ({ index = "0" }) => {
 
         return () => clearTimeout(firstRenderTimeout.current)
 
-    }, [updateSelectOptionsTimes, selectOptionsData])
+    }, [updateSelectOptionsTimes, selectOptionsData, lengthAllSelectOptions])
 
     const [headline, setHeadline] = useState(selectOptionsData.headerText)
     useEffect(() => {
@@ -651,18 +656,25 @@ const SelectOptions = ({ index = "0" }) => {
                             </div>
                         }
                         afterComponent={
-                            <Button className={'close-button'} onClick={() => {
-
-                                dispatch('CLOSE_SELECT_OPTION', index)
-                                closeSelectOptions()
-
-                            }}>
-                                {selectOptionsData.closeButtonText ?? 'done'}
-                            </Button>
+                            <Button
+                                className={'clear-button'}
+                                leftIcon={"backspace"}
+                                onClick={() => {
+                                    setSearchText("")
+                                }}
+                            />
                         }
                         value={searchText}
                         placeholder={selectOptionsData.searchPlaceHolder ?? 'finde options'}
                         onChange={setSearchText}
+                    />
+                    <Button
+                        className={'close-button'}
+                        leftIcon={"close"}
+                        onClick={() => {
+                            dispatch('CLOSE_SELECT_OPTION', index)
+                            closeSelectOptions()
+                        }}
                     />
                 </div>
                 <div
@@ -684,10 +696,25 @@ const SelectOptions = ({ index = "0" }) => {
                                                 setSearchTextUnselectedTail(_searchText)
                                                 setSearchTextSelectedTail('')
                                             } else {
+                                                console.log(_searchText)
                                                 setSearchTextSelectedTail(_searchText)
                                                 setSearchTextUnselectedTail('')
                                             }
                                         }}
+                                        afterComponent={
+                                            <Button
+                                                className={'clear-button'}
+                                                leftIcon={"backspace"}
+                                                onClick={() => {
+                                                    setSearchText("")
+                                                    if (viewport === 3) {
+                                                        setSearchTextSelectedTail('')
+                                                    } else {
+                                                        setSearchTextUnselectedTail('')
+                                                    }
+                                                }}
+                                            />
+                                        }
                                     />
                                 ) : null}
 
@@ -703,7 +730,7 @@ const SelectOptions = ({ index = "0" }) => {
                                                 : ''
                                                 }`}
                                         >
-                                            <span className={'material-icons-outlined'}>
+                                            <span className={'material-symbols-outlined'}>
                                                 {viewport === 3 ? 'done_all' : 'remove_done'}
                                             </span>
                                         </div>
@@ -759,6 +786,33 @@ const SelectOptions = ({ index = "0" }) => {
                                                     else return false
                                                 })()
 
+                                            const hideOption = (() => {
+                                                const isOneOfTheParallelColumns = selectOptionsData.showSelectedParallel &&
+                                                    ((wasSelected && viewport === 1) ||
+                                                        (!wasSelected && viewport === 3))
+
+                                                const _searchText = selectOptionsData.showSelectedParallel
+                                                    ? viewport === 1
+                                                        ? searchTextUnselectedTail
+                                                        : searchTextSelectedTail
+                                                    : searchText
+
+                                                return _searchText ||
+                                                    isOneOfTheParallelColumns
+                                                    ? (foundOptions(
+                                                        _searchText,
+                                                        option,
+                                                        selectOptionsData.searchEveryWare
+                                                    ) &&
+                                                        Boolean(selectOptionsData.showSelectedParallel
+                                                            ? viewport === 1
+                                                                ? !wasSelected
+                                                                : wasSelected
+                                                            : true)) ||
+                                                    isOneOfTheParallelColumns
+                                                    : false
+                                            })()
+
                                             return (
                                                 <SelectOption
                                                     options={selectOptionsData.options}
@@ -772,34 +826,7 @@ const SelectOptions = ({ index = "0" }) => {
                                                     selectedOption={selectOptionsData.selectedOption}
                                                     setShowOptions={closeSelectOptions}
                                                     setSelectedOption={selectOptionsData.setSelectedOption}
-                                                    hide={
-                                                        (selectOptionsData.showSelectedParallel
-                                                            ? viewport === 1
-                                                                ? searchTextUnselectedTail
-                                                                : searchTextSelectedTail
-                                                            : searchText) ||
-                                                            (selectOptionsData.showSelectedParallel &&
-                                                                ((wasSelected && viewport === 1) ||
-                                                                    (!wasSelected && viewport === 3)))
-                                                            ? (foundOptions(
-                                                                selectOptionsData.showSelectedParallel
-                                                                    ? viewport === 1
-                                                                        ? searchTextUnselectedTail
-                                                                        : searchTextSelectedTail
-                                                                    : searchText,
-                                                                option,
-                                                                selectOptionsData.searchEveryWare
-                                                            ) &&
-                                                                (selectOptionsData.showSelectedParallel
-                                                                    ? viewport === 1
-                                                                        ? !wasSelected
-                                                                        : wasSelected
-                                                                    : true)) ||
-                                                            (selectOptionsData.showSelectedParallel &&
-                                                                ((wasSelected && viewport === 1) ||
-                                                                    (!wasSelected && viewport === 3)))
-                                                            : false
-                                                    }
+                                                    hide={hideOption}
                                                 >
                                                     {option[1]}
                                                 </SelectOption>

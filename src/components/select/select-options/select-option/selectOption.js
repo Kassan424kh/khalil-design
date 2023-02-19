@@ -1,8 +1,10 @@
 import React, { useRef } from 'react'
 import './styles.sass'
 import Select from '../../select'
+import { useStore } from '../../../../hooks-store/store'
 
 const SelectOption = ({
+    options,
     id,
     defaultOption,
     hide,
@@ -15,8 +17,13 @@ const SelectOption = ({
     textRef,
     selectOptionsIndex
 }) => {
+
+    const [state, dispatch] = useStore()
+
     const pauseClickTime = useRef(Date.now())
-    const isSubmenu = Array.isArray(children) && children.length === 2
+    const selectOptionsIncludeSubmenuOption = Object.values(options).filter(o => Array.isArray(o) && o.length === 2).length
+    const isOptionSubmenu = Array.isArray(children) && children.length === 2
+
 
     const selectOption = (
         <div
@@ -50,25 +57,33 @@ const SelectOption = ({
                         )
                     }
                     setDisableSelecting(true)
-                    if (!multiSelect && !isSubmenu) {
+                    if (!multiSelect && !isOptionSubmenu) {
+                        console.log(20989074)
                         setTimeout(() => {
-                            setShowOptions(false)
+                            dispatch("CLOASE_ALL_SELECT_OPTIONS")
                         }, 450)
                     }
                     pauseClickTime.current = Date.now() + 350
                 }
             }}
         >
-            <span className={'select-option-icon material-icons-outlined'}>arrow_right</span>
-            <pre ref={textRef}>{isSubmenu ? children[0] : children}</pre>
-            {isSubmenu && !multiSelect ? <span className={'select-option-icon submenu material-icons'}>checklist</span> : null}
+            <span className={'select-option-icon material-symbols-outlined'}>arrow_right</span>
+            <pre ref={textRef}>{isOptionSubmenu ? children[0] : children}</pre>
+            {isOptionSubmenu && !multiSelect ? <span className={'select-option-icon submenu material-symbols-outlined'}>list</span> : null}
         </div>
     )
 
     return (
-        isSubmenu && !multiSelect ? <Select className={"submenu-selector"} options={children[1]} index={String(parseInt(selectOptionsIndex) + 1)} enableSearch>
-            {selectOption}
-        </Select> : selectOption
+        isOptionSubmenu && !multiSelect ? (
+            <Select 
+                className={"submenu-selector"} 
+                options={children[1]} 
+                index={String(parseInt(selectOptionsIndex) + 1)} 
+                enableSearch
+            >
+                {selectOption}
+            </Select>
+        ) : selectOption
     )
 }
 

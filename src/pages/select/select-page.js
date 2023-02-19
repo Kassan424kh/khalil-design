@@ -20,6 +20,9 @@ const SelectPage = () => {
                 enableSelectAllButton
                 headerText={"asdfasdf"}
                 options={{ "1": "asdf1", "2": "asdf2", "3": ["asdf3", [1, 2, [3, [55, 55, 66]]]] }}
+                onSelect={(selectedOption) => {
+                    console.log(selectedOption)
+                }}
             >
                 click me to open select options
             </Select>

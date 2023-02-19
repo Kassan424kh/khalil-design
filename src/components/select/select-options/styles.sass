@@ -48,7 +48,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
         z-index: -1
         top: 0
         left: 0
-        background: linear-gradient(180deg, transparent  -51px, $white 70px), $background-effect-lines
+        background: linear-gradient(180deg, transparent  -51px, $white 70px, $white 70px), $background-effect-lines
 
     .select-options-body
         display: contents
@@ -123,11 +123,12 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
         overflow: hidden
 
         .select-options-search-field
-            width: 100%
+            width: calc(100% - 55px)
             height: max-content
             min-height: max-content
             margin-bottom: 15px
             position: relative
+            margin-right: -40px
 
             &:focus
                 background-color: $white
@@ -145,7 +146,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                 z-index: 22
 
                 .select-all-button
-                    padding: 19.5px 20px !important
+                    padding: 19px 20px !important
                     box-shadow: 0 0 0 transparent !important
                     background-color: transparent !important
                     max-height: 0
@@ -179,30 +180,61 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                 pointer-events: none
 
             input
-                width: calc(100% - 2px)
+                width: calc(100% - 40px)
+                min-width: calc(100% - 40px)
+                box-sizing: border-box
                 line-height: 40px
                 font-size: 15px
                 border: 1px solid $grey
                 position: relative
                 z-index: 20
                 background-color: $white
-                padding-right: 10px
                 padding-left: 95px
+                padding-right: 40px
                 border-radius: 10px
-                margin-right: 10px
 
-
-            .close-button
-                @extend .select-all-button
+            .clear-button
+                position: absolute
                 box-shadow: 0 0 0 transparent !important
-                padding: 20px 30px !important
-                width: auto
+                border-color: transparent !important
+                background-color: transparent !important
+                padding: 20px !important
+                top: .5px
+                width: 0
+                height: 0
                 right: 0
                 z-index: 22
-                border-radius: 10px
+                border-radius: 0
                 color: $black
                 font-weight: normal
                 line-height: 0
+
+        .close-button
+            box-shadow: 0 0 0 transparent !important
+            border-color: rgba($red-rgb, .5) !important
+            padding: 0 0 !important
+            top: 0
+            width: 42px
+            height: 41px
+            min-width: 42px
+            min-height: 41px
+            margin-left: 10px 
+            right: 0
+            z-index: 22
+            border-radius: 10px
+            color: $black
+            font-weight: normal
+            line-height: 0
+            background: repeating-linear-gradient(45deg, rgba($red-rgb, .2) 1px, rgba($red-rgb, .2) 2px, transparent 2px, transparent 7px), $white
+
+            .button-icon
+                font-size: 15px
+                width: 0
+                max-height: 0
+                line-height: 40px
+                padding: 0
+                color: $red
+                font-variation-settings: 'FILL' 0, 'wght' 800, 'GRAD' 0, 'opsz' 48
 
     &.single-select
         .select-option
@@ -217,6 +249,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
     &.show-selected-parallel
         max-width: max-content
         max-height: 450px
+        width: 100%
         height: 100%
 
         > div
@@ -236,13 +269,17 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                 width: 50%
 
                 .search-field-parallel-view
+                    width: 100%
+                    margin-right: -40px
                     position: relative
                     z-index: 20
                     background-color: $white
                     border-radius: 20px !important
+                    box-sizing: border-box
                     
                     input
-                        width: calc(100% - 21px)
+                        position: absolute
+                        width: 100%
                         line-height: 40px
                         font-size: 15px
                         border: 1px solid $grey
@@ -250,6 +287,24 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                         z-index: 20
                         background-color: $white
                         border-radius: 10px
+                        padding-right: 40px
+
+                    .clear-button
+                        position: absolute
+                        box-shadow: 0 0 0 transparent !important
+                        border-color: transparent !important
+                        background-color: transparent !important
+                        padding: 20px !important
+                        top: .5px
+                        width: 0
+                        height: 0
+                        right: 0
+                        z-index: 22
+                        border-radius: 0
+                        color: $black
+                        font-weight: normal
+                        line-height: 0
+                            
 
                 .content
                     $content-height: calc(100% - 60px)
@@ -301,6 +356,9 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                 &:last-child
                     .search-field-parallel-view
                         padding-right: 15px
+
+                        .clear-button
+                            right: 15px
                         
                     .content
                         padding-right: 10px

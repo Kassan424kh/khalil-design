@@ -91,6 +91,11 @@ const configureStore = () => {
         CLOASE_ALL_SELECT_OPTIONS: prevState => {
             const nextState = deepCopy(prevState)
             Object.keys(nextState.selectOptions).map(soKey => {
+                if (soKey !== "0") {
+                    delete nextState.selectOptions[soKey]
+                    return
+                }
+
                 nextState.selectOptions[soKey]["show"] = false
                 nextState.selectOptions[soKey]["lastUpdate"] = Date.now()
             })

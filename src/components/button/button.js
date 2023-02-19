@@ -53,7 +53,7 @@ const Button = ({
             }}
             onClick={!disabled && !loading ? onClick : null}
         >
-            {leftIcon ? <span className="button-icon left material-icons-outlined">{leftIcon}</span> : null}
+            {leftIcon ? <span className="button-icon left material-symbols-outlined">{leftIcon}</span> : null}
             {children ? (
                 <div
                     className={'button-content'}
@@ -66,7 +66,7 @@ const Button = ({
                     {children}
                 </div>
             ) : null}
-            {rightIcon ? <span className="button-icon right material-icons-outlined">{rightIcon}</span> : null}
+            {rightIcon ? <span className="button-icon right material-symbols-outlined">{rightIcon}</span> : null}
             {loading ? <div className="loading-effect" /> : null}
         </div>
     )
