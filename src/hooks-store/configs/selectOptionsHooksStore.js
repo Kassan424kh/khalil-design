@@ -7,6 +7,8 @@ export const defaultSelectOptionsData = {
         "0": {
             index: 0,
             selectId: undefined,
+            mainSelectId: undefined,
+            parentSelectId: undefined,
             className: undefined,
             headerText: undefined,
             enableSearch: false,

@@ -15,13 +15,14 @@ const SelectOption = ({
     setDisableSelecting,
     setShowOptions,
     textRef,
-    selectOptionsIndex
+    selectOptionsIndex,
+    mainSelectId,
+    parentSelectId,
 }) => {
 
     const [state, dispatch] = useStore()
 
     const pauseClickTime = useRef(Date.now())
-    const selectOptionsIncludeSubmenuOption = Object.values(options).filter(o => Array.isArray(o) && o.length === 2).length
     const isOptionSubmenu = Array.isArray(children) && children.length === 2
 
 
@@ -78,8 +79,10 @@ const SelectOption = ({
             <Select 
                 className={"submenu-selector"} 
                 options={children[1]} 
-                index={String(parseInt(selectOptionsIndex) + 1)} 
+                index={String(parseInt(selectOptionsIndex) + 1)}
                 enableSearch
+                mainSelectId={mainSelectId}
+                parentSelectId={parentSelectId}
             >
                 {selectOption}
             </Select>

@@ -24,6 +24,8 @@ import { useStore } from '../../hooks-store/store'
 const Select = ({
     className,
     getSelectId,
+    mainSelectId,
+    parentSelectId,
     open,
     close,
     multiSelect,
@@ -63,7 +65,8 @@ const Select = ({
 
     // hook store
     const [{ selectOptions }, dispatch] = useStore()
-    const { show: showOnStore, selectId: selectIdOnStore } = selectOptions[index] ?? { show: false, selectId: uuidv4() }
+    const { selectId: selectIdParentSelectElement } = selectOptions[0] ?? { selectId: uuidv4() }
+    const { selectId: selectIdOnStore } = selectOptions[index] ?? { show: false, selectId: uuidv4() }
 
 
     // useState variables
@@ -211,6 +214,13 @@ const Select = ({
         }
     })
 
+    useEffect(() => {
+        console.log(selectIdParentSelectElement, (mainSelectId ?? selectId))
+        if (selectIdParentSelectElement !== (mainSelectId ?? selectId)) {
+            dispatch('DELETE_ALL_SUB_SELECT_OPTIONS')
+        }
+    }, [click])
+
     const hoverTimeout = useRef()
     const [updateOptionsProperties, setUpdateOptionsProperties] = useState(1)
     return (
@@ -264,6 +274,8 @@ const Select = ({
             {click ? (
                 <SelectOptionsDataTransmitter
                     selectId={selectId}
+                    mainSelectId={mainSelectId}
+                    parentSelectId={parentSelectId}
                     showSelectedParallel={showSelectedParallel && multiSelect}
                     selectMouseEnter={hover}
                     clicked={click}

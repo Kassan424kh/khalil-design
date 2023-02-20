@@ -426,6 +426,10 @@ const SelectOptions = ({ index = "0" }) => {
         y: 0
     })
 
+    const parsePixel = (number) => {
+        return number + "px"
+    }
+
     useEffect(() => {
         if (animateTimeout.current) clearTimeout(animateTimeout.current)
 
@@ -433,10 +437,10 @@ const SelectOptions = ({ index = "0" }) => {
             const $header = $(`.select-options[index="${index}"] .select-options-headline`)
             const headerChildHeight = $header.children().first().prop('scrollHeight')
             gsap.to(`.select-options[index="${index}"] .select-options-headline`, {
-                minHeight: selectOptionsData.headerText ? Math.max(headerChildHeight, 35) : 0,
-                maxHeight: selectOptionsData.headerText ? Math.max(headerChildHeight, 35) : 0,
+                minHeight: parsePixel(selectOptionsData.headerText ? Math.max(headerChildHeight, 35) : 0),
+                maxHeight: parsePixel(selectOptionsData.headerText ? Math.max(headerChildHeight, 35) : 0),
                 opacity: selectOptionsData.headerText ? 1 : 0,
-                marginBottom: selectOptionsData.headerText ? -15 : 0,
+                marginBottom: parsePixel(selectOptionsData.headerText ? -15 : 0) ,
                 duration: 0.15
             })
 
@@ -447,10 +451,10 @@ const SelectOptions = ({ index = "0" }) => {
             const enableSelectAllButton = selectOptionsData.multiSelect && selectOptionsData.enableSearch && selectOptionsData.enableSelectAllButton
 
             gsap.to(`.select-options[index="${index}"] .select-options-actions`, {
-                minHeight: selectOptionsData.enableSearch ? selectOptionsActionsScrollHeight : 0,
-                maxHeight: selectOptionsData.enableSearch ? selectOptionsActionsScrollHeight : 0,
+                minHeight: parsePixel(selectOptionsData.enableSearch ? selectOptionsActionsScrollHeight : 0),
+                maxHeight: parsePixel(selectOptionsData.enableSearch ? selectOptionsActionsScrollHeight : 0),
                 opacity: selectOptionsData.enableSearch ? 1 : 0,
-                paddingTop: selectOptionsData.enableSearch ? 1 : 0,
+                paddingTop: parsePixel(selectOptionsData.enableSearch ? 1 : 0),
                 pointerEvents: wasShown && selectOptionsData.enableSearch && thisSelectIsActiveNow ? 'auto' : 'none',
                 duration: 0.15,
                 delay: 0.05
@@ -458,7 +462,7 @@ const SelectOptions = ({ index = "0" }) => {
 
             gsap.to(`.select-options[index="${index}"] .select-options-actions .select-options-search-field input`, {
                 width: !enableSelectAllButton ? 'calc(100%)' : '100%',
-                paddingLeft: enableSelectAllButton ? 95 : 10,
+                paddingLeft: parsePixel(enableSelectAllButton ? 95 : 10),
                 duration: 0
             })
 
@@ -479,11 +483,11 @@ const SelectOptions = ({ index = "0" }) => {
             gsap.to(
                 `.select-options[index="${index}"] .select-options-actions .select-options-search-field .select-all-buttons`,
                 {
-                    borderTopRightRadius: selectOptionsData.showSelectedParallel ? 10 : 0,
-                    borderBottomRightRadius: selectOptionsData.showSelectedParallel ? 10 : 0,
+                    borderTopRightRadius: parsePixel(selectOptionsData.showSelectedParallel ? 10 : 0),
+                    borderBottomRightRadius: parsePixel(selectOptionsData.showSelectedParallel ? 10 : 0),
                     pointerEvents: wasShown && enableSelectAllButton && thisSelectIsActiveNow ? 'auto' : 'none',
                     opacity: enableSelectAllButton ? 1 : 0,
-                    translateX: enableSelectAllButton ? 0 : -20,
+                    translateX: parsePixel(enableSelectAllButton ? 0 : -20),
                     duration: 0.15,
                     delay: 0.05,
                     onComplete: () => {
@@ -573,7 +577,7 @@ const SelectOptions = ({ index = "0" }) => {
                 gsap.to(`.select-options[index="${index}"]`, {
                     x: x,
                     y: y,
-                    minWidth: Math.max(maxOptionTextWidth + 10, 250),
+                    minWidth: parsePixel(Math.max(maxOptionTextWidth + 10, 250)),
                     duration: selectOptionsData.show && !wasClosed ? distanceToSeconds : 0,
                     onComplete: () => {
                         _toggleSelectOptions()
@@ -750,8 +754,7 @@ const SelectOptions = ({ index = "0" }) => {
                                             {selectOptionsData.defaultOptionText ?? 'Select a option'}
                                         </SelectOption>
                                     ) : null}
-                                    <div>
-                                        {(() => {
+                                    {(() => {
                                             const optionsListNotSorted = Object.entries(selectOptionsData.options)
                                             try {
                                                 const DescSorted = _.sortBy(optionsListNotSorted, o => o[1]?.toUpperCase())
@@ -815,11 +818,13 @@ const SelectOptions = ({ index = "0" }) => {
 
                                             return (
                                                 <SelectOption
+                                                    key={option[0]}
+                                                    id={option[0]}
+                                                    mainSelectId={selectOptionsData.mainSelectId ?? selectOptionsData.selectId}
+                                                    parentSelectId={selectOptionsData.selectId}
                                                     options={selectOptionsData.options}
                                                     selectOptionsIndex={index}
                                                     textRef={ref => (optionTextRefs.current[`${oIndex}`] = ref)}
-                                                    key={option[0]}
-                                                    id={option[0]}
                                                     disableSelecting={selectOptionsData.disableSelecting}
                                                     setDisableSelecting={selectOptionsData.setDisableSelecting}
                                                     multiSelect={selectOptionsData.multiSelect}
@@ -832,7 +837,6 @@ const SelectOptions = ({ index = "0" }) => {
                                                 </SelectOption>
                                             )
                                         })}
-                                    </div>
                                 </div>
                             </div>
                         ) : (

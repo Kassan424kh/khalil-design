@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useStore } from '../../../hooks-store/store'
 
 const SelectOptionsDataTransmitter = ({
+    mainSelectId,
+    parentSelectId,
     show,
     top,
     bottom,
@@ -89,7 +91,11 @@ const SelectOptionsDataTransmitter = ({
             setDisableSelecting: setDisableSelecting,
             lastUpdate: clicked,
             sort: sort,
-            index: index
+            index: index,
+            ...(mainSelectId && parentSelectId ? {
+                mainSelectId: mainSelectId,
+                parentSelectId: parentSelectId,
+            } : {})
         })
     }, [
         selectId,
