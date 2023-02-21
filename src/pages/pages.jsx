@@ -1,3 +1,4 @@
+import React from "react"
 import "./pages.sass";
 import { Route, Routes } from "react-router-dom";
 import Error404Page from "./404/error-404-page";

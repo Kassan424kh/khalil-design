@@ -19,12 +19,10 @@ const SelectOption = ({
     mainSelectId,
     parentSelectId,
 }) => {
-
     const [state, dispatch] = useStore()
 
     const pauseClickTime = useRef(Date.now())
     const isOptionSubmenu = Array.isArray(children) && children.length === 2
-
 
     const selectOption = (
         <div

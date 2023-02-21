@@ -1,5 +1,5 @@
 import "./styles.sass";
-import { useState } from "react";
+import React, { useState } from "react";
 import TabsPage from "../../components/tabs/tabs-pages/tabs-page/tabs-page";
 import TabsPages from "../../components/tabs/tabs-pages/tabs-pages";
 import TabsSwitcher from "../../components/tabs/tabs-switcher/tabs-switcher";

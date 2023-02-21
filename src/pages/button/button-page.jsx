@@ -1,3 +1,4 @@
+import React from "react"
 import "./styles.sass";
 import Button from "../../components/button/button";
 

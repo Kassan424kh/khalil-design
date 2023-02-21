@@ -1,3 +1,4 @@
+import React from "react"
 import "./styles.sass";
 import FloatingActionButtons from "../../components/floating-action-buttons/floating-action-buttons";
 

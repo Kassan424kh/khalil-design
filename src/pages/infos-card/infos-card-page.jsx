@@ -1,3 +1,4 @@
+import React from "react"
 import "./styles.sass";
 import InfosCard from "../../components/infos-card/infos-card";
 
