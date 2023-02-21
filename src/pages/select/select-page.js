@@ -7,7 +7,7 @@ import { faker } from '@faker-js/faker'
 
 
 const SelectPage = () => {
-    const [_fakeList, _]  = useState(new Array(5000).fill().map((value, index) => faker.lorem.words(5)))
+    const [_fakeList, _]  = useState(new Array(100).fill().map((value, index) => faker.lorem.words(5)))
 
     return (
         <div className="page">

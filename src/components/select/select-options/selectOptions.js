@@ -440,7 +440,7 @@ const SelectOptions = ({ index = "0" }) => {
                 minHeight: parsePixel(selectOptionsData.headerText ? Math.max(headerChildHeight, 35) : 0),
                 maxHeight: parsePixel(selectOptionsData.headerText ? Math.max(headerChildHeight, 35) : 0),
                 opacity: selectOptionsData.headerText ? 1 : 0,
-                marginBottom: parsePixel(selectOptionsData.headerText ? -15 : 0) ,
+                marginBottom: parsePixel(selectOptionsData.headerText ? -15 : 0),
                 duration: 0.15
             })
 
@@ -722,39 +722,46 @@ const SelectOptions = ({ index = "0" }) => {
                                     />
                                 ) : null}
 
-                                <div key={viewport} className={`content ${viewport}-ct`}>
-                                    {selectOptionsData.showSelectedParallel ? (
-                                        <div
-                                            className={`empty-listview-background-image ${(selectOptionsData.selectedOption &&
-                                                selectOptionsData.selectedOption.length !==
-                                                Object.entries(selectOptionsData.options).length &&
-                                                viewport === 1) ||
-                                                (selectOptionsData.selectedOption.length && viewport === 3)
-                                                ? 'hide'
-                                                : ''
-                                                }`}
-                                        >
-                                            <span className={'material-symbols-outlined'}>
-                                                {viewport === 3 ? 'done_all' : 'remove_done'}
-                                            </span>
-                                        </div>
-                                    ) : null}
-                                    {selectOptionsData.defaultOption && viewport === 1 ? (
-                                        <SelectOption
-                                            options={selectOptionsData.options}
-                                            id={''}
-                                            disableSelecting={selectOptionsData.disableSelecting}
-                                            setDisableSelecting={selectOptionsData.setDisableSelecting}
-                                            selectedOption={selectOptionsData}
-                                            setShowOptions={selectOptionsData.setShowOptions}
-                                            setSelectedOption={selectOptionsData.setSelectedOption}
-                                            hide={selectOptionsData.searchText}
-                                            defaultOption
-                                        >
-                                            {selectOptionsData.defaultOptionText ?? 'Select a option'}
-                                        </SelectOption>
-                                    ) : null}
-                                    {(() => {
+                                {selectOptionsData.showSelectedParallel ? (
+                                    <div
+                                        className={`empty-listview-background-image ${(selectOptionsData.selectedOption &&
+                                            selectOptionsData.selectedOption.length !==
+                                            Object.entries(selectOptionsData.options).length &&
+                                            viewport === 1) ||
+                                            (selectOptionsData.selectedOption.length && viewport === 3)
+                                            ? 'hide'
+                                            : ''
+                                            }`}
+                                    >
+                                        <span className={'material-symbols-outlined'}>
+                                            {viewport === 3 ? 'done_all' : 'remove_done'}
+                                        </span>
+                                    </div>
+                                ) : null}
+
+                                <div key={viewport} className={`options-list ${viewport}-ct`}>
+                                    <div style={{
+                                        height : `${selectOptionsData.options.length * 50}px`,
+                                        maxHeight: `${selectOptionsData.options.length * 50}px`,
+                                        minHeight: `${selectOptionsData.options.length * 50}px`,
+                                    }}>
+
+                                        {selectOptionsData.defaultOption && viewport === 1 ? (
+                                            <SelectOption
+                                                options={selectOptionsData.options}
+                                                id={''}
+                                                disableSelecting={selectOptionsData.disableSelecting}
+                                                setDisableSelecting={selectOptionsData.setDisableSelecting}
+                                                selectedOption={selectOptionsData}
+                                                setShowOptions={selectOptionsData.setShowOptions}
+                                                setSelectedOption={selectOptionsData.setSelectedOption}
+                                                hide={selectOptionsData.searchText}
+                                                defaultOption
+                                            >
+                                                {selectOptionsData.defaultOptionText ?? 'Select a option'}
+                                            </SelectOption>
+                                        ) : null}
+                                        {(() => {
                                             const optionsListNotSorted = Object.entries(selectOptionsData.options)
                                             try {
                                                 const DescSorted = _.sortBy(optionsListNotSorted, o => o[1]?.toUpperCase())
@@ -837,6 +844,7 @@ const SelectOptions = ({ index = "0" }) => {
                                                 </SelectOption>
                                             )
                                         })}
+                                    </div>
                                 </div>
                             </div>
                         ) : (

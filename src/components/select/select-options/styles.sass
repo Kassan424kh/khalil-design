@@ -53,12 +53,9 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
     .select-options-body
         display: contents
 
-        .content
-            width: 100%
-            max-width: 100%
-            padding-right: 15px
+        .select-options-column
             position: relative
-
+            
             .empty-listview-background-image
                 opacity: 0
                 position: absolute
@@ -73,6 +70,12 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                 > span
                     font-size: 50px
                     color: $grey
+
+            .options-list
+                width: 100%
+                max-width: 100%
+                padding-right: 15px
+                position: relative
 
     .select-options-headline
         position: relative
@@ -278,6 +281,16 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                 height: 100%
                 width: 50%
 
+                .empty-listview-background-image
+                    transition: opacity 750ms cubic-bezier(.4, .2, 0, 1)
+                    opacity: 1
+                    top: -15px
+                    left: -7.5px
+                    right: -7.5px
+
+                    &.hide
+                        opacity: 0
+
                 .search-field-parallel-view
                     width: 100%
                     margin-right: -40px
@@ -316,7 +329,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                         line-height: 0
                             
 
-                .content
+                .options-list
                     $content-height: calc(100% - 60px)
                     padding-right: 0
                     width: 100%
@@ -326,16 +339,6 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                     margin-top: 15px
                     overflow-y: scroll
                     transition: max-width 350ms cubic-bezier(.4, .2, 0, 1) 550ms, min-width 350ms cubic-bezier(.4, .2, 0, 1) 550ms
-
-                    .empty-listview-background-image
-                        transition: opacity 750ms cubic-bezier(.4, .2, 0, 1)
-                        opacity: 1
-                        top: -15px
-                        left: -7.5px
-                        right: -7.5px
-
-                        &.hide
-                            opacity: 0
 
                     &.hovered
                         max-width: calc(80% - 18px) !important
@@ -349,7 +352,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                     .search-field-parallel-view
                         padding-left: 15px
                         
-                    .content
+                    .options-list
                         direction: rtl
                         padding-left: 10px
                         > div
@@ -362,7 +365,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                         .clear-button
                             right: 15px
                         
-                    .content
+                    .options-list
                         padding-right: 10px
 
             .vertical-rule
