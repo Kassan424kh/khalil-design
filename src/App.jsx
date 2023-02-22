@@ -51,7 +51,7 @@ export default function App() {
     return (
         <div className="App">
             <Pages />
-            <SelectOptions />
+            <SelectOptions key={0} />
             {Object.keys(selectOptions).length > 1
                 ? Object.keys(selectOptions).map((_, selectOptionsIndex) =>
                     selectOptionsIndex !== 0 ? (

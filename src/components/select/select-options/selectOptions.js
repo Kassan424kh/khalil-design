@@ -33,22 +33,10 @@ const SelectOptions = ({ index = "0" }) => {
 
     const [selectButtonProperties, setSelectButtonProperties] = useState(defaultSelectOptionsData.selectOptions[0])
 
-    const [maxOptionTextWidth, setMaxOptionTextWidth] = useState(0)
+    const [optionsListWidth, setOptionsListWidth] = useState(0)
     const optionTextRefs = useRef({})
 
     useEffect(() => {
-        const t = setTimeout(() => {
-            Object.entries(optionTextRefs.current).forEach(([key, value]) => {
-                setMaxOptionTextWidth(oldWidth =>
-                    value && value.scrollWidth > oldWidth ? value.scrollWidth : oldWidth
-                )
-            })
-        }, 10)
-        return () => clearTimeout(t)
-    }, [selectOptionsData.options])
-
-    useEffect(() => {
-        setMaxOptionTextWidth(0)
         optionTextRefs.current = {}
     }, [selectOptionsData.options])
 
@@ -391,7 +379,9 @@ const SelectOptions = ({ index = "0" }) => {
                     offset: null
                 }
             }) || lengthAllSelectOptions != prevLengthAllSelectOptions.current) {
+
                 if (selectOptionsData.selectId !== selectOptionsDataAfterIndex.selectId || !selectOptionsDataAfterIndex.show) {
+                    setOptionsListWidth(0)
                     setSearchText('')
                 }
                 prevLengthAllSelectOptions.current = lengthAllSelectOptions
@@ -399,6 +389,11 @@ const SelectOptions = ({ index = "0" }) => {
             }
             return currentSelectOptionsData
         })
+
+        return () => {
+            setSelectOptionsData(defaultSelectOptionsData.selectOptions[0])
+            setSearchText('')
+        }
 
     }, [selectOptionsDataAfterIndex, lengthAllSelectOptions])
 
@@ -408,15 +403,6 @@ const SelectOptions = ({ index = "0" }) => {
             searchFieldRef.current && searchFieldRef.current.focus()
         }
     }, [searchFieldRef, selectOptionsData])
-
-    useClickOutside(myRef, e => {
-        const $selectOptions = $('.select')
-
-        // if the target of the click isn't the container nor a descendant of the container
-        if (!$selectOptions.is(e.target) && $selectOptions.has(e.target).length === 0) {
-            //closeSelectOptions()
-        }
-    })
 
     const animateTimeout = useRef()
     const prevData = useRef({
@@ -429,6 +415,7 @@ const SelectOptions = ({ index = "0" }) => {
     const parsePixel = (number) => {
         return number + "px"
     }
+    
 
     useEffect(() => {
         if (animateTimeout.current) clearTimeout(animateTimeout.current)
@@ -523,11 +510,31 @@ const SelectOptions = ({ index = "0" }) => {
         return { x, y }
     }
 
+    // get max option width to set the options-list div with the new width after every options update
+    const optionsRef = useRef([])
+    // update selectOptions Component size and dimentions 
     const firstRenderTimeout = useRef()
-    const firstTimeRender = useRef(true)
+    const firstTimeRender = useRef(true)    
     useEffect(() => {
         if (firstRenderTimeout.current) clearTimeout(firstRenderTimeout.current)
         const { x: prevX, y: prevY, showSelectedParallel: prevShowSelectedParallel, wasClosed } = prevData.current
+
+        let optionWidth = 0
+        const ListOfOptionsRefWithoutEmptyItems = optionsRef.current.filter(Boolean)
+        if (ListOfOptionsRefWithoutEmptyItems.length && setOptionsListWidth) {
+            ListOfOptionsRefWithoutEmptyItems.forEach(or => {
+                const _optionWidth = or.firstChild.clientWidth
+                if (_optionWidth > optionWidth) optionWidth = _optionWidth 
+            })
+        }
+        optionWidth = Math.max(optionWidth + 75, 250)
+
+        console.log(optionWidth) // TODO: check this 
+
+        gsap.to(`.select-options[index="${index}"] .select-options-column .options-list`, {
+            width: optionWidth,
+            duration: 0
+        })
 
         firstRenderTimeout.current = setTimeout(() => {
             let nextXY = getNextXY()
@@ -557,8 +564,8 @@ const SelectOptions = ({ index = "0" }) => {
             }
 
             if (prevShowSelectedParallel || wasClosed) {
-                gsap.to(`.select-options[index="${index}"]`, {
-                    minWidth: Math.max(maxOptionTextWidth + 10, 250),
+                gsap.to(`.select-options[index="${index}"] .select-options-column .options-list`, {
+                    width: optionWidth,
                     duration: 0,
                     onComplete: () => {
                         nextXY = getNextXY()
@@ -577,7 +584,6 @@ const SelectOptions = ({ index = "0" }) => {
                 gsap.to(`.select-options[index="${index}"]`, {
                     x: x,
                     y: y,
-                    minWidth: parsePixel(Math.max(maxOptionTextWidth + 10, 250)),
                     duration: selectOptionsData.show && !wasClosed ? distanceToSeconds : 0,
                     onComplete: () => {
                         _toggleSelectOptions()
@@ -741,9 +747,9 @@ const SelectOptions = ({ index = "0" }) => {
 
                                 <div key={viewport} className={`options-list ${viewport}-ct`}>
                                     <div style={{
-                                        height : `${selectOptionsData.options.length * 50}px`,
-                                        maxHeight: `${selectOptionsData.options.length * 50}px`,
-                                        minHeight: `${selectOptionsData.options.length * 50}px`,
+                                        minHeight: parsePixel(Object.entries(selectOptionsData.options).length * 40),
+                                        height: parsePixel(Object.entries(selectOptionsData.options).length * 40),
+                                        maxHeight: parsePixel(Object.entries(selectOptionsData.options).length * 40)
                                     }}>
 
                                         {selectOptionsData.defaultOption && viewport === 1 ? (
@@ -826,17 +832,17 @@ const SelectOptions = ({ index = "0" }) => {
                                             return (
                                                 <SelectOption
                                                     key={option[0]}
+                                                    ref={optionRef => optionsRef.current.push(optionRef)}
                                                     id={option[0]}
+                                                    top={oIndex * 40}
                                                     mainSelectId={selectOptionsData.mainSelectId ?? selectOptionsData.selectId}
                                                     parentSelectId={selectOptionsData.selectId}
-                                                    options={selectOptionsData.options}
                                                     selectOptionsIndex={index}
                                                     textRef={ref => (optionTextRefs.current[`${oIndex}`] = ref)}
                                                     disableSelecting={selectOptionsData.disableSelecting}
                                                     setDisableSelecting={selectOptionsData.setDisableSelecting}
                                                     multiSelect={selectOptionsData.multiSelect}
                                                     selectedOption={selectOptionsData.selectedOption}
-                                                    setShowOptions={closeSelectOptions}
                                                     setSelectedOption={selectOptionsData.setSelectedOption}
                                                     hide={hideOption}
                                                 >

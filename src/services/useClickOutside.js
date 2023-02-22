@@ -6,9 +6,10 @@ export const useClickOutside = (ref, callback, deps = []) => {
         callbackRef.current = callback
 
         useEffect(() => {
+            let unmountFunction
             const handleClickOutside = e => {
                 if (ref.current && !ref.current.contains(e.target)) {
-                    callbackRef.current(e)
+                    unmountFunction = callbackRef.current(e)
                 }
             }
 
@@ -17,6 +18,7 @@ export const useClickOutside = (ref, callback, deps = []) => {
             return () => {
                 // Unbind the event listener on clean up
                 document.removeEventListener('mousedown', handleClickOutside)
+                if (typeof unmountFunction === "function") unmountFunction()
             }
         }, [callbackRef, ref, ...deps])
     }

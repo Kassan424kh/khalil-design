@@ -1,11 +1,11 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, forwardRef } from 'react'
 import './styles.sass'
 import Select from '../../select'
 import { useStore } from '../../../../hooks-store/store'
 
-const SelectOption = ({
-    options,
+const SelectOption = forwardRef(({
     id,
+    top,
     defaultOption,
     hide,
     selectedOption,
@@ -13,37 +13,38 @@ const SelectOption = ({
     setSelectedOption,
     children,
     setDisableSelecting,
-    setShowOptions,
     textRef,
     selectOptionsIndex,
     mainSelectId,
-    parentSelectId,
-}) => {
-    const [state, dispatch] = useStore()
+    parentSelectId
+}, ref) => {
+
+    const [_, dispatch] = useStore()
 
     const pauseClickTime = useRef(Date.now())
     const isOptionSubmenu = Array.isArray(children) && children.length === 2
 
     const selectOption = (
         <div
-            className={`select-option${defaultOption ? ' default-option' : ''}${hide ? ' hide-option' : ''}${
-                selectedOption &&
+            ref={ref}
+            className={`select-option${hide ? ' hide-option' : ''}${defaultOption ? ' default-option' : ''}${hide ? ' hide-option' : ''}${selectedOption &&
                 (() => {
                     if (selectedOption.length)
                         return multiSelect
                             ? (() => {
-                                  const foundSelectedOption = selectedOption.filter(option => {
-                                      return option[0] === id
-                                  })[0]
-                                  return foundSelectedOption ? foundSelectedOption[0] === id : false
-                              })()
+                                const foundSelectedOption = selectedOption.filter(option => {
+                                    return option[0] === id
+                                })[0]
+                                return foundSelectedOption ? foundSelectedOption[0] === id : false
+                            })()
                             : selectedOption[0] === id
                     else return false
                 })() &&
                 !defaultOption
-                    ? ' selected'
-                    : ''
-            }`}
+                ? ' selected'
+                : ''
+                }`
+            }
             onClick={() => {
                 if (Date.now() > pauseClickTime.current) {
                     if (!defaultOption && setSelectedOption) {
@@ -66,26 +67,34 @@ const SelectOption = ({
                 }
             }}
         >
-            <span className={'select-option-icon material-symbols-outlined'}>arrow_right</span>
-            <pre ref={textRef}>{isOptionSubmenu ? children[0] : children}</pre>
-            {isOptionSubmenu && !multiSelect ? <span className={'select-option-icon submenu material-symbols-outlined'}>list</span> : null}
+            <div className={"option-content"}>
+                <span className={'select-option-icon material-symbols-outlined'}>arrow_right</span>
+                <pre className={"option-text"} ref={textRef}>{isOptionSubmenu ? children[0] : children}</pre>
+                {isOptionSubmenu && !multiSelect ? <span className={'select-option-icon submenu material-symbols-outlined'}>list</span> : null}
+            </div>
         </div>
     )
 
     return (
-        isOptionSubmenu && !multiSelect ? (
-            <Select 
-                className={"submenu-selector"} 
-                options={children[1]} 
-                index={String(parseInt(selectOptionsIndex) + 1)}
-                enableSearch
-                mainSelectId={mainSelectId}
-                parentSelectId={parentSelectId}
-            >
-                {selectOption}
-            </Select>
-        ) : selectOption
+        <div
+            className={`select-option-container`}
+            style={{ top: top }}
+
+        >
+            {isOptionSubmenu && !multiSelect ? (
+                <Select
+                    className={"submenu-selector"}
+                    options={children[1]}
+                    index={String(parseInt(selectOptionsIndex) + 1)}
+                    enableSearch
+                    mainSelectId={mainSelectId}
+                    parentSelectId={parentSelectId}
+                >
+                    {selectOption}
+                </Select>
+            ) : selectOption}
+        </div>
     )
-}
+})
 
 export default SelectOption
