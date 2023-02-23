@@ -13,7 +13,6 @@ const SelectOption = forwardRef(({
     setSelectedOption,
     children,
     setDisableSelecting,
-    textRef,
     selectOptionsIndex,
     mainSelectId,
     parentSelectId
@@ -69,7 +68,7 @@ const SelectOption = forwardRef(({
         >
             <div className={"option-content"}>
                 <span className={'select-option-icon material-symbols-outlined'}>arrow_right</span>
-                <pre className={"option-text"} ref={textRef}>{isOptionSubmenu ? children[0] : children}</pre>
+                <pre className={"option-text"}>{isOptionSubmenu ? children[0] : children}</pre>
                 {isOptionSubmenu && !multiSelect ? <span className={'select-option-icon submenu material-symbols-outlined'}>list</span> : null}
             </div>
         </div>
