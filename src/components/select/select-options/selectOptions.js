@@ -34,11 +34,9 @@ const SelectOptions = ({ index = "0" }) => {
 
     const updateOffsetTimeout = useRef()
     useEffect(() => {
-        console.log(444444447777777)
         clearTimeout(updateOffsetTimeout.current)
 
         updateOffsetTimeout.current = setTimeout(() => {
-            setUpdateOffset(Date.now())
         }, 100)
         return () => clearTimeout(updateOffsetTimeout.current)
     }, [selectOptionsData.options])
@@ -47,8 +45,6 @@ const SelectOptions = ({ index = "0" }) => {
 
     const foundOptions = useCallback(
         (__searchText, option, searchEveryWare = false) => {
-            
-            console.log(44444444448711111100)
             return !__searchText
                 .toUpperCase()
                 .split(' ')
@@ -115,7 +111,6 @@ const SelectOptions = ({ index = "0" }) => {
         defaultPosition = 0,
         effectUsage = false
     ) => {
-        console.log(44444444445555555555)
         if (selectButtonProperties.offset) {
             const // directions
                 directions = selectOptionsData.openDirections,
@@ -216,7 +211,6 @@ const SelectOptions = ({ index = "0" }) => {
         centerPosition = null,
         effectUsage = false
     ) => {
-        console.log(777777777778888888888)
         if (selectButtonProperties.offset) {
             const // directions
                 directions = selectOptionsData.openDirections,
@@ -349,7 +343,6 @@ const SelectOptions = ({ index = "0" }) => {
     }
 
     useEffect(() => {
-        console.log(11111)
         setSelectButtonProperties({
             ...selectOptionsData.selectButtonProperties
         })
@@ -358,7 +351,6 @@ const SelectOptions = ({ index = "0" }) => {
     // update selectOptionsData state after check if there is a real change
     const prevLengthAllSelectOptions = useRef(1)
     useEffect(() => {
-        console.log(2222)
         setSelectOptionsData(currentSelectOptionsData => {
             if (JSON.stringify({
                 ...selectOptionsDataAfterIndex,
@@ -396,7 +388,6 @@ const SelectOptions = ({ index = "0" }) => {
 
     const searchFieldRef = useRef()
     useEffect(() => {
-        console.log(3333)
         if (searchFieldRef.current && selectOptionsData.show && selectOptionsData.selectId) {
             searchFieldRef.current && searchFieldRef.current.focus()
         }
@@ -413,7 +404,6 @@ const SelectOptions = ({ index = "0" }) => {
         return number + "px"
     }
     useEffect(() => {
-        console.log(4444)
         if (animateTimeout.current) clearTimeout(animateTimeout.current)
 
         animateTimeout.current = setTimeout(() => {
@@ -480,7 +470,7 @@ const SelectOptions = ({ index = "0" }) => {
             )
         }, 150)
         return () => clearTimeout(animateTimeout.current)
-    }, [selectButtonProperties, selectOptionsData, lengthAllSelectOptions])
+    }, [selectOptionsData, lengthAllSelectOptions])
 
     const getNextXY = () => {
         const optionsProperties = getDimensions({
@@ -512,7 +502,6 @@ const SelectOptions = ({ index = "0" }) => {
     const firstRenderTimeout = useRef()
     const firstTimeRender = useRef(true)
     useEffect(() => {
-        console.log(5555)
         if (firstRenderTimeout.current) clearTimeout(firstRenderTimeout.current)
         const { x: prevX, y: prevY, showSelectedParallel: prevShowSelectedParallel, wasClosed } = prevData.current
 
@@ -590,11 +579,10 @@ const SelectOptions = ({ index = "0" }) => {
 
         return () => clearTimeout(firstRenderTimeout.current)
 
-    }, [updateSelectOptionsTimes, lengthAllSelectOptions])
+    }, [updateSelectOptionsTimes])
 
     const [headline, setHeadline] = useState(selectOptionsData.headerText)
     useEffect(() => {
-        console.log(66666)
         const t = setTimeout(() => {
             setHeadline(selectOptionsData.headerText)
         }, selectOptionsData.headerText ? 0 : 500)
@@ -602,15 +590,14 @@ const SelectOptions = ({ index = "0" }) => {
     }, [selectOptionsData.headerText])
 
     const [sortedOptions, setSortedOptions] = useState([])
-    const sortOptions = () => {
-        console.log(4444444444555555555)
-        const optionsListNotSorted = Object.entries(selectOptionsData.options)
+    const sortOptions = (_options) => {
+        const optionsListNotSorted = Object.entries(_options)
         try {
             const DescSorted = _.sortBy(optionsListNotSorted, o => o[1]?.toUpperCase())
 
             switch (selectOptionsData.sort) {
                 case 'DESC':
-                    return DescSorted
+                    return setSortedOptions(sortOptions())
                 case 'ASC':
                     return DescSorted.reverse()
                 default:
@@ -620,13 +607,20 @@ const SelectOptions = ({ index = "0" }) => {
             return optionsListNotSorted
         }
     }
+
+    const initListTilesInView = {
+        1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(String), // key is the viewport on parallel view, item is list of options indexes can render in view 
+        3: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(String), // same ^ 
+    }
+
+    const [listTilesInView, setListTilesInView] = useState(initListTilesInView)
     useEffect(() => {
-        console.log(133333311133)
-        setSortedOptions(sortOptions())
+        setSortedOptions(sortOptions(selectOptionsData.options))
+        setListTilesInView(initListTilesInView)
     }, [selectOptionsData.options, selectOptionsData.sort])
 
+    // check if option was selected
     const wasSelected = (option) => {
-        console.log(8888)
         return selectOptionsData.selectedOption &&
             (() => {
                 if (selectOptionsData.selectedOption.length)
@@ -645,15 +639,15 @@ const SelectOptions = ({ index = "0" }) => {
             })()
     }
 
+    // check if option should hide `only with parallel view`
     const hideOption = (option, viewport) => {
         const _wasSelected = wasSelected(option)
-        console.log(9999)
         const isOneOfTheParallelColumns = selectOptionsData.showSelectedParallel &&
-            ((_wasSelected && viewport === 1) ||
-                (!_wasSelected && viewport === 3))
+            ((_wasSelected && viewport === "1") ||
+                (!_wasSelected && viewport === "3"))
 
         const _searchText = selectOptionsData.showSelectedParallel
-            ? viewport === 1
+            ? viewport === "1"
                 ? searchTextUnselectedTail
                 : searchTextSelectedTail
             : searchText
@@ -666,7 +660,7 @@ const SelectOptions = ({ index = "0" }) => {
                 selectOptionsData.searchEveryWare
             ) &&
                 Boolean(selectOptionsData.showSelectedParallel
-                    ? viewport === 1
+                    ? viewport === "1"
                         ? !_wasSelected
                         : _wasSelected
                     : true)) ||
@@ -674,30 +668,23 @@ const SelectOptions = ({ index = "0" }) => {
             : false
     }
 
-    const [listTilesInView, setListTilesInView] = useState({
-        1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(String), // key is the viewport on parallel view, item is list of options indexes can render in view 
-        3: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(String), // same ^ 
-    })
-
     const scrollingOptionsListTimeout = useRef()
     // this handler is used to preduce performance lag if there is a large list of options
     // it would be claculated wich options are in view, a list of indexes would be saved in `listTilesInView`
     // and used later to allow option to be renderd or not
     const handleScrollingOptionsList = (e, viewport, viewportOptionsIds) => {
-        console.log(212121212221)
-
         if (scrollingOptionsListTimeout.current) clearTimeout(scrollingOptionsListTimeout.current)
 
         scrollingOptionsListTimeout.current = setTimeout(() => {
             const _scrollTop = $(e.target).scrollTop() // px
             const _height = $(e.target).height() // px
             const _optionHeight = 40 // px
-            const _cacheExtent = 5 * 40
+            const _cacheExtent = 500 * 40
             const _dimensions = {
                 top: Math.round(_scrollTop),
                 bottom: Math.round(_scrollTop + _height)
             }
-    
+
             setListTilesInView(currentListTilesInView => {
                 currentListTilesInView[String(viewport)] = [...Array(viewportOptionsIds.length).keys()].filter(oIndex => {
                     const _optionDimensions = {
@@ -706,38 +693,39 @@ const SelectOptions = ({ index = "0" }) => {
                     }
                     return _optionDimensions.top >= _dimensions.top - _cacheExtent && _optionDimensions.bottom <= _dimensions.bottom + _cacheExtent
                 }).map(String)
-    
-                
-                console.log("[65465465 scrollTop]:", currentListTilesInView)
-    
-                return {...currentListTilesInView}
+
+                return { ...currentListTilesInView }
             })
         }, 350)
-        
     }
-    
-    console.log(15151515)
-
 
     const [viewportOptionsIds, setViewportOptionsIds] = useState({
-        1: [],
-        3: []
+        "1": [],
+        "3": []
     })
 
 
-    // this variables are used for parallel view
-    const listOfOptionsIdsWithoutHidden = (viewport) => {
-        console.log(5454545454)
-        return sortedOptions.filter(option => !hideOption(option, viewport)).map(option => String(option[0]))
-    }
-
     useEffect(() => {
-        console.log(500050005000)
-        setViewportOptionsIds({
-            1: listOfOptionsIdsWithoutHidden(1),
-            3: listOfOptionsIdsWithoutHidden(3)
-        })
-    }, [selectOptionsData.selectedOption])
+            const nextViewportOptionsIds = {
+                "1": [],
+                "3": []
+            }
+    
+            // return sortedOptions.filter(option => !hideOption(option, viewport)).map(option => String(option[0]))
+    
+            for (const option of sortedOptions){
+                let pushToViewport = "1"
+                if (hideOption(option, pushToViewport)) {
+                    pushToViewport = "3"
+                }
+                nextViewportOptionsIds[pushToViewport].push(String(option[0]))
+
+            }
+            console.log(nextViewportOptionsIds)
+    
+            setViewportOptionsIds(nextViewportOptionsIds)
+        
+    }, [sortedOptions, selectOptionsData.selectedOption])
 
     return (
         <div
@@ -841,7 +829,6 @@ const SelectOptions = ({ index = "0" }) => {
                                                 setSearchTextUnselectedTail(_searchText)
                                                 setSearchTextSelectedTail('')
                                             } else {
-                                                console.log(_searchText)
                                                 setSearchTextSelectedTail(_searchText)
                                                 setSearchTextUnselectedTail('')
                                             }
@@ -882,7 +869,7 @@ const SelectOptions = ({ index = "0" }) => {
 
                                 {(() => {
                                     return <div
-                                        key={viewport} 
+                                        key={viewport}
                                         className={`options-list ${viewport}-ct`}
                                         onScroll={(e) => handleScrollingOptionsList(e, viewport, viewportOptionsIds[String(viewport)])}
                                     >
@@ -907,7 +894,7 @@ const SelectOptions = ({ index = "0" }) => {
                                                     {selectOptionsData.defaultOptionText ?? 'Select a option'}
                                                 </SelectOption>
                                             ) : null}
-                                            
+
                                             {sortedOptions.map(option => {
                                                 const indexOfShownOption = viewportOptionsIds[String(viewport)].indexOf(String(option[0]))
                                                 return listTilesInView[String(viewport)].includes(String(indexOfShownOption)) ? (
@@ -924,7 +911,7 @@ const SelectOptions = ({ index = "0" }) => {
                                                         multiSelect={selectOptionsData.multiSelect}
                                                         selectedOption={selectOptionsData.selectedOption}
                                                         setSelectedOption={selectOptionsData.setSelectedOption}
-                                                        //hide={hideOption(option, viewport)}
+                                                        hide={hideOption(option, viewport)}
                                                     >
                                                         {option[1]}
                                                     </SelectOption>
