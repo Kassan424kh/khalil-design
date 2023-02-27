@@ -21,7 +21,7 @@ messagesUpdaterConfig();
 selectOptionsHooksStore();
 
 export default function App() {
-    const [{ showLoadingSpinner, selectOptions }, dispatch] = useStore()
+    const [{ showLoadingSpinner, selectProps }, dispatch] = useStore()
 
     // set Theme
     useEffect(() => {
@@ -52,8 +52,8 @@ export default function App() {
         <div className="App">
             <Pages />
             <SelectOptions key={0} />
-            {Object.keys(selectOptions).length > 1
-                ? Object.keys(selectOptions).map((_, selectOptionsIndex) =>
+            {Object.keys(selectProps).length > 1
+                ? Object.keys(selectProps).map((_, selectOptionsIndex) =>
                     selectOptionsIndex !== 0 ? (
                         <SelectOptions key={selectOptionsIndex} index={String(selectOptionsIndex)} />
                     ) : null

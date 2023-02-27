@@ -92,7 +92,7 @@ const Nav = (props) => {
     });
 
     const closeSelectOptions = () => {
-        dispatch("UPDATE_DATA", {
+        dispatch("UPDATE_SELECT_PROPS", {
             show: false,
             lastUpdate: Date.now()
         });

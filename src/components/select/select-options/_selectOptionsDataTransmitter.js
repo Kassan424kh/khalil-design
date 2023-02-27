@@ -38,7 +38,8 @@ const SelectOptionsDataTransmitter = ({
     index
 }) => {
     const [disableSelecting, setDisableSelecting] = useState(false)
-    const [state, dispatch] = useStore()
+    const [{selectProps}, dispatch] = useStore()
+    const selectOptionsDataAfterIndex = selectProps[index]
     const [openDirections, setOpenDirections] = useState({
         top: top !== undefined ? top : true,
         bottom: bottom !== undefined ? bottom : true,
@@ -48,8 +49,8 @@ const SelectOptionsDataTransmitter = ({
 
     const currentSelectId = useRef()
     useEffect(() => {
-        currentSelectId.current = state.selectOptions.selectId
-    }, [state])
+        currentSelectId.current = selectOptionsDataAfterIndex?.selectId
+    }, [selectOptionsDataAfterIndex])
 
     useEffect(() => {
         const newOpenDirections = {
@@ -67,7 +68,7 @@ const SelectOptionsDataTransmitter = ({
         showSelectOptions.current = selectId !== currentSelectId.current ? true : show
         currentAndNextSelectIds.current = { current: currentSelectId.current, next: selectId }
 
-        dispatch('UPDATE_DATA', {
+        dispatch('UPDATE_SELECT_PROPS', {
             selectId: selectId,
             showSelectedParallel: showSelectedParallel,
             className: className,
@@ -79,7 +80,6 @@ const SelectOptionsDataTransmitter = ({
             enableCloseButton: enableCloseButton,
             closeButtonText: closeButtonText,
             setShow: setShow,
-            options: options,
             additionalFilterInformation: additionalFilterInformation,
             multiSelect: multiSelect,
             selectedOption: selectedOption,
@@ -101,7 +101,6 @@ const SelectOptionsDataTransmitter = ({
         selectId,
         selectedOption,
         lastTimeUpdatedSelectedOptions,
-        options,
         additionalFilterInformation,
         clearSelectedOptions,
         disableSelecting,
@@ -110,10 +109,20 @@ const SelectOptionsDataTransmitter = ({
         show
     ])
 
+    // set and update options
+    useEffect(() => {
+        dispatch('UPDATE_SELECT_OPTIONS', {
+            options: options,
+            index: index,
+        })
+    }, [
+        options,
+    ])
+
     const showTimeout = useRef()
     useEffect(() => {
         showTimeout.current = setTimeout(() => {
-            dispatch('UPDATE_DATA', {
+            dispatch('UPDATE_SELECT_PROPS', {
                 show: showSelectOptions.current,
                 lastUpdate: clicked,
                 index: index
@@ -124,7 +133,7 @@ const SelectOptionsDataTransmitter = ({
     }, [show, clicked, showSelectOptions])
 
     useEffect(() => {
-        dispatch('UPDATE_DATA', {
+        dispatch('UPDATE_SELECT_PROPS', {
             selectButtonProperties: selectButtonProperties,
             openDirections: openDirections,
             lastUpdate: selectMouseEnter,

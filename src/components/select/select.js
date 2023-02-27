@@ -61,17 +61,12 @@ const Select = ({
     index = "0", // used only for submenus
     ...props
 }) => {
-
-
-
-
     const selectId = useState(uuidv4())[0]
 
     // hook store
-    const [{ selectOptions }, dispatch] = useStore()
-    const { selectId: selectIdParentSelectElement } = selectOptions[0] ?? { selectId: uuidv4() }
-    const { selectId: selectIdOnStore } = selectOptions[index] ?? { show: false, selectId: uuidv4() }
-
+    const [{ selectProps }, dispatch] = useStore()
+    const { selectId: selectIdParentSelectElement } = selectProps[0] ?? { selectId: uuidv4() }
+    const { selectId: selectIdOnStore } = selectProps[index] ?? { show: false, selectId: uuidv4() }
 
     // useState variables
     const [_options, _setOptions] = useState([])
@@ -121,26 +116,26 @@ const Select = ({
     const [lastTimeUpdatedSelectedOptions, setLastTimeUpdatedSelectedOptions] = useState()
     const myRef = useRef([])
     const [selectedOption, setSelectedOption] = useState(
-        multiSelect && defaultAllSelected ? Object.entries(_options).map(option => [option[0], option[1]]) : []
+        multiSelect && defaultAllSelected ? _options.map(option => [option[0], option[1]]) : []
     )
     const [selectMouseEnter, setSelectMouseEnter] = useState(false)
     const selectButtonProperties = useContainerDimensions({
         ref: myRef,
         id: 0,
-        withoutResize : true,
-        withoutScroll : true,
+        withoutResize: true,
+        withoutScroll: true,
         update: [updatePosition, selectMouseEnter]
     })
 
     // set options locally
     // this useEffect is usefull to update state after only realy new object
+    const prevSelectOptions = useRef()
     useEffect(() => {
-        _setOptions(_currentOptions => {
-            if (options && !_.isEqual(options, _currentOptions)) {
-                return options
-            }
-            return _currentOptions
-        })
+        if (options && !_.isEqual(options, prevSelectOptions.current)){
+            prevSelectOptions.current = options
+            console.log(44444, options)
+            _setOptions(Object.entries(options))
+        }
     }, [options])
 
     // set additionalFilterInformation locally
@@ -188,9 +183,9 @@ const Select = ({
     useEffect(() => {
         if (!firstLoading3.current && multiSelect) {
             setSelectedOption(
-                selectedOption.length === Object.entries(options).length
+                selectedOption.length === _options.length
                     ? []
-                    : Object.entries(options).map(option => [option[0], option[1]])
+                    : _options.map(option => [option[0], option[1]])
             )
         }
         if (firstLoading3.current) firstLoading3.current = false
@@ -200,7 +195,7 @@ const Select = ({
     const firstLoading4 = useRef(true)
     useEffect(() => {
         if (!firstLoading4.current && multiSelect) {
-            setSelectedOption(Object.entries(options).map(option => [option[0], option[1]]))
+            setSelectedOption(_options.map(option => [option[0], option[1]]))
         }
         if (firstLoading4.current) firstLoading4.current = false
     }, [selectAllOptions])
@@ -234,7 +229,7 @@ const Select = ({
             {...props}
             ref={ele => (myRef.current[0] = ele)}
             className={`select disable-selecting ${className ? className : ''} ${showOptions ? ' active' : ''} ${selectedOption.length &&
-                Object.keys(_options).filter(_optionKey => _optionKey === selectedOption[0]).length &&
+                _options.filter(([_optionKey, _]) => _optionKey === selectedOption[0]).length &&
                 enableSelectedStatusDot
                 ? 'options-selected'
                 : ''
@@ -301,7 +296,7 @@ const Select = ({
                     left={left}
                     right={right}
                     updateOptionsProperties={updateOptionsProperties}
-                    options={JSON.stringify(_options)}
+                    options={_options}
                     additionalFilterInformation={_additionalFilterInformation}
                     multiSelect={multiSelect}
                     selectedOption={selectedOption}

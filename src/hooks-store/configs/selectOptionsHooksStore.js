@@ -2,8 +2,8 @@ import { initStore } from '../store'
 import { deepCopy } from '../../services/deepCopy'
 import _ from "underscore"
 
-export const defaultSelectOptionsData = {
-    selectOptions: {
+export const defaultSelectsProps = {
+    selectProps: {
         "0": {
             index: 0,
             selectId: undefined,
@@ -36,7 +36,6 @@ export const defaultSelectOptionsData = {
                 right: true
             },
             updateOptionsProperties: [],
-            options: [],
             multiSelect: false,
             selectedOption: undefined,
             setSelectedOption: undefined,
@@ -49,39 +48,42 @@ export const defaultSelectOptionsData = {
             sort: '',
             lastUpdate: 0
         }
+    },
+    selectOptions: {
+        "0": []
     }
 }
 
 const configureStore = () => {
     const actions = {
-        UPDATE_DATA: (prevState, data) => {
+        UPDATE_SELECT_PROPS: (prevState, data) => {
             const dataIncludeIndex = Object.keys(data).includes("index")
             if (!dataIncludeIndex) {
-                console.error("`selectOptionsHooksStore.js` => `UPDATE_DATA` data object don't incluedes `index` key")
+                console.error("`selectOptionsHooksStore.js` => `UPDATE_SELECT_PROPS` data object don't incluedes `index` key")
                 return prevState
             }
 
             const nextState = _.clone(prevState)
-            nextState.selectOptions[data.index] = {
-                ...(nextState.selectOptions[data.index] ?? {}),
+            nextState.selectProps[data.index] = {
+                ...(nextState.selectProps[data.index] ?? {}),
                 ...data
             }
 
             const newDataNotEqualToOldData = JSON.stringify({
-                ...nextState.selectOptions[data.index],
+                ...nextState.selectProps[data.index],
                 lastUpdate: 0,
                 headerText: '',
                 selectButtonProperties: {
-                    ...nextState.selectOptions[data.index].selectButtonProperties,
+                    ...nextState.selectProps[data.index].selectButtonProperties,
                     offset: null
                 }
             }) !==
                 JSON.stringify({
-                    ...prevState.selectOptions[data.index],
+                    ...prevState.selectProps[data.index],
                     lastUpdate: 0,
                     headerText: '',
                     selectButtonProperties: {
-                        ...prevState.selectOptions[data.index].selectButtonProperties,
+                        ...prevState.selectProps[data.index].selectButtonProperties,
                         offset: null
                     }
                 })
@@ -90,41 +92,57 @@ const configureStore = () => {
                 ? nextState
                 : prevState
         },
+        UPDATE_SELECT_OPTIONS: (prevState, data) => {
+            const dataIncludeIndex = Object.keys(data).includes("index")
+            if (!dataIncludeIndex) {
+                console.error("`selectOptionsHooksStore.js` => `UPDATE_SELECT_OPTIONS` data object don't incluedes `index` key")
+                return prevState
+            }
+
+            const nextState = _.clone(prevState)
+            nextState.selectOptions[data.index] = data.options
+
+            const newDataNotEqualToOldData = !_.isEqual(nextState.selectOptions[data.index], prevState.selectOptions[data.index])
+
+            return newDataNotEqualToOldData
+                ? nextState
+                : prevState
+        },
         CLOASE_ALL_SELECT_OPTIONS: prevState => {
             const nextState = deepCopy(prevState)
-            Object.keys(nextState.selectOptions).map(soKey => {
+            Object.keys(nextState.selectProps).map(soKey => {
                 if (soKey !== "0") {
-                    delete nextState.selectOptions[soKey]
+                    delete nextState.selectProps[soKey]
                     return
                 }
 
-                nextState.selectOptions[soKey]["show"] = false
-                nextState.selectOptions[soKey]["lastUpdate"] = Date.now()
+                nextState.selectProps[soKey]["show"] = false
+                nextState.selectProps[soKey]["lastUpdate"] = Date.now()
             })
             return nextState
         },
         CLOSE_SELECT_OPTION: (prevState, index) => {
             const nextState = deepCopy(prevState)
-            Object.keys(nextState.selectOptions).forEach(soKey => {
-                if (soKey === index ) {
-                    nextState.selectOptions[index]["show"] = false
-                    nextState.selectOptions[index]["lastUpdate"] = Date.now()
+            Object.keys(nextState.selectProps).forEach(soKey => {
+                if (soKey === index) {
+                    nextState.selectProps[index]["show"] = false
+                    nextState.selectProps[index]["lastUpdate"] = Date.now()
                 }
             })
             return nextState
         },
         DELETE_SUB_SELECT_OPTIONS: (prevState, index) => {
-            if (index !== "0") delete prevState.selectOptions[index]
+            if (index !== "0") delete prevState.selectProps[index]
             return prevState
         },
         DELETE_ALL_SUB_SELECT_OPTIONS: (prevState) => {
-            Object.keys(prevState.selectOptions).forEach(soIndex => {
-                if (soIndex !== "0") delete prevState.selectOptions[soIndex]
+            Object.keys(prevState.selectProps).forEach(soIndex => {
+                if (soIndex !== "0") delete prevState.selectProps[soIndex]
             })
             return prevState
         }
     }
-    initStore(actions, defaultSelectOptionsData)
+    initStore(actions, defaultSelectsProps)
 }
 
 export default configureStore
