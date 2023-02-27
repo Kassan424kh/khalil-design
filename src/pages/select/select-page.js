@@ -4,7 +4,7 @@ import Select from "../../components/select/select";
 import { faker } from '@faker-js/faker'
 
 const SelectPage = () => {
-    const [_fakeList, _]  = useState(new Array(300).fill().map((value, index) => faker.lorem.words(6)))
+    const [_fakeList, _]  = useState(new Array(30000).fill().map((value, index) => faker.lorem.words(6)))
 
     return (
         <div className="page">

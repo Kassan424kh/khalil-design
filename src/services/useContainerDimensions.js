@@ -77,7 +77,7 @@ export const useContainerDimensions = ({
             clearTimeout(timeout.current)
             timeout.current = setTimeout(() => {
                 if (ref.current) {
-                    setDimensions(Object.assign({}, getDimensions({ id, ref })))
+                    setDimensions(getDimensions({ id, ref }))
                 }
             }, duration)
         }

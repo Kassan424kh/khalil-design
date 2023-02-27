@@ -350,6 +350,7 @@ const SelectOptions = ({ index = "0" }) => {
 
     // update selectOptionsData state after check if there is a real change
     const prevLengthAllSelectOptions = useRef(1)
+    const prevOptions = useRef()
     useEffect(() => {
         setSelectOptionsData(currentSelectOptionsData => {
             if (JSON.stringify({
@@ -364,6 +365,7 @@ const SelectOptions = ({ index = "0" }) => {
                 ...currentSelectOptionsData,
                 lastUpdate: 0,
                 headerText: '',
+                options: prevOptions.current,
                 selectButtonProperties: {
                     ...currentSelectOptionsData.selectButtonProperties,
                     offset: null
@@ -373,14 +375,20 @@ const SelectOptions = ({ index = "0" }) => {
                 if (selectOptionsData.selectId !== selectOptionsDataAfterIndex.selectId || !selectOptionsDataAfterIndex.show) {
                     setSearchText('')
                 }
+
                 prevLengthAllSelectOptions.current = lengthAllSelectOptions
-                return selectOptionsDataAfterIndex
+                prevOptions.current = selectOptionsDataAfterIndex.options
+                const _options = selectOptionsDataAfterIndex.options
+                const _convertedOptionsToObject =  _.isObject(_options) && typeof _options !== "string" ? _options : JSON.parse(_options ?? JSON.stringify([]))
+                const _convertedOptionsToEntries = Object.entries(_convertedOptionsToObject)
+                console.log(888888, _convertedOptionsToEntries)
+            
+                return {...selectOptionsDataAfterIndex, options: _convertedOptionsToEntries}
             }
             return currentSelectOptionsData
         })
 
         return () => {
-            setSelectOptionsData(defaultSelectOptionsData.selectOptions[0])
             setSearchText('')
         }
 
@@ -436,7 +444,8 @@ const SelectOptions = ({ index = "0" }) => {
             gsap.to(`.select-options[index="${index}"] .select-options-actions .select-options-search-field input`, {
                 width: !enableSelectAllButton ? 'calc(100%)' : '100%',
                 paddingLeft: parsePixel(enableSelectAllButton ? 95 : 10),
-                duration: 0
+                duration: 0.15,
+                delay: 0.05,
             })
 
             gsap.to(`.select-options[index="${index}"] .select-options-actions .select-options-search-field input`, {
@@ -591,20 +600,19 @@ const SelectOptions = ({ index = "0" }) => {
 
     const [sortedOptions, setSortedOptions] = useState([])
     const sortOptions = (_options) => {
-        const optionsListNotSorted = Object.entries(_options)
         try {
-            const DescSorted = _.sortBy(optionsListNotSorted, o => o[1]?.toUpperCase())
+            const DescSorted = _.sortBy(_options, o => String(o[1]).toUpperCase())
 
             switch (selectOptionsData.sort) {
                 case 'DESC':
-                    return setSortedOptions(sortOptions())
+                    return DescSorted
                 case 'ASC':
                     return DescSorted.reverse()
                 default:
-                    return optionsListNotSorted
+                    return _options
             }
         } catch (e) {
-            return optionsListNotSorted
+            return _options
         }
     }
 
@@ -618,6 +626,8 @@ const SelectOptions = ({ index = "0" }) => {
         setSortedOptions(sortOptions(selectOptionsData.options))
         setListTilesInView(initListTilesInView)
     }, [selectOptionsData.options, selectOptionsData.sort])
+    
+    console.log(7777777, sortedOptions)
 
     // check if option was selected
     const wasSelected = (option) => {
@@ -679,7 +689,7 @@ const SelectOptions = ({ index = "0" }) => {
             const _scrollTop = $(e.target).scrollTop() // px
             const _height = $(e.target).height() // px
             const _optionHeight = 40 // px
-            const _cacheExtent = 500 * 40
+            const _cacheExtent = 30 * 40
             const _dimensions = {
                 top: Math.round(_scrollTop),
                 bottom: Math.round(_scrollTop + _height)
@@ -696,7 +706,8 @@ const SelectOptions = ({ index = "0" }) => {
 
                 return { ...currentListTilesInView }
             })
-        }, 350)
+        }, 100)
+        return () => clearTimeout(scrollingOptionsListTimeout.current)
     }
 
     const [viewportOptionsIds, setViewportOptionsIds] = useState({
@@ -704,15 +715,12 @@ const SelectOptions = ({ index = "0" }) => {
         "3": []
     })
 
-
     useEffect(() => {
             const nextViewportOptionsIds = {
                 "1": [],
                 "3": []
             }
-    
-            // return sortedOptions.filter(option => !hideOption(option, viewport)).map(option => String(option[0]))
-    
+
             for (const option of sortedOptions){
                 let pushToViewport = "1"
                 if (hideOption(option, pushToViewport)) {
@@ -758,7 +766,7 @@ const SelectOptions = ({ index = "0" }) => {
                                     leftIcon={'done_all'}
                                     onClick={() => {
                                         selectOptionsData.setSelectedOption(
-                                            Object.entries(selectOptionsData.options).filter(option => {
+                                            selectOptionsData.options.filter(option => {
                                                 const _searchedText = selectOptionsData.showSelectedParallel
                                                     ? searchTextUnselectedTail
                                                     : searchText
@@ -854,7 +862,7 @@ const SelectOptions = ({ index = "0" }) => {
                                     <div
                                         className={`empty-listview-background-image ${(selectOptionsData.selectedOption &&
                                             selectOptionsData.selectedOption.length !==
-                                            Object.entries(selectOptionsData.options).length &&
+                                            selectOptionsData.options.length &&
                                             viewport === 1) ||
                                             (selectOptionsData.selectedOption.length && viewport === 3)
                                             ? 'hide'
@@ -881,7 +889,6 @@ const SelectOptions = ({ index = "0" }) => {
 
                                             {selectOptionsData.defaultOption && viewport === 1 ? (
                                                 <SelectOption
-                                                    options={selectOptionsData.options}
                                                     id={''}
                                                     disableSelecting={selectOptionsData.disableSelecting}
                                                     setDisableSelecting={selectOptionsData.setDisableSelecting}

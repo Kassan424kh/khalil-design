@@ -127,6 +127,8 @@ const Select = ({
     const selectButtonProperties = useContainerDimensions({
         ref: myRef,
         id: 0,
+        withoutResize : true,
+        withoutScroll : true,
         update: [updatePosition, selectMouseEnter]
     })
 
@@ -299,7 +301,7 @@ const Select = ({
                     left={left}
                     right={right}
                     updateOptionsProperties={updateOptionsProperties}
-                    options={_options}
+                    options={JSON.stringify(_options)}
                     additionalFilterInformation={_additionalFilterInformation}
                     multiSelect={multiSelect}
                     selectedOption={selectedOption}
