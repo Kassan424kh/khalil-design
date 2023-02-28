@@ -729,18 +729,26 @@ const SelectOptions = ({ index = '0' }) => {
         for (const option of sortedOptions) {
             if (selectProps.showSelectedParallel) {
                 let pushToViewport = '1'
-                if (hideOption(option, pushToViewport) && selectProps.showSelectedParallel) {
+                if (hideOption(option, pushToViewport)) {
                     pushToViewport = '3'
                 }
 
                 nextViewportOptionsIds[pushToViewport].push(String(option[0]))
+            } else {
+                if (!hideOption(option, '1')) nextViewportOptionsIds['1'].push(String(option[0]))
+                nextViewportOptionsIds['3'] = []
             }
         }
 
         setViewportOptionsIds(nextViewportOptionsIds)
-    }, [sortedOptions, selectProps.selectedOption, selectProps.showSelectedParallel])
-
-    useEffect(() => {}, [searchText, searchTextSelectedTail, searchTextUnselectedTail])
+    }, [
+        sortedOptions,
+        selectProps.selectedOption,
+        selectProps.showSelectedParallel,
+        searchText,
+        searchTextSelectedTail,
+        searchTextUnselectedTail
+    ])
 
     return (
         <div
