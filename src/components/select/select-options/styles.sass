@@ -76,6 +76,11 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                 padding-right: 15px
                 position: relative
                 overflow-x: hidden
+                width: 100%
+                min-height: 100%
+                max-height: 100%
+                height: 100%
+                overflow-y: scroll
 
     .select-options-headline
         position: relative
@@ -241,13 +246,13 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
     &.single-select
         .select-options-column
             position: relative
+            display: inherit
             .select-option
                 &.selected
                     position: sticky
                     top: 0
                     bottom: 0
                     z-index: 20
-                    background-color: $white
                     border-radius: 0 !important
 
     &.multi-select
@@ -257,7 +262,6 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
 
             .select-options-column
                 height: 100%
-                overflow: auto
 
     &.show-selected-parallel
         max-width: max-content
@@ -366,6 +370,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                         
                     .options-list
                         padding-right: 10px
+                        margin-right: -15px
 
             .vertical-rule
                 margin: 0 10px

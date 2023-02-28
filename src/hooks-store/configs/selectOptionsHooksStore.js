@@ -50,7 +50,10 @@ export const defaultSelectsProps = {
         }
     },
     selectOptions: {
-        "0": []
+        "0": {
+            options: [],
+            length: 0,
+        }
     }
 }
 
@@ -100,7 +103,10 @@ const configureStore = () => {
             }
 
             const nextState = _.clone(prevState)
-            nextState.selectOptions[data.index] = data.options
+            nextState.selectOptions[data.index] = {
+                options: data.options,
+                length: data.options.length
+            }
 
             const newDataNotEqualToOldData = !_.isEqual(nextState.selectOptions[data.index], prevState.selectOptions[data.index])
 
@@ -108,11 +114,12 @@ const configureStore = () => {
                 ? nextState
                 : prevState
         },
-        CLOASE_ALL_SELECT_OPTIONS: prevState => {
+        CLOASE_ALL_SELECT: prevState => {
             const nextState = deepCopy(prevState)
             Object.keys(nextState.selectProps).map(soKey => {
                 if (soKey !== "0") {
                     delete nextState.selectProps[soKey]
+                    delete nextState.selectOptions[soKey]
                     return
                 }
 
@@ -121,23 +128,25 @@ const configureStore = () => {
             })
             return nextState
         },
-        CLOSE_SELECT_OPTION: (prevState, index) => {
+        CLOSE_SELECT: (prevState, index) => {
             const nextState = deepCopy(prevState)
-            Object.keys(nextState.selectProps).forEach(soKey => {
-                if (soKey === index) {
-                    nextState.selectProps[index]["show"] = false
-                    nextState.selectProps[index]["lastUpdate"] = Date.now()
-                }
-            })
+            nextState.selectProps[index]["show"] = false
+            nextState.selectProps[index]["lastUpdate"] = Date.now()
             return nextState
         },
-        DELETE_SUB_SELECT_OPTIONS: (prevState, index) => {
-            if (index !== "0") delete prevState.selectProps[index]
+        DELETE_SUB_SELECT: (prevState, index) => {
+            if (index !== "0") {
+                delete prevState.selectProps[index]
+                delete prevState.selectOptions[index]
+            }
             return prevState
         },
-        DELETE_ALL_SUB_SELECT_OPTIONS: (prevState) => {
+        DELETE_ALL_SUB_SELECT: (prevState) => {
             Object.keys(prevState.selectProps).forEach(soIndex => {
-                if (soIndex !== "0") delete prevState.selectProps[soIndex]
+                if (soIndex !== "0") {
+                    delete prevState.selectProps[soIndex]
+                    delete prevState.selectOptions[soIndex]
+                }
             })
             return prevState
         }

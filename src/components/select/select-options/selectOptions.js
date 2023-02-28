@@ -13,26 +13,22 @@ import gsap from 'gsap'
 const SelectOptions = ({ index = "0" }) => {
     const [{ selectProps: selectPropsFromStore, selectOptions: selectOptionsFromStore }, dispatch] = useStore()
     const selectOptionsGetByIndex = selectOptionsFromStore[index]
-    const selectPropssGetByIndex = selectPropsFromStore[index]
+    const selectPropsGetByIndex = selectPropsFromStore[index]
     const lengthAllSelects = Object.values(selectPropsFromStore).length
     const thisSelectIsActiveNow = lengthAllSelects - 1 <= index
-    const [selectOptions, setSelectOptions] = useState([])
     const [selectProps, setSelectProps] = useState(defaultSelectsProps.selectProps[0])
+    const [selectOptions, setSelectOptions] = useState([])
     const [updateSelectPropsTimes, setUpdateSelectPropsTimes] = useState(0)
-
-    const closeSelectOptions = () => {
-        if (index === "0") {
-            dispatch('CLOSE_SELECT_OPTION', index)
-        }
-        else dispatch('DELETE_SUB_SELECT_OPTIONS', index)
-    }
-
     const [searchText, setSearchText] = useState('')
-
     const [searchTextSelectedTail, setSearchTextSelectedTail] = useState('')
     const [searchTextUnselectedTail, setSearchTextUnselectedTail] = useState('')
 
-    const [selectButtonProperties, setSelectButtonProperties] = useState(defaultSelectsProps.selectProps[0])
+    const closeSelectOptions = () => {
+        if (index === "0") {
+            dispatch('CLOSE_SELECT', index)
+        }
+        else dispatch('DELETE_SUB_SELECT', index)
+    }
 
     const updateOffsetTimeout = useRef()
     useEffect(() => {
@@ -44,7 +40,6 @@ const SelectOptions = ({ index = "0" }) => {
     }, [selectOptions])
 
     const myRef = useRef()
-
     const foundOptions = useCallback(
         (__searchText, option, searchEveryWare = false) => {
             return !__searchText
@@ -69,11 +64,11 @@ const SelectOptions = ({ index = "0" }) => {
 
                     // return true if there are matching parts in the publisher name which is passed as additional filter information
                     if (
-                        selectPropssGetByIndex.additionalFilterInformation &&
-                        option[0] in selectPropssGetByIndex.additionalFilterInformation
+                        selectPropsGetByIndex.additionalFilterInformation &&
+                        option[0] in selectPropsGetByIndex.additionalFilterInformation
                     )
                         if (
-                            selectPropssGetByIndex.additionalFilterInformation[option[0]]
+                            selectPropsGetByIndex.additionalFilterInformation[option[0]]
                                 .toString()
                                 .toUpperCase()
                                 .split(' ')
@@ -113,7 +108,7 @@ const SelectOptions = ({ index = "0" }) => {
         defaultPosition = 0,
         effectUsage = false
     ) => {
-        if (selectButtonProperties.offset) {
+        if (selectProps.selectButtonProperties.offset) {
             const // directions
                 directions = selectProps.openDirections,
                 directionTop = selectProps.openDirections.top,
@@ -121,9 +116,9 @@ const SelectOptions = ({ index = "0" }) => {
                 // window
                 windowHeight = window.innerHeight,
                 // select
-                selectHeight = selectButtonProperties.height,
-                selectTop = selectButtonProperties.offset.top,
-                selectBottom = selectButtonProperties.offset.bottom,
+                selectHeight = selectProps.selectButtonProperties.height,
+                selectTop = selectProps.selectButtonProperties.offset.top,
+                selectBottom = selectProps.selectButtonProperties.offset.bottom,
                 // selectOptions
                 selectOptionsHeight = optionsProperties.height,
                 selectOptionsTop = optionsProperties.top,
@@ -213,7 +208,7 @@ const SelectOptions = ({ index = "0" }) => {
         centerPosition = null,
         effectUsage = false
     ) => {
-        if (selectButtonProperties.offset) {
+        if (selectProps.selectButtonProperties.offset) {
             const // directions
                 directions = selectProps.openDirections,
                 directionLeft = selectProps.openDirections.left,
@@ -221,9 +216,9 @@ const SelectOptions = ({ index = "0" }) => {
                 // window
                 windowWidth = window.innerWidth,
                 // select
-                selectWidth = selectButtonProperties.width,
-                selectLeft = selectButtonProperties.offset.left,
-                selectRight = selectButtonProperties.offset.right,
+                selectWidth = selectProps.selectButtonProperties.width,
+                selectLeft = selectProps.selectButtonProperties.offset.left,
+                selectRight = selectProps.selectButtonProperties.offset.right,
                 // selectOptions
                 selectOptionsWidth = optionsProperties.width,
                 selectOptionsLeft = optionsProperties.left,
@@ -344,22 +339,16 @@ const SelectOptions = ({ index = "0" }) => {
         }
     }
 
-    useEffect(() => {
-        setSelectButtonProperties({
-            ...selectProps.selectButtonProperties
-        })
-    }, [selectProps])
-
     // update selectOptionsData state after check if there is a real change
     const prevLengthAllSelectOptions = useRef(1)
     useEffect(() => {
         setSelectProps(currentSelectOptionsData => {
             if (JSON.stringify({
-                ...selectPropssGetByIndex,
+                ...selectPropsGetByIndex,
                 lastUpdate: 0,
                 headerText: '',
                 selectButtonProperties: {
-                    ...selectPropssGetByIndex.selectButtonProperties,
+                    ...selectPropsGetByIndex.selectButtonProperties,
                     offset: null
                 }
             }) !== JSON.stringify({
@@ -372,12 +361,12 @@ const SelectOptions = ({ index = "0" }) => {
                 }
             }) || lengthAllSelects != prevLengthAllSelectOptions.current) {
 
-                if (selectProps.selectId !== selectPropssGetByIndex.selectId || !selectPropssGetByIndex.show) {
+                if (selectProps.selectId !== selectPropsGetByIndex.selectId || !selectPropsGetByIndex.show) {
                     setSearchText('')
                 }
                 prevLengthAllSelectOptions.current = lengthAllSelects
 
-                return selectPropssGetByIndex
+                return selectPropsGetByIndex
             }
             return currentSelectOptionsData
         })
@@ -386,15 +375,17 @@ const SelectOptions = ({ index = "0" }) => {
             setSearchText('')
         }
 
-    }, [selectPropssGetByIndex, lengthAllSelects])
+    }, [selectPropsGetByIndex, lengthAllSelects])
 
     const prevSelectOptions = useRef()
     useEffect(() => {
-        if (!_.isEqual(prevSelectOptions.current, selectOptionsGetByIndex)) {
-            prevSelectOptions.current = selectOptionsGetByIndex
-            setSelectOptions(selectOptionsGetByIndex)
+        const _options = selectOptionsGetByIndex.options
+        if (!_.isEqual(prevSelectOptions.current, _options)) {
+            prevSelectOptions.current = _options
+            setSelectOptions(_options)
+            $(".options-list").scrollTop(0)
         }
-    }, [selectOptionsGetByIndex])
+    }, [selectOptionsGetByIndex.options])
 
     const searchFieldRef = useRef()
     useEffect(() => {
@@ -481,7 +472,7 @@ const SelectOptions = ({ index = "0" }) => {
             )
         }, 150)
         return () => clearTimeout(animateTimeout.current)
-    }, [selectProps, lengthAllSelects])
+    }, [selectProps, lengthAllSelects, selectOptions])
 
     const getNextXY = () => {
         const optionsProperties = getDimensions({
@@ -489,20 +480,20 @@ const SelectOptions = ({ index = "0" }) => {
         })
         const x = moveHorizontal(
             optionsProperties,
-            `${selectButtonProperties.offset ? selectButtonProperties.offset.left + selectButtonProperties.width : 0
+            `${selectProps.selectButtonProperties.offset ? selectProps.selectButtonProperties.offset.left + selectProps.selectButtonProperties.width : 0
             }px`,
-            `${selectButtonProperties.offset ? selectButtonProperties.offset.left - optionsProperties.width : 0}px`,
-            selectButtonProperties.offset
-                ? selectButtonProperties.offset.left - optionsProperties.width / 2 + selectButtonProperties.width / 2
+            `${selectProps.selectButtonProperties.offset ? selectProps.selectButtonProperties.offset.left - optionsProperties.width : 0}px`,
+            selectProps.selectButtonProperties.offset
+                ? selectProps.selectButtonProperties.offset.left - optionsProperties.width / 2 + selectProps.selectButtonProperties.width / 2
                 : 0
         )
 
         const y = moveVertikal(
             optionsProperties,
-            `${selectButtonProperties.offset ? selectButtonProperties.offset.top + selectButtonProperties.height : 0
+            `${selectProps.selectButtonProperties.offset ? selectProps.selectButtonProperties.offset.top + selectProps.selectButtonProperties.height : 0
             }px`,
-            `${selectButtonProperties.offset ? selectButtonProperties.offset.top - optionsProperties.height : 0}px`,
-            `${selectButtonProperties.top}px`
+            `${selectProps.selectButtonProperties.offset ? selectProps.selectButtonProperties.offset.top - optionsProperties.height : 0}px`,
+            `${selectProps.selectButtonProperties.top}px`
         )
         return { x, y }
     }
@@ -539,7 +530,6 @@ const SelectOptions = ({ index = "0" }) => {
             )
             const distanceToSeconds = Math.min(Math.max((distance / 50) * 0.04, 0.1), 0.25)
 
-
             const _toggleSelectOptions = () => {
                 gsap.to(`.select-options[index="${index}"]`, {
                     opacity: selectProps.show ? 1 : 0,
@@ -566,10 +556,10 @@ const SelectOptions = ({ index = "0" }) => {
                         nextXY = getNextXY()
                         const { x, y } = nextXY
                         gsap.to(`.select-options[index="${index}"]`, {
-                            x: x,
-                            y: y,
+                            x: selectProps.show ? x : prevX,
+                            y: selectProps.show ? y : prevY,
                             duration: 0.35,
-                            delay: 0.1,
+                            delay: 0.15,
                             onComplete: () => {
                                 _toggleSelectOptions()
                             }
@@ -578,8 +568,9 @@ const SelectOptions = ({ index = "0" }) => {
                 })
             } else {
                 gsap.to(`.select-options[index="${index}"]`, {
-                    x: x,
-                    y: y,
+                    x: selectProps.show ? x : prevX,
+                    y: selectProps.show ? y : prevY,
+                    delay: 0.15,
                     duration: selectProps.show && !wasClosed ? distanceToSeconds : 0,
                     onComplete: () => {
                         _toggleSelectOptions()
@@ -590,7 +581,7 @@ const SelectOptions = ({ index = "0" }) => {
 
         return () => clearTimeout(firstRenderTimeout.current)
 
-    }, [updateSelectPropsTimes])
+    }, [updateSelectPropsTimes, selectProps.show])
 
     const [headline, setHeadline] = useState(selectProps.headerText)
     useEffect(() => {
@@ -682,7 +673,6 @@ const SelectOptions = ({ index = "0" }) => {
     // it would be claculated wich options are in view, a list of indexes would be saved in `listTilesInView`
     // and used later to allow option to be renderd or not
     const handleScrollingOptionsList = (e, viewport, viewportOptionsIds) => {
-        console.log("asdfasdfasdfasdf")
         const _scrollTop = $(e.target).scrollTop() // px
         const _height = $(e.target).height() // px
         const _optionHeight = 40 // px
@@ -807,7 +797,6 @@ const SelectOptions = ({ index = "0" }) => {
                         className={'close-button'}
                         leftIcon={"close"}
                         onClick={() => {
-                            dispatch('CLOSE_SELECT_OPTION', index)
                             closeSelectOptions()
                         }}
                     />
@@ -873,7 +862,10 @@ const SelectOptions = ({ index = "0" }) => {
                                     return <div
                                         key={viewport}
                                         className={`options-list ${viewport}-ct select-index-${index}`}
-                                        onScroll={(e) => handleScrollingOptionsList(e, String(viewport), viewportOptionsIds[String(viewport)])}
+                                        onScroll={(e) => {
+                                            handleScrollingOptionsList(e, String(viewport), viewportOptionsIds[String(viewport)])
+                                            console.log("asdfasdf")
+                                        }}
                                     >
                                         <div
                                             style={{

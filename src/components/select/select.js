@@ -92,11 +92,11 @@ const Select = ({
     // close selectOptions window
     useEffect(() => {
         if (close) {
-            dispatch('CLOASE_ALL_SELECT_OPTIONS')
+            dispatch('CLOASE_ALL_SELECT')
             setShowOptions(false)
             const t = setTimeout(() => {
-                dispatch('CLOASE_ALL_SELECT_OPTIONS')
-                dispatch('DELETE_ALL_SUB_SELECT_OPTIONS')
+                dispatch('CLOASE_ALL_SELECT')
+                dispatch('DELETE_ALL_SUB_SELECT')
             }, 150)
 
             return () => clearTimeout(t)
@@ -133,7 +133,6 @@ const Select = ({
     useEffect(() => {
         if (options && !_.isEqual(options, prevSelectOptions.current)){
             prevSelectOptions.current = options
-            console.log(44444, options)
             _setOptions(Object.entries(options))
         }
     }, [options])
@@ -210,15 +209,15 @@ const Select = ({
             ((!$selectOptions.is(e.target) && $selectOptions.has(e.target).length === 0) &&
                 (!$select.is(e.target) && $select.has(e.target).length === 0))
         ) {
-            dispatch('DELETE_ALL_SUB_SELECT_OPTIONS')
-            dispatch('CLOSE_SELECT_OPTION', index)
+            dispatch('DELETE_ALL_SUB_SELECT')
+            dispatch('CLOSE_SELECT', index)
         }
     })
 
     useEffect(() => {
         console.log(selectIdParentSelectElement, (mainSelectId ?? selectId))
         if (selectIdParentSelectElement !== (mainSelectId ?? selectId)) {
-            dispatch('DELETE_ALL_SUB_SELECT_OPTIONS')
+            dispatch('DELETE_ALL_SUB_SELECT')
         }
     }, [click])
 
@@ -253,6 +252,8 @@ const Select = ({
             }}
             onClick={() => {
                 setHover(Date.now())
+                setClick(Date.now())
+                setShowOptions(true)
             }}
             onMouseDown={() => {
                 setClick(Date.now())

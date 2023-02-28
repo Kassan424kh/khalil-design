@@ -59,7 +59,7 @@ const SelectOption = forwardRef(({
                     if (!multiSelect && !isOptionSubmenu) {
                         console.log(20989074)
                         setTimeout(() => {
-                            dispatch("CLOASE_ALL_SELECT_OPTIONS")
+                            dispatch("CLOASE_ALL_SELECT")
                         }, 450)
                     }
                     pauseClickTime.current = Date.now() + 350
