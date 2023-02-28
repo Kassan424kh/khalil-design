@@ -58,7 +58,7 @@ const Select = ({
     defaultOptionText,
     sort,
     children,
-    index = "0", // used only for submenus
+    index = '0', // used only for submenus
     ...props
 }) => {
     const selectId = useState(uuidv4())[0]
@@ -131,7 +131,7 @@ const Select = ({
     // this useEffect is usefull to update state after only realy new object
     const prevSelectOptions = useRef()
     useEffect(() => {
-        if (options && !_.isEqual(options, prevSelectOptions.current)){
+        if (options && !_.isEqual(options, prevSelectOptions.current)) {
             prevSelectOptions.current = options
             _setOptions(Object.entries(options))
         }
@@ -182,9 +182,7 @@ const Select = ({
     useEffect(() => {
         if (!firstLoading3.current && multiSelect) {
             setSelectedOption(
-                selectedOption.length === _options.length
-                    ? []
-                    : _options.map(option => [option[0], option[1]])
+                selectedOption.length === _options.length ? [] : _options.map(option => [option[0], option[1]])
             )
         }
         if (firstLoading3.current) firstLoading3.current = false
@@ -206,8 +204,10 @@ const Select = ({
 
         // if the target of the click isn't the container nor a descendant of the container
         if (
-            ((!$selectOptions.is(e.target) && $selectOptions.has(e.target).length === 0) &&
-                (!$select.is(e.target) && $select.has(e.target).length === 0))
+            !$selectOptions.is(e.target) &&
+            $selectOptions.has(e.target).length === 0 &&
+            !$select.is(e.target) &&
+            $select.has(e.target).length === 0
         ) {
             dispatch('DELETE_ALL_SUB_SELECT')
             dispatch('CLOSE_SELECT', index)
@@ -215,7 +215,7 @@ const Select = ({
     })
 
     useEffect(() => {
-        console.log(selectIdParentSelectElement, (mainSelectId ?? selectId))
+        console.log(selectIdParentSelectElement, mainSelectId ?? selectId)
         if (selectIdParentSelectElement !== (mainSelectId ?? selectId)) {
             dispatch('DELETE_ALL_SUB_SELECT')
         }
@@ -227,12 +227,13 @@ const Select = ({
         <div
             {...props}
             ref={ele => (myRef.current[0] = ele)}
-            className={`select disable-selecting ${className ? className : ''} ${showOptions ? ' active' : ''} ${selectedOption.length &&
+            className={`select disable-selecting ${className ? className : ''} ${showOptions ? ' active' : ''} ${
+                selectedOption.length &&
                 _options.filter(([_optionKey, _]) => _optionKey === selectedOption[0]).length &&
                 enableSelectedStatusDot
-                ? 'options-selected'
-                : ''
-                }`}
+                    ? 'options-selected'
+                    : ''
+            }`}
             id={selectId}
             index={index}
             onMouseEnter={() => {

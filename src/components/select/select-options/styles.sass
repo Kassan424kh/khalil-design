@@ -3,7 +3,6 @@
 
 $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
 
-
 .select-options
     position: fixed
     font-family: $font-family
@@ -26,7 +25,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
     pointer-events: none
     top: 0
     left: 0
-    
+
     > div
         height: 100%
         display: contents
@@ -48,14 +47,14 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
         z-index: -1
         top: 0
         left: 0
-        background: linear-gradient(180deg, transparent  -51px, $white 70px, $white 70px), $background-effect-lines
+        background: linear-gradient(180deg, transparent -51px, $white 70px, $white 70px), $background-effect-lines
 
     .select-options-body
         display: contents
 
         .select-options-column
             position: relative
-            
+
             .empty-listview-background-image
                 opacity: 0
                 position: absolute
@@ -103,24 +102,24 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
 
     &.show-gradient-effect
         &:before
-            background: linear-gradient(180deg, transparent  -51px, $white 70px), $background-effect-lines
+            background: linear-gradient(180deg, transparent -51px, $white 70px), $background-effect-lines
 
         &.with-search
             &:before
-                background: linear-gradient(180deg, transparent  -51px, $white 70px), $background-effect-lines
+                background: linear-gradient(180deg, transparent -51px, $white 70px), $background-effect-lines
 
         &.with-header-text
             &:before
-                background: linear-gradient(180deg, transparent  -51px, $white 150px), $background-effect-lines
+                background: linear-gradient(180deg, transparent -51px, $white 150px), $background-effect-lines
 
             &.with-search
                 &:before
-                    background: linear-gradient(180deg, transparent  -51px, $white 130px), $background-effect-lines
+                    background: linear-gradient(180deg, transparent -51px, $white 130px), $background-effect-lines
 
         &.multi-select
             &.show-selected-parallel
                 &:before
-                    background: linear-gradient(180deg, transparent  -51px, $white 150px), $background-effect-lines
+                    background: linear-gradient(180deg, transparent -51px, $white 150px), $background-effect-lines
 
     .select-options-actions
         display: flex
@@ -225,7 +224,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
             height: 41px
             min-width: 42px
             min-height: 41px
-            margin-left: 10px 
+            margin-left: 10px
             right: 0
             z-index: 22
             border-radius: 10px
@@ -302,7 +301,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                     z-index: 20
                     border-radius: 20px !important
                     box-sizing: border-box
-                    
+
                     input
                         position: absolute
                         width: 100%
@@ -330,7 +329,6 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                         color: $black
                         font-weight: normal
                         line-height: 0
-                            
 
                 .options-list
                     $content-height: calc(100% - 60px)
@@ -354,7 +352,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                 &:first-child
                     .search-field-parallel-view
                         padding-left: 15px
-                        
+
                     .options-list
                         direction: rtl
                         padding-left: 10px
@@ -367,7 +365,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
 
                         .clear-button
                             right: 15px
-                        
+
                     .options-list
                         padding-right: 10px
                         margin-right: -15px
