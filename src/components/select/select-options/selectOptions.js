@@ -22,6 +22,11 @@ const SelectOptions = ({ index = "0" }) => {
     const [searchText, setSearchText] = useState('')
     const [searchTextSelectedTail, setSearchTextSelectedTail] = useState('')
     const [searchTextUnselectedTail, setSearchTextUnselectedTail] = useState('')
+    const initListTilesInView = {
+        1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(String), // key is the viewport on parallel view, item is list of options indexes can render in view 
+        3: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(String), // same ^ 
+    }
+    const [listTilesInView, setListTilesInView] = useState(initListTilesInView)
 
     const closeSelectOptions = () => {
         if (index === "0") {
@@ -378,11 +383,15 @@ const SelectOptions = ({ index = "0" }) => {
     }, [selectPropsGetByIndex, lengthAllSelects])
 
     const prevSelectOptions = useRef()
+    const optionsListWidth = useRef(0)
     useEffect(() => {
         const _options = selectOptionsGetByIndex.options
         if (!_.isEqual(prevSelectOptions.current, _options)) {
+            optionsListWidth.current = 0
             prevSelectOptions.current = _options
             setSelectOptions(_options)
+            setSortedOptions(sortOptions(_options))
+            setListTilesInView(initListTilesInView)
             $(".options-list").scrollTop(0)
         }
     }, [selectOptionsGetByIndex.options])
@@ -399,7 +408,8 @@ const SelectOptions = ({ index = "0" }) => {
         wasClosed: true,
         showSelectedParallel: false,
         x: 0,
-        y: 0
+        y: 0,
+        lengthAllSelects: 0
     })
     const parsePixel = (number) => {
         return number + "px"
@@ -415,7 +425,7 @@ const SelectOptions = ({ index = "0" }) => {
                 maxHeight: parsePixel(selectProps.headerText ? Math.max(headerChildHeight, 35) : 0),
                 opacity: selectProps.headerText ? 1 : 0,
                 marginBottom: parsePixel(selectProps.headerText ? -15 : 0),
-                duration: 0.15
+                duration: 0.2
             })
 
             const $el = $(`.select-options[index="${index}"] .select-options-actions`)
@@ -430,29 +440,29 @@ const SelectOptions = ({ index = "0" }) => {
                 opacity: selectProps.enableSearch ? 1 : 0,
                 paddingTop: parsePixel(selectProps.enableSearch ? 1 : 0),
                 pointerEvents: wasShown && selectProps.enableSearch && thisSelectIsActiveNow ? 'auto' : 'none',
-                duration: 0.15,
-                delay: 0.05
+                duration: 0.2,
+                delay: 0.2
             })
 
             gsap.to(`.select-options[index="${index}"] .select-options-actions .select-options-search-field input`, {
                 width: !enableSelectAllButton ? 'calc(100%)' : '100%',
                 paddingLeft: parsePixel(enableSelectAllButton ? 95 : 10),
-                duration: 0.15,
-                delay: 0.05,
+                duration: 0.2,
+                delay: 0.2,
             })
 
             gsap.to(`.select-options[index="${index}"] .select-options-actions .select-options-search-field input`, {
                 opacity: selectProps.showSelectedParallel ? 0 : 1,
                 pointerEvents: !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
-                duration: 0.15,
-                delay: 0.05,
+                duration: 0.2,
+                delay: 0.2,
             })
 
             gsap.to(`.select-options[index="${index}"] .select-options-actions .select-options-search-field .clear-button`, {
                 opacity: selectProps.showSelectedParallel ? 0 : 1,
                 pointerEvents: !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
-                duration: 0.15,
-                delay: 0.05,
+                duration: 0.2,
+                delay: 0.2,
             })
 
             gsap.to(
@@ -463,8 +473,8 @@ const SelectOptions = ({ index = "0" }) => {
                     pointerEvents: wasShown && enableSelectAllButton && thisSelectIsActiveNow ? 'auto' : 'none',
                     opacity: enableSelectAllButton ? 1 : 0,
                     translateX: parsePixel(enableSelectAllButton ? 0 : -20),
-                    duration: 0.15,
-                    delay: 0.05,
+                    duration: 0.2,
+                    delay: 0.2,
                     onComplete: () => {
                         setUpdateSelectPropsTimes(_ => _ + 1)
                     }
@@ -505,21 +515,28 @@ const SelectOptions = ({ index = "0" }) => {
     const firstTimeRender = useRef(true)
     useEffect(() => {
         if (firstRenderTimeout.current) clearTimeout(firstRenderTimeout.current)
-        const { x: prevX, y: prevY, showSelectedParallel: prevShowSelectedParallel, wasClosed } = prevData.current
+        const { 
+            x: prevX, 
+            y: prevY, 
+            showSelectedParallel: prevShowSelectedParallel, 
+            wasClosed, 
+            lengthAllSelects: prevLengthAllSelects 
+        } = prevData.current
 
-        let optionWidth = 0
+        const selectLengthWasDownscalled = lengthAllSelects < prevLengthAllSelects
+        
         const ListOfOptionsRefWithoutEmptyItems = optionsRef.current.filter(Boolean)
         if (ListOfOptionsRefWithoutEmptyItems.length) {
             ListOfOptionsRefWithoutEmptyItems.forEach(or => {
                 const _optionWidth = or.firstChild.clientWidth
-                if (_optionWidth > optionWidth) optionWidth = _optionWidth
+                if (_optionWidth > optionsListWidth.current) optionsListWidth.current = _optionWidth
             })
         }
-        optionWidth = Math.max(optionWidth + 75, 250)
+        const optionWidth = Math.max(optionsListWidth.current, 250)
 
         gsap.to(`.select-options[index="${index}"] .select-options-column .options-list`, {
-            width: optionWidth,
-            duration: 0
+            width: optionWidth + 75,
+            duration: .2
         })
 
         firstRenderTimeout.current = setTimeout(() => {
@@ -535,13 +552,14 @@ const SelectOptions = ({ index = "0" }) => {
                     opacity: selectProps.show ? 1 : 0,
                     filter: `blur(${selectProps.show && thisSelectIsActiveNow ? 0 : 1}px)`,
                     pointerEvents: selectProps.show && thisSelectIsActiveNow ? 'auto' : 'none',
-                    duration: distanceToSeconds,
+                    duration: selectLengthWasDownscalled ? 0.05 : distanceToSeconds,
                     onComplete: () => {
                         prevData.current = {
                             wasClosed: !selectProps.show,
                             showSelectedParallel: selectProps.showSelectedParallel,
                             x: x,
-                            y: y
+                            y: y,
+                            lengthAllSelects: lengthAllSelects
                         }
                         firstTimeRender.current = false
                     }
@@ -550,7 +568,7 @@ const SelectOptions = ({ index = "0" }) => {
 
             if (prevShowSelectedParallel || wasClosed || !selectProps.showSelectedParallel) {
                 gsap.to(`.select-options[index="${index}"] .select-options-column .options-list`, {
-                    width: optionWidth,
+                    width: optionWidth + 75,
                     duration: 0,
                     onComplete: () => {
                         nextXY = getNextXY()
@@ -581,13 +599,13 @@ const SelectOptions = ({ index = "0" }) => {
 
         return () => clearTimeout(firstRenderTimeout.current)
 
-    }, [updateSelectPropsTimes, selectProps.show])
+    }, [updateSelectPropsTimes, selectProps.show, lengthAllSelects])
 
     const [headline, setHeadline] = useState(selectProps.headerText)
     useEffect(() => {
         const t = setTimeout(() => {
             setHeadline(selectProps.headerText)
-        }, selectProps.headerText ? 0 : 500)
+        }, selectProps.headerText ? 0 : 1000)
         return () => clearTimeout(t)
     }, [selectProps.headerText])
 
@@ -608,17 +626,6 @@ const SelectOptions = ({ index = "0" }) => {
             return _options
         }
     }
-
-    const initListTilesInView = {
-        1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(String), // key is the viewport on parallel view, item is list of options indexes can render in view 
-        3: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(String), // same ^ 
-    }
-
-    const [listTilesInView, setListTilesInView] = useState(initListTilesInView)
-    useEffect(() => {
-        setSortedOptions(sortOptions(selectOptions))
-        setListTilesInView(initListTilesInView)
-    }, [selectOptions, selectProps.sort])
 
     // check if option was selected
     const wasSelected = (option) => {
@@ -694,30 +701,29 @@ const SelectOptions = ({ index = "0" }) => {
             return { ...currentListTilesInView }
         })
     }
-    
-    const [viewportOptionsIds, setViewportOptionsIds] = useState({
-        "1": [],
-        "3": []
-    })
+
+    const [viewportOptionsIds, setViewportOptionsIds] = useState({ "1": [], "3": [] })
+    useEffect(() => {
+            const nextViewportOptionsIds = {
+                "1": [],
+                "3": []
+            }
+
+            for (const option of sortedOptions) {
+                let pushToViewport = "1"
+                if (hideOption(option, pushToViewport) && selectProps.showSelectedParallel) {
+                    pushToViewport = "3"
+                }
+                
+                nextViewportOptionsIds[pushToViewport].push(String(option[0]))
+            }
+
+            setViewportOptionsIds(nextViewportOptionsIds)
+    }, [sortedOptions, selectProps.selectedOption, selectProps.showSelectedParallel])
 
     useEffect(() => {
-        const nextViewportOptionsIds = {
-            "1": [],
-            "3": []
-        }
 
-        for (const option of sortedOptions) {
-            let pushToViewport = "1"
-            if (hideOption(option, pushToViewport) && selectProps.showSelectedParallel) {
-                pushToViewport = "3"
-            }
-            nextViewportOptionsIds[pushToViewport].push(String(option[0]))
-        }
-        console.log(nextViewportOptionsIds)
-
-        setViewportOptionsIds(nextViewportOptionsIds)
-
-    }, [sortedOptions, selectProps.selectedOption, selectProps.showSelectedParallel])
+    }, [searchText, searchTextSelectedTail, searchTextUnselectedTail])
 
     return (
         <div
