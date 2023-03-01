@@ -521,6 +521,7 @@ const SelectOptions = ({ index = '0' }) => {
 
     // get max option width to set the options-list div with the new width after every options update
     const optionsRef = useRef([])
+    const optionsText = useRef([])
     // update selectOptions Component size and dimentions
     const firstRenderTimeout = useRef()
     const firstTimeRender = useRef(true)
@@ -536,11 +537,16 @@ const SelectOptions = ({ index = '0' }) => {
 
         const selectLengthWasDownscalled = lengthAllSelects < prevLengthAllSelects
 
-        const ListOfOptionsRefWithoutEmptyItems = optionsRef.current.filter(Boolean)
+        const ListOfOptionsRefWithoutEmptyItems = optionsRef.current.filter(oRef => Boolean(oRef))
         if (ListOfOptionsRefWithoutEmptyItems.length) {
-            ListOfOptionsRefWithoutEmptyItems.forEach(or => {
-                const _optionWidth = or.firstChild.clientWidth
-                if (_optionWidth > optionsListWidth.current) optionsListWidth.current = _optionWidth
+            ListOfOptionsRefWithoutEmptyItems.forEach((oR, orIndex) => {
+                const _optionWidth = oR.firstChild.clientWidth
+                const _optionsText = optionsText[orIndex]
+                const isOptionSubmenu = Array.isArray(_optionsText) && _optionsText.length === 2
+                const optionText = String(isOptionSubmenu ? _optionsText[0] : _optionsText)
+                const _textWidth = optionText.split('').length * 5
+                if (_optionWidth > optionsListWidth.current)
+                    optionsListWidth.current = _textWidth > _optionWidth ? _textWidth : _optionWidth
             })
         }
         const optionWidth = Math.max(optionsListWidth.current, 250)
@@ -685,30 +691,46 @@ const SelectOptions = ({ index = '0' }) => {
     }
 
     const [viewportOptionsIds, setViewportOptionsIds] = useState({ 1: [], 3: [] })
+    const viewportOptionsIdsTimeout = useRef()
     useEffect(() => {
-        const nextViewportOptionsIds = { 1: [], 3: [] }
+        if (viewportOptionsIdsTimeout.current) clearTimeout(viewportOptionsIdsTimeout.current)
+        viewportOptionsIdsTimeout.current = setTimeout(() => {
+            const nextViewportOptionsIds = { 1: [], 3: [] }
 
-        for (const option of sortedOptions) {
-            const optionId = String(option[0])
-            const optionWasSelected = wasSelected(option)
-            if (selectProps.showSelectedParallel) {
-                let pushToViewport = !optionWasSelected ? '1' : '3'
+            for (const option of sortedOptions) {
+                const optionId = String(option[0])
+                const optionWasSelected = wasSelected(option)
+                if (selectProps.multiSelect && selectProps.showSelectedParallel) {
+                    let pushToViewport = !optionWasSelected ? '1' : '3'
 
-                if (!hideOption(option, pushToViewport)) nextViewportOptionsIds[pushToViewport].push(optionId)
-            } else {
-                if (!hideOption(option, '1')) nextViewportOptionsIds['1'].push(optionId)
+                    if (!hideOption(option, pushToViewport)) nextViewportOptionsIds[pushToViewport].push(optionId)
+                } else {
+                    if (!hideOption(option, '1')) nextViewportOptionsIds['1'].push(optionId)
+                }
             }
-        }
 
-        setViewportOptionsIds(nextViewportOptionsIds)
+            setViewportOptionsIds(nextViewportOptionsIds)
+        }, 50)
+        return () => clearTimeout(viewportOptionsIdsTimeout.current)
     }, [
         sortedOptions,
         selectProps.selectedOption,
+        selectProps.multiSelect,
         selectProps.showSelectedParallel,
         searchText,
         searchTextSelectedTail,
         searchTextUnselectedTail
     ])
+
+    // reset options view after modifysearchText
+    const resetListTileInViewsTimeout = useRef()
+    useEffect(() => {
+        if (resetListTileInViewsTimeout.current) clearTimeout(resetListTileInViewsTimeout.current)
+        resetListTileInViewsTimeout.current = setTimeout(() => {
+            handleScrollingOptionsList({ target: '.options-list' }, '1', viewportOptionsIds['1'])
+        }, 50)
+        return () => clearTimeout(resetListTileInViewsTimeout.current)
+    }, [searchText, searchTextSelectedTail, searchTextUnselectedTail, viewportOptionsIds])
 
     return (
         <div
@@ -899,7 +921,10 @@ const SelectOptions = ({ index = '0' }) => {
                                                     ) ? (
                                                         <SelectOption
                                                             key={option[0]}
-                                                            ref={optionRef => optionsRef.current.push(optionRef)}
+                                                            ref={optionRef => {
+                                                                optionsRef.current.push(optionRef)
+                                                                optionsText.current.push(option[1])
+                                                            }}
                                                             id={option[0]}
                                                             top={indexOfShownOption * 40}
                                                             mainSelectId={
