@@ -3,6 +3,16 @@ import './styles.sass'
 import Select from '../../select'
 import { useStore } from '../../../../hooks-store/store'
 
+String.prototype.replaceJSX = function (find, replace) {
+    return find
+        .split(/  +/g)
+        .filter(Boolean)
+        .flatMap(splitedSearchWord => {
+            const splitedText = this.split(splitedSearchWord)
+            return splitedText.flatMap((item, index) => [item, index !== splitedText.length - 1 ? replace : ''])
+        })
+}
+
 const SelectOption = forwardRef(
     (
         {
@@ -17,7 +27,8 @@ const SelectOption = forwardRef(
             setDisableSelecting,
             selectOptionsIndex,
             mainSelectId,
-            parentSelectId
+            parentSelectId,
+            searchText
         },
         ref
     ) => {
@@ -62,7 +73,6 @@ const SelectOption = forwardRef(
                         }
                         setDisableSelecting(true)
                         if (!multiSelect && !isOptionSubmenu) {
-                            console.log(20989074)
                             setTimeout(() => {
                                 dispatch('CLOASE_ALL_SELECT')
                             }, 450)
@@ -73,7 +83,17 @@ const SelectOption = forwardRef(
             >
                 <div className={'option-content'}>
                     <span className={'select-option-icon material-symbols-outlined'}>arrow_right</span>
-                    <pre className={'option-text'}>{isOptionSubmenu ? children[0] : children}</pre>
+                    <pre className={'option-text'}>
+                        {(() => {
+                            const optionText = String(isOptionSubmenu ? children[0] : children)
+                            return typeof optionText === 'string' && Boolean(searchText.replace(/  +/g, ''))
+                                ? optionText.replaceJSX(
+                                      searchText.replace(/  +/g, ''),
+                                      <b>{searchText.replace(/  +/g, ' ')}</b>
+                                  )
+                                : optionText
+                        })()}
+                    </pre>
                     {isOptionSubmenu && !multiSelect ? (
                         <span className={'select-option-icon submenu material-symbols-outlined'}>list</span>
                     ) : null}

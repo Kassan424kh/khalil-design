@@ -15,7 +15,7 @@ export default class Theme {
         Theme.updateColorVariable('--ini_blue', dark ? '67,132,154' : '67,132,154')
         Theme.updateColorVariable('--amazon_yellow', dark ? '247,148,0' : '247,148,0')
 
-        Theme.updateColorVariable('--grey', dark ? '#30363d' : '#eaedee')
+        Theme.updateColorVariable('--grey', dark ? '#30363d' : '#b5b5b5')
         Theme.updateColorVariable('--green', dark ? '#00d980' : '#00C071')
         Theme.updateColorVariable('--red', dark ? '#ff5a68' : '#FF4553')
         Theme.updateColorVariable('--blue', dark ? '#007aef' : '#0066C9')

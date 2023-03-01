@@ -53,7 +53,6 @@ const Select = ({
     bottom,
     left,
     right,
-    searchEveryWare,
     defaultOption,
     defaultOptionText,
     sort,
@@ -311,7 +310,6 @@ const Select = ({
                             }
                         }
                     }}
-                    searchEveryWare={searchEveryWare}
                     lastTimeUpdatedSelectedOptions={lastTimeUpdatedSelectedOptions}
                     defaultOption={defaultOption}
                     defaultOptionText={defaultOptionText}

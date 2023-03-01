@@ -42,60 +42,53 @@ const SelectOptions = ({ index = '0' }) => {
         return () => clearTimeout(updateOffsetTimeout.current)
     }, [selectOptions])
 
+    // check if option was selected
+    const wasSelected = option => {
+        return (
+            selectProps.selectedOption &&
+            (() => {
+                if (selectProps.selectedOption.length)
+                    return selectProps.multiSelect
+                        ? (() => {
+                              const foundSelectedOption = selectProps.selectedOption.filter(_option => {
+                                  return _option[0] === option[0]
+                              })[0]
+                              return foundSelectedOption ? foundSelectedOption[0] === option[0] : false
+                          })()
+                        : selectProps.selectedOption[0] === option[0]
+                else return false
+            })()
+        )
+    }
+
     const myRef = useRef()
     const foundOptions = useCallback(
-        (__searchText, option, searchEveryWare = false) => {
-            return !__searchText
+        (__searchText, option) => {
+            const optionWasSelected = wasSelected(option)
+
+            if (selectProps.multiSelect && selectProps.showSelectedParallel && selectProps.filterOnly)
+                if (
+                    (!optionWasSelected && selectProps.filterOnly === 'selected') ||
+                    (optionWasSelected && selectProps.filterOnly === 'unselected')
+                )
+                    return false
+
+            const regex = new RegExp(__searchText.toUpperCase(), 'g')
+
+            const isOptionSubmenu = Array.isArray(option[1]) && option[1].length === 2
+            let optionText = isOptionSubmenu ? option[1][0] : option[1]
+
+            // return true if there are matching parts in the publisher name which is passed as additional filter information
+            if (
+                selectPropsGetByIndex.additionalFilterInformation &&
+                option[0] in selectPropsGetByIndex.additionalFilterInformation
+            )
+                optionText = selectPropsGetByIndex.additionalFilterInformation[option[0]]
+            console.log(optionText)
+
+            return !String(optionText ?? '')
                 .toUpperCase()
-                .split(' ')
-                .filter(word => word)
-                .some(r => {
-                    const optionWasSelected = selectProps.selectedOption.filter(
-                        selectedOption => selectedOption[0] === option[0]
-                    ).length
-
-                    if (selectProps.multiSelect && selectProps.showSelectedParallel && selectProps.filterOnly)
-                        if (
-                            (!optionWasSelected && selectProps.filterOnly === 'selected') ||
-                            (optionWasSelected && selectProps.filterOnly === 'unselected')
-                        )
-                            return true
-
-                    // return true if there are matching parts in the publisher name which is passed as additional filter information
-                    if (
-                        selectPropsGetByIndex.additionalFilterInformation &&
-                        option[0] in selectPropsGetByIndex.additionalFilterInformation
-                    )
-                        if (
-                            selectPropsGetByIndex.additionalFilterInformation[option[0]]
-                                .toString()
-                                .toUpperCase()
-                                .split(' ')
-                                .filter(word => {
-                                    if (searchEveryWare) {
-                                        const regex = new RegExp(r, 'g')
-                                        return word && word.match(regex)
-                                    } else {
-                                        return word.startsWith(r) ? word : ''
-                                    }
-                                }).length
-                        )
-                            return true
-
-                    // return true if there are matching parts of the media name
-                    return option[1]
-                        .toString()
-                        .toUpperCase()
-                        .split(' ')
-                        .filter(word => {
-                            if (searchEveryWare) {
-                                const regex = new RegExp(r, 'g')
-                                return word && word.match(regex)
-                            } else {
-                                return word.startsWith(r) ? word : ''
-                            }
-                        }).length // TODO: fix search selected on parallel view not works
-                })
+                .match(regex)
         },
         [selectProps.selectedOption, searchText, searchTextSelectedTail, searchTextUnselectedTail]
     )
@@ -647,45 +640,17 @@ const SelectOptions = ({ index = '0' }) => {
         }
     }
 
-    // check if option was selected
-    const wasSelected = option => {
-        return (
-            selectProps.selectedOption &&
-            (() => {
-                if (selectProps.selectedOption.length)
-                    return selectProps.multiSelect
-                        ? (() => {
-                              const foundSelectedOption = selectProps.selectedOption.filter(_option => {
-                                  return _option[0] === option[0]
-                              })[0]
-                              return foundSelectedOption ? foundSelectedOption[0] === option[0] : false
-                          })()
-                        : selectProps.selectedOption[0] === option[0]
-                else return false
-            })()
-        )
-    }
-
     // check if option should hide `only with parallel view`
     const hideOption = (option, viewport) => {
-        const _wasSelected = wasSelected(option)
-        const isOneOfTheParallelColumns =
-            selectProps.showSelectedParallel &&
-            ((_wasSelected && viewport === '1') || (!_wasSelected && viewport === '3'))
+        const _searchText =
+            selectProps.multiSelect && selectProps.showSelectedParallel
+                ? {
+                      1: searchTextUnselectedTail,
+                      3: searchTextSelectedTail
+                  }[viewport]
+                : searchText
 
-        const _searchText = selectProps.showSelectedParallel
-            ? viewport === '1'
-                ? searchTextUnselectedTail
-                : searchTextSelectedTail
-            : searchText
-
-        return _searchText || isOneOfTheParallelColumns
-            ? (foundOptions(_searchText, option, selectProps.searchEveryWare) &&
-                  Boolean(
-                      selectProps.showSelectedParallel ? (viewport === '1' ? !_wasSelected : _wasSelected) : true
-                  )) ||
-                  isOneOfTheParallelColumns
-            : false
+        return _searchText ? foundOptions(_searchText, option) : false
     }
 
     // this handler is used to preduce performance lag if there is a large list of options
@@ -721,22 +686,17 @@ const SelectOptions = ({ index = '0' }) => {
 
     const [viewportOptionsIds, setViewportOptionsIds] = useState({ 1: [], 3: [] })
     useEffect(() => {
-        const nextViewportOptionsIds = {
-            1: [],
-            3: []
-        }
+        const nextViewportOptionsIds = { 1: [], 3: [] }
 
         for (const option of sortedOptions) {
+            const optionId = String(option[0])
+            const optionWasSelected = wasSelected(option)
             if (selectProps.showSelectedParallel) {
-                let pushToViewport = '1'
-                if (hideOption(option, pushToViewport)) {
-                    pushToViewport = '3'
-                }
+                let pushToViewport = !optionWasSelected ? '1' : '3'
 
-                nextViewportOptionsIds[pushToViewport].push(String(option[0]))
+                if (!hideOption(option, pushToViewport)) nextViewportOptionsIds[pushToViewport].push(optionId)
             } else {
-                if (!hideOption(option, '1')) nextViewportOptionsIds['1'].push(String(option[0]))
-                nextViewportOptionsIds['3'] = []
+                if (!hideOption(option, '1')) nextViewportOptionsIds['1'].push(optionId)
             }
         }
 
@@ -791,9 +751,8 @@ const SelectOptions = ({ index = '0' }) => {
                                                     ? searchTextUnselectedTail
                                                     : searchText
 
-                                                return _searchedText !== ''
-                                                    ? !foundOptions(_searchedText, option) ||
-                                                          selectProps.selectedOption.map(o => o[0]).includes(option[0])
+                                                return Boolean(_searchedText)
+                                                    ? !foundOptions(_searchedText, option) || wasSelected(option)
                                                     : true
                                             })
                                         )
@@ -954,6 +913,15 @@ const SelectOptions = ({ index = '0' }) => {
                                                             selectedOption={selectProps.selectedOption}
                                                             setSelectedOption={selectProps.setSelectedOption}
                                                             hide={hideOption(option, viewport)}
+                                                            searchText={
+                                                                selectProps.multiSelect &&
+                                                                selectProps.showSelectedParallel
+                                                                    ? {
+                                                                          1: searchTextUnselectedTail,
+                                                                          3: searchTextSelectedTail
+                                                                      }[viewport]
+                                                                    : searchText
+                                                            }
                                                         >
                                                             {option[1]}
                                                         </SelectOption>

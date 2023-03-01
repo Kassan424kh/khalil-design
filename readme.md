@@ -25,7 +25,6 @@
     defaultOptionText={"asdfasdf"} // default option text
     enableSearch // enable searh option/s
     searchPlaceHolder={"search me"} // search input field placeholder
-    searchEveryWare // search not only after start the word, search also in all places in the word
     enableSelectAllButton // enable select or unselect options, only works when multiSelect is on
     enableCloseButton // enable close button, to close selectOptions window
     closeButtonText={"close"} // change close button text

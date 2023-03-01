@@ -10,7 +10,6 @@ const SelectPage = () => {
         <div className="page">
             <Select
                 enableSearch
-                filterOnly={'unselected'}
                 multiSelect
                 showSelectedParallel
                 enableCloseButton
