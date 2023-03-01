@@ -28,19 +28,12 @@ const SelectOptions = ({ index = '0' }) => {
     }
     const [listTilesInView, setListTilesInView] = useState(initListTilesInView)
 
+    // handle select closing
     const closeSelectOptions = () => {
         if (index === '0') {
             dispatch('CLOSE_SELECT', index)
         } else dispatch('DELETE_SUB_SELECT', index)
     }
-
-    const updateOffsetTimeout = useRef()
-    useEffect(() => {
-        clearTimeout(updateOffsetTimeout.current)
-
-        updateOffsetTimeout.current = setTimeout(() => {}, 100)
-        return () => clearTimeout(updateOffsetTimeout.current)
-    }, [selectOptions])
 
     // check if option was selected
     const wasSelected = option => {
@@ -61,6 +54,7 @@ const SelectOptions = ({ index = '0' }) => {
         )
     }
 
+    // finde optinos after modify search text
     const myRef = useRef()
     const foundOptions = useCallback(
         (__searchText, option) => {
@@ -331,7 +325,7 @@ const SelectOptions = ({ index = '0' }) => {
         }
     }
 
-    // update selectOptionsData state after check if there is a real change
+    // update select props
     const prevLengthAllSelectOptions = useRef(1)
     useEffect(() => {
         setSelectProps(currentSelectOptionsData => {
@@ -371,6 +365,7 @@ const SelectOptions = ({ index = '0' }) => {
         }
     }, [selectPropsGetByIndex, lengthAllSelects])
 
+    // update options
     const prevSelectOptions = useRef()
     const optionsListWidth = useRef(0)
     useEffect(() => {
@@ -385,6 +380,7 @@ const SelectOptions = ({ index = '0' }) => {
         }
     }, [selectOptionsGetByIndex.options])
 
+    // set search field focused after change selector
     const searchFieldRef = useRef()
     useEffect(() => {
         if (searchFieldRef.current && selectProps.show && selectProps.selectId) {
@@ -403,6 +399,8 @@ const SelectOptions = ({ index = '0' }) => {
     const parsePixel = number => {
         return number + 'px'
     }
+
+    // animate other components before move the selectOptions window to another selector
     useEffect(() => {
         if (animateTimeout.current) clearTimeout(animateTimeout.current)
 
@@ -537,6 +535,7 @@ const SelectOptions = ({ index = '0' }) => {
 
         const selectLengthWasDownscalled = lengthAllSelects < prevLengthAllSelects
 
+        // get options-list width
         const ListOfOptionsRefWithoutEmptyItems = optionsRef.current.filter(oRef => Boolean(oRef))
         if (ListOfOptionsRefWithoutEmptyItems.length) {
             ListOfOptionsRefWithoutEmptyItems.forEach((oR, orIndex) => {
@@ -549,6 +548,8 @@ const SelectOptions = ({ index = '0' }) => {
                     optionsListWidth.current = _textWidth > _optionWidth ? _textWidth : _optionWidth
             })
         }
+
+        // min width 250px if optionsListWidth is smaller then that
         const optionWidth = Math.max(optionsListWidth.current, 250)
 
         gsap.to(`.select-options[index="${index}"] .select-options-column .options-list`, {
@@ -617,6 +618,8 @@ const SelectOptions = ({ index = '0' }) => {
         return () => clearTimeout(firstRenderTimeout.current)
     }, [updateSelectPropsTimes, selectProps.show, lengthAllSelects])
 
+    // change headline to empty after 1 second if the next one is empty
+    // this is for more stabile animation
     const [headline, setHeadline] = useState(selectProps.headerText)
     useEffect(() => {
         const t = setTimeout(
@@ -628,6 +631,7 @@ const SelectOptions = ({ index = '0' }) => {
         return () => clearTimeout(t)
     }, [selectProps.headerText])
 
+    // sort options function
     const [sortedOptions, setSortedOptions] = useState([])
     const sortOptions = _options => {
         try {
@@ -690,6 +694,7 @@ const SelectOptions = ({ index = '0' }) => {
         })
     }
 
+    // hide options
     const [viewportOptionsIds, setViewportOptionsIds] = useState({ 1: [], 3: [] })
     const viewportOptionsIdsTimeout = useRef()
     useEffect(() => {
