@@ -569,7 +569,7 @@ const SelectOptions = ({ index = '0' }) => {
                             wasClosed: !selectProps.show,
                             showSelectedParallel: selectProps.showSelectedParallel,
                             x: x,
-                            y: y,
+                            y: parseFloat(y) - (index !== '0' ? 10 : 0), // if submenu subtract 5px
                             lengthAllSelects: lengthAllSelects
                         }
                         firstTimeRender.current = false
@@ -586,7 +586,7 @@ const SelectOptions = ({ index = '0' }) => {
                         const { x, y } = nextXY
                         gsap.to(`.select-options[index="${index}"]`, {
                             x: selectProps.show ? x : prevX,
-                            y: selectProps.show ? y : prevY,
+                            y: parseFloat(selectProps.show ? y : prevY) - (index !== '0' ? 10 : 0), // if submenu subtract 5px,
                             duration: 0.35,
                             delay: 0.15,
                             onComplete: () => {
@@ -598,7 +598,7 @@ const SelectOptions = ({ index = '0' }) => {
             } else {
                 gsap.to(`.select-options[index="${index}"]`, {
                     x: selectProps.show ? x : prevX,
-                    y: selectProps.show ? y : prevY,
+                    y: parseFloat(selectProps.show ? y : prevY) - (index !== '0' ? 10 : 0), // if submenu subtract 5px,
                     delay: 0.15,
                     duration: selectProps.show && !wasClosed ? distanceToSeconds : 0,
                     onComplete: () => {
