@@ -932,7 +932,13 @@ const SelectOptions = ({ index = '0' }) => {
                                                         <SelectOption
                                                             key={option[0]}
                                                             id={option[0]}
-                                                            top={indexOfShownOption * 40}
+                                                            top={
+                                                                (indexOfShownOption +
+                                                                    (selectProps.defaultOption && viewport === 1
+                                                                        ? 1
+                                                                        : 0)) *
+                                                                40
+                                                            }
                                                             mainSelectId={
                                                                 selectProps.mainSelectId ?? selectProps.selectId
                                                             }
