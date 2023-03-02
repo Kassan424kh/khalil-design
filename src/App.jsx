@@ -55,7 +55,7 @@ export default function App() {
             {Object.keys(selectProps).length > 1
                 ? Object.keys(selectProps).map((_, selectOptionsIndex) =>
                       selectOptionsIndex !== 0 ? (
-                          <SelectOptions key={selectOptionsIndex} index={String(selectOptionsIndex)} />
+                          <SelectOptions key={String(selectOptionsIndex)} index={String(selectOptionsIndex)} />
                       ) : null
                   )
                 : null}

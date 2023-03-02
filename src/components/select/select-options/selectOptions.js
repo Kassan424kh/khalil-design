@@ -366,18 +366,41 @@ const SelectOptions = ({ index = '0' }) => {
         }
     }, [selectPropsGetByIndex, lengthAllSelects])
 
+
+    
+    const [optionsListWidth, setOptionsListWidth] = useState(0)
+    const calcOptionsListWidth = options => {
+        // get options-list width
+        let _width = 0
+        if (options.length) {
+            for (const _option of options) {
+                let _optionText = _option[1]
+                const isOptionSubmenu = Array.isArray(_optionText) && _optionText.length === 2
+                _optionText = String(isOptionSubmenu ? _optionText[0] : _optionText)
+                const _textWidth = _optionText
+                    .split('')
+                    .reduce(
+                        (width, char) => width + (Object.keys(_charsWidth).includes(char) ? _charsWidth[char] : 7),
+                        0
+                    )
+                if (_textWidth > _width) _width = _textWidth
+            }
+        }
+        console.log(_width)
+        setOptionsListWidth(_width)
+        return _width
+    }
+
     // update options
     const prevSelectOptions = useRef()
-    const optionsListWidth = useRef(0)
     useEffect(() => {
         const _options = selectOptionsGetByIndex.options
         if (!_.isEqual(prevSelectOptions.current, _options)) {
-            optionsListWidth.current = 0
             prevSelectOptions.current = _options
+            calcOptionsListWidth(_options)
             setSelectOptions(_options)
             setSortedOptions(sortOptions(_options))
             setListTilesInView(initListTilesInView)
-            $('.options-list').scrollTop(0)
         }
     }, [selectOptionsGetByIndex.options])
 
@@ -518,9 +541,6 @@ const SelectOptions = ({ index = '0' }) => {
         return { x, y }
     }
 
-    // get max option width to set the options-list div with the new width after every options update
-    const optionsRef = useRef([])
-    const optionsText = useRef([])
     // update selectOptions Component size and dimentions
     const firstRenderTimeout = useRef()
     const firstTimeRender = useRef(true)
@@ -536,23 +556,8 @@ const SelectOptions = ({ index = '0' }) => {
 
         const selectLengthWasDownscalled = lengthAllSelects < prevLengthAllSelects
 
-        // get options-list width
-        if (optionsText.current.length) {
-            optionsText.current.forEach(optionText => {
-                const isOptionSubmenu = Array.isArray(optionText) && optionText.length === 2
-                const _optionText = String(isOptionSubmenu ? optionText[0] : optionText)
-                const _textWidth = _optionText
-                    .split('')
-                    .reduce(
-                        (width, char) => width + (Object.keys(_charsWidth).includes(char) ? _charsWidth[char] : 7),
-                        0
-                    )
-                if (_textWidth > optionsListWidth.current) optionsListWidth.current = _textWidth
-            })
-        }
-
         // min width 250px if optionsListWidth is smaller then that
-        const optionWidth = Math.max(optionsListWidth.current + 10, 250)
+        const optionWidth = Math.max(optionsListWidth + 10, 250)
 
         gsap.to(`.select-options[index="${index}"] .select-options-column .options-list`, {
             width: optionWidth + 75,
@@ -618,7 +623,7 @@ const SelectOptions = ({ index = '0' }) => {
         }, 150)
 
         return () => clearTimeout(firstRenderTimeout.current)
-    }, [updateSelectPropsTimes, selectProps.show, lengthAllSelects])
+    }, [updateSelectPropsTimes, selectProps.show, lengthAllSelects, optionsListWidth])
 
     // change headline to empty after 1 second if the next one is empty
     // this is for more stabile animation
@@ -927,10 +932,6 @@ const SelectOptions = ({ index = '0' }) => {
                                                     ) ? (
                                                         <SelectOption
                                                             key={option[0]}
-                                                            ref={optionRef => {
-                                                                optionsRef.current.push(optionRef)
-                                                                optionsText.current.push(option[1])
-                                                            }}
                                                             id={option[0]}
                                                             top={indexOfShownOption * 40}
                                                             mainSelectId={
