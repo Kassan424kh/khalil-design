@@ -10,6 +10,10 @@ import { useStore } from '../../hooks-store/store'
 
 /**
  * <b>options:</b> Should be a list of (Strings) e.g. ["1", ...], or object with keys and values of (Strings) e.g. {"0": "1", ...}
+ * <br/> to active submenu/s mode, you should set the options to this formats:
+ * <br/> . . . . Object: { 1: 'test1', 2: 'test2', 3: ['test3', ["subTest1", ["subSubTest1", "subSubTest2"]]] }
+ * <br/> . . . . Array:  ['test1', 'test2', ['test3', ["subTest1", ["subSubTest1", "subSubTest2"]]]]
+ * 
  *
  * <b>selected:</b> the value can be a single option (e.g. ["key", "value"]) or multible options (e.g. [["key", "values"], ...])
  *
