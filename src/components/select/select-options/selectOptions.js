@@ -386,7 +386,6 @@ const SelectOptions = ({ index = '0' }) => {
                 if (_textWidth > _width) _width = _textWidth
             }
         }
-        console.log(_width)
         setOptionsListWidth(_width)
         return _width
     }
