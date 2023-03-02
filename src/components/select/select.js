@@ -13,8 +13,13 @@ import { useStore } from '../../hooks-store/store'
  *
  * <b>selected:</b> the value can be a single option (e.g. ["key", "value"]) or multible options (e.g. [["key", "values"], ...])
  *
- * <b>onSelect:</b> Return a single option (e.g. ["key", "value"]) or multible options (e.g. [["key", "values"], ...])
+ * <b>selected includes submenu/s:</b> ["parentOptionKey", ["submenuOptionKey", ["optionKey", "optionKey"]]]
+ *
+ * <b>onSelect(selectedOption/s):</b> Return a single option (e.g. ["key", "value"]) or multible options (e.g. [["key", "values"], ...])
  * <br/> . . . . called only if there was option/s selected/deselected
+ * <br/> . . . . with submenu selected it return the selected option with this format ["parentOptionKey", ["submenuOptionKey", ["optionKey", "optionKey"]]]
+ *
+ * <b>flatOnSelect(selectedOption):</b> Return a single option like without submenu/s options e. g. ["key", "value"]
  *
  * <b>onActive:</b> Return a status of the current SelectOptions window if it is open/closed
  * <br/> . . . . called only if SelectOptions window was opened or closed
@@ -35,6 +40,7 @@ const Select = ({
     updatePosition,
     onActive,
     onSelect,
+    flatOnSelect, // can only used with submenu/s 
     selected,
     clearAllOptions,
     toggleAllOptions,
@@ -303,6 +309,18 @@ const Select = ({
                     setSelectedOption={_so => {
                         if (!_.isEqual(_so, selectedOption)) {
                             setSelectedOption(_so)
+                            if (flatOnSelect) {
+                                const getSubmenuSelectedOption = (_selectedOption) => {
+                                    if (!_selectedOption) return
+                                    const childOfSelectedOptionIsArray = Array.isArray(_selectedOption[1]) && _selectedOption[1].length === 2
+                                    if (childOfSelectedOptionIsArray) {
+                                        return getSubmenuSelectedOption(_selectedOption[1])
+                                    }
+                                    return _selectedOption
+                                    
+                                }
+                                flatOnSelect(getSubmenuSelectedOption(_so))
+                            }
                             if (onSelect) {
                                 onSelect(_so)
                                 if (selected === null) setSelectedOption([])

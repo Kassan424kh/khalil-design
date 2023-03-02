@@ -31,10 +31,26 @@ const SelectPage = () => {
             </Select>
             <Select
                 enableSearch
-                headerText={'asdfasdf'}
+                headerText={'Array'}
+                options={['asdf1', 'asdf2', ['asdf3', [0, [1, _fakeList]]]]}
+                onSelect={selectedOption => {
+                    console.log('[onSelect]: ', selectedOption)
+                }}
+                flatOnSelect={selectedOption => {
+                    console.log('[flatOnSelect]: ', selectedOption)
+                }}
+            >
+                click me to open select options
+            </Select>
+            <Select
+                enableSearch
+                headerText={'Object'}
                 options={{ 1: 'asdf1', 2: 'asdf2', 3: ['asdf3', [0, [1, _fakeList]]] }}
                 onSelect={selectedOption => {
-                    console.log(selectedOption)
+                    console.log('[onSelect]: ', selectedOption)
+                }}
+                flatOnSelect={selectedOption => {
+                    console.log('[flatOnSelect]: ', selectedOption)
                 }}
             >
                 click me to open select options
