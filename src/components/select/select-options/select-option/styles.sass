@@ -29,8 +29,10 @@
         cursor: pointer
         overflow: hidden
         width: calc(100% - 15px)
-        height: 40px
+        height: 38px
         box-sizing: border-box
+        border: 1px solid rgba($blue-rgb, 0)
+        border-radius: 5px
 
         .option-content
             display: flex
@@ -106,8 +108,7 @@
         &.hide-option
             pointer-events: none
 
-        &:hover
+        &:hover, &.hover-effect
             background-color: $blue-light
             .option-text
-                color: $black
-                background-color: rgba($black-rgb, .1)
+                color: $blue

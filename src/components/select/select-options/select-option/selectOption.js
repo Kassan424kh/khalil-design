@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, forwardRef } from 'react'
+import React, { useEffect, useRef, forwardRef, useState } from 'react'
 import './styles.sass'
 import Select from '../../select'
 import { useStore } from '../../../../hooks-store/store'
@@ -33,6 +33,7 @@ const SelectOption = forwardRef(
         ref
     ) => {
         const [_, dispatch] = useStore()
+        const [submenuShowNow, setSubmenuShowNow] = useState(false)
 
         const pauseClickTime = useRef(Date.now())
         const isOptionSubmenu = Array.isArray(children) && children.length === 2
@@ -41,9 +42,9 @@ const SelectOption = forwardRef(
         const selectOption = (
             <div
                 ref={ref}
-                className={`select-option${hide ? ' hide-option' : ''}${defaultOption ? ' default-option' : ''}${
+                className={`select-option${isOptionSubmenu && submenuShowNow ? ' hover-effect' : ''}${
                     hide ? ' hide-option' : ''
-                }${
+                }${defaultOption ? ' default-option' : ''}${hide ? ' hide-option' : ''}${
                     selectedOption &&
                     (() => {
                         if (selectedOption.length)
@@ -115,6 +116,7 @@ const SelectOption = forwardRef(
                         selected={(() => {
                             if (childOfSelectedOptionIsArray && selectedOption[0] === id) return selectedOption[1]
                         })()}
+                        onActive={setSubmenuShowNow}
                         onSelect={option => {
                             if (Date.now() > pauseClickTime.current) {
                                 if (!defaultOption && setSelectedOption) setSelectedOption([id, option])
