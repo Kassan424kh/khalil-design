@@ -145,6 +145,15 @@ const configureStore = () => {
             }
             return prevState
         },
+        DELETE_SUB_SELECTS_UP_TARGET_INDEX: (prevState, index) => {
+            Object.keys(prevState.selectProps).forEach(soIndex => {
+                if (parseInt(soIndex) > parseInt(index)) {
+                    delete prevState.selectProps[soIndex]
+                    delete prevState.selectOptions[soIndex]
+                }
+            })
+            return prevState
+        },
         DELETE_ALL_SUB_SELECT: prevState => {
             Object.keys(prevState.selectProps).forEach(soIndex => {
                 if (soIndex !== '0') {

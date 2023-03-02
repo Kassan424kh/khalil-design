@@ -979,7 +979,7 @@ const SelectOptions = ({ index = '0' }) => {
             <div
                 className="disable-pointer-events-layer"
                 onClick={() => {
-                    dispatch('DELETE_SUB_SELECT', String(parseInt(index) + 1))
+                    dispatch('DELETE_SUB_SELECTS_UP_TARGET_INDEX', index)
                 }}
             />
         </div>
