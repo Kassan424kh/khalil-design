@@ -10,7 +10,7 @@ const myLoremText =
 const SelectPage = () => {
     const [_fakeList, _] = useState(
         new Array(300).fill().map(() => {
-            return shuffledArray(myLoremText.split(' ')).slice(8, 15).join(' ')
+            return shuffledArray(myLoremText.split(' ')).slice(8, 20).join(' ')
         })
     )
 

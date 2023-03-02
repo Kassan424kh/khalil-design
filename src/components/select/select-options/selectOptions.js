@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { defaultSelectsProps } from '../../../hooks-store/configs/selectOptionsHooksStore'
 import { useStore } from '../../../hooks-store/store'
 import { getDimensions } from '../../../services/useContainerDimensions'
+import { charsWidth } from '../../../services/calcCharsWidth'
 import Button from '../../button/button'
 import TextField from '../../textfield/textfield'
 import SelectOption from './select-option/selectOption'
@@ -22,6 +23,7 @@ const SelectOptions = ({ index = '0' }) => {
     const [searchText, setSearchText] = useState('')
     const [searchTextSelectedTail, setSearchTextSelectedTail] = useState('')
     const [searchTextUnselectedTail, setSearchTextUnselectedTail] = useState('')
+    const _charsWidth = useState(charsWidth())[0]
     const initListTilesInView = {
         1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(String), // key is the viewport on parallel view, item is list of options indexes can render in view
         3: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(String) // same ^
@@ -78,7 +80,6 @@ const SelectOptions = ({ index = '0' }) => {
                 option[0] in selectPropsGetByIndex.additionalFilterInformation
             )
                 optionText = selectPropsGetByIndex.additionalFilterInformation[option[0]]
-            console.log(optionText)
 
             return !String(optionText ?? '')
                 .toUpperCase()
@@ -536,21 +537,22 @@ const SelectOptions = ({ index = '0' }) => {
         const selectLengthWasDownscalled = lengthAllSelects < prevLengthAllSelects
 
         // get options-list width
-        const ListOfOptionsRefWithoutEmptyItems = optionsRef.current.filter(oRef => Boolean(oRef))
-        if (ListOfOptionsRefWithoutEmptyItems.length) {
-            ListOfOptionsRefWithoutEmptyItems.forEach((oR, orIndex) => {
-                const _optionWidth = oR.firstChild.clientWidth
-                const _optionsText = optionsText[orIndex]
-                const isOptionSubmenu = Array.isArray(_optionsText) && _optionsText.length === 2
-                const optionText = String(isOptionSubmenu ? _optionsText[0] : _optionsText)
-                const _textWidth = optionText.split('').length * 5
-                if (_optionWidth > optionsListWidth.current)
-                    optionsListWidth.current = _textWidth > _optionWidth ? _textWidth : _optionWidth
+        if (optionsText.current.length) {
+            optionsText.current.forEach(optionText => {
+                const isOptionSubmenu = Array.isArray(optionText) && optionText.length === 2
+                const _optionText = String(isOptionSubmenu ? optionText[0] : optionText)
+                const _textWidth = _optionText
+                    .split('')
+                    .reduce(
+                        (width, char) => width + (Object.keys(_charsWidth).includes(char) ? _charsWidth[char] : 7),
+                        0
+                    )
+                if (_textWidth > optionsListWidth.current) optionsListWidth.current = _textWidth
             })
         }
 
         // min width 250px if optionsListWidth is smaller then that
-        const optionWidth = Math.max(optionsListWidth.current, 250)
+        const optionWidth = Math.max(optionsListWidth.current + 10, 250)
 
         gsap.to(`.select-options[index="${index}"] .select-options-column .options-list`, {
             width: optionWidth + 75,
@@ -735,7 +737,7 @@ const SelectOptions = ({ index = '0' }) => {
             handleScrollingOptionsList({ target: '.options-list' }, '1', viewportOptionsIds['1'])
         }, 50)
         return () => clearTimeout(resetListTileInViewsTimeout.current)
-    }, [searchText, searchTextSelectedTail, searchTextUnselectedTail, viewportOptionsIds])
+    }, [searchText, searchTextSelectedTail, searchTextUnselectedTail, viewportOptionsIds, selectProps.selectedOption])
 
     return (
         <div
@@ -892,7 +894,6 @@ const SelectOptions = ({ index = '0' }) => {
                                                     String(viewport),
                                                     viewportOptionsIds[String(viewport)]
                                                 )
-                                                console.log('asdfasdf')
                                             }}
                                         >
                                             <div

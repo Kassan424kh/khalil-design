@@ -214,7 +214,6 @@ const Select = ({
     })
 
     useEffect(() => {
-        console.log(selectIdParentSelectElement, mainSelectId ?? selectId)
         if (selectIdParentSelectElement !== (mainSelectId ?? selectId)) {
             dispatch('DELETE_ALL_SUB_SELECT')
         }
