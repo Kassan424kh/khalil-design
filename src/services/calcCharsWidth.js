@@ -31,8 +31,6 @@ export const charsWidth = () => {
                 : obj
         }, {})
 
-    console.log(_charsWidthObject)
-
     return _charsWidthObject
 }
 
