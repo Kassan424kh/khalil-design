@@ -9,7 +9,7 @@ const myLoremText =
 
 const SelectPage = () => {
     const [_fakeList, _] = useState(
-        new Array(300).fill().map(() => {
+        new Array(500).fill().map(() => {
             return shuffledArray(myLoremText.split(' ')).slice(8, 15).join(' ')
         })
     )
@@ -23,6 +23,9 @@ const SelectPage = () => {
                 enableCloseButton
                 enableSelectAllButton
                 options={_fakeList}
+                onSelect={selectedOption => {
+                    console.log(selectedOption)
+                }}
             >
                 click me to open select options
             </Select>

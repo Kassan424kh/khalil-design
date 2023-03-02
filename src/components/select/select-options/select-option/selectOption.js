@@ -36,6 +36,7 @@ const SelectOption = forwardRef(
 
         const pauseClickTime = useRef(Date.now())
         const isOptionSubmenu = Array.isArray(children) && children.length === 2
+        const childOfSelectedOptionIsArray = Array.isArray(selectedOption[1]) && selectedOption[1].length === 2
 
         const selectOption = (
             <div
@@ -53,7 +54,7 @@ const SelectOption = forwardRef(
                                       })[0]
                                       return foundSelectedOption ? foundSelectedOption[0] === id : false
                                   })()
-                                : selectedOption[0] === id
+                                : selectedOption[0] === id && (isOptionSubmenu ? childOfSelectedOptionIsArray : true)
                         else return false
                     })() &&
                     !defaultOption
@@ -61,7 +62,7 @@ const SelectOption = forwardRef(
                         : ''
                 }`}
                 onClick={() => {
-                    if (Date.now() > pauseClickTime.current) {
+                    if (Date.now() > pauseClickTime.current && !isOptionSubmenu) {
                         if (!defaultOption && setSelectedOption) {
                             setSelectedOption(
                                 multiSelect
@@ -111,6 +112,18 @@ const SelectOption = forwardRef(
                         enableSearch
                         mainSelectId={mainSelectId}
                         parentSelectId={parentSelectId}
+                        selected={(() => {
+                            if (childOfSelectedOptionIsArray && selectedOption[0] === id) return selectedOption[1]
+                        })()}
+                        onSelect={option => {
+                            if (Date.now() > pauseClickTime.current) {
+                                if (!defaultOption && setSelectedOption) setSelectedOption([id, option])
+                                setDisableSelecting(true)
+                                setTimeout(() => {
+                                    dispatch('CLOASE_ALL_SELECT')
+                                }, 450)
+                            }
+                        }}
                     >
                         {selectOption}
                     </Select>
