@@ -17,6 +17,20 @@ const SelectPage = () => {
     return (
         <div className="page">
             <Select
+                headerText={'Multiselector'}
+                enableSearch
+                multiSelect
+                enableCloseButton
+                enableSelectAllButton
+                options={_fakeList}
+                onSelect={selectedOption => {
+                    console.log(selectedOption)
+                }}
+            >
+                click me to open select options
+            </Select>
+            <Select
+                headerText={'Multiselector Parallelview'}
                 enableSearch
                 multiSelect
                 showSelectedParallel

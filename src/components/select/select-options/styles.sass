@@ -244,7 +244,6 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
 
     &.single-select
         .select-options-column
-            position: relative
             display: inherit
             .select-option
                 &.selected
@@ -255,6 +254,9 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                     border-radius: 0 !important
 
     &.multi-select
+        &:not(.show-selected-parallel)
+            .select-options-column
+                display: inherit
 
     &:not(.show-selected-parallel)
         .select-options-body
