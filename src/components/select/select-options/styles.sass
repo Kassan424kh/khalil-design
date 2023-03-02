@@ -22,13 +22,21 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
     z-index: 9999999999
     overflow: hidden
     @include disable-selecting
-    pointer-events: none
     top: 0
     left: 0
 
     > div
         height: 100%
         display: contents
+
+    .disable-pointer-events-layer
+        position: absolute
+        width: 100%
+        height: 100%
+        top: 0
+        left: 0
+        z-index: 50
+        display: block
 
     .tv-tool-button
         box-shadow: 0 5px 20px rgba(0, 0, 0, .04) !important
@@ -110,7 +118,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
 
         &.with-header-text
             &:before
-                background: linear-gradient(180deg, transparent -51px, $white 150px), $background-effect-lines
+                background: linear-gradient(180deg, transparent -51px, $white 60px), $background-effect-lines
 
             &.with-search
                 &:before
@@ -183,7 +191,6 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
 
             &.hide
                 opacity: 0
-                pointer-events: none
 
             input
                 width: calc(100% - 40px)

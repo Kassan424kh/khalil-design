@@ -313,20 +313,18 @@ const Select = ({
                     setSelectedOption={_so => {
                         if (!_.isEqual(_so, selectedOption)) {
                             setSelectedOption(_so)
-                            if (flatOnSelect) {
-                                const getSubmenuSelectedOption = (_selectedOption) => {
+                            if (onSelect) {
+                                const _submenuValue = Array.isArray(_so[1]) && _so[1].length === 2
+                                const getSubmenuSelectedOption = _selectedOption => {
                                     if (!_selectedOption) return
-                                    const childOfSelectedOptionIsArray = Array.isArray(_selectedOption[1]) && _selectedOption[1].length === 2
+                                    const childOfSelectedOptionIsArray =
+                                        Array.isArray(_selectedOption[1]) && _selectedOption[1].length === 2
                                     if (childOfSelectedOptionIsArray) {
                                         return getSubmenuSelectedOption(_selectedOption[1])
                                     }
                                     return _selectedOption
-                                    
                                 }
-                                flatOnSelect(getSubmenuSelectedOption(_so))
-                            }
-                            if (onSelect) {
-                                onSelect(_so)
+                                onSelect(_so, _submenuValue && !multiSelect ? getSubmenuSelectedOption(_so) : undefined)
                                 if (selected === null) setSelectedOption([])
                             }
                         }

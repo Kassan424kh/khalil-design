@@ -366,8 +366,6 @@ const SelectOptions = ({ index = '0' }) => {
         }
     }, [selectPropsGetByIndex, lengthAllSelects])
 
-
-    
     const [optionsListWidth, setOptionsListWidth] = useState(0)
     const calcOptionsListWidth = options => {
         // get options-list width
@@ -445,12 +443,17 @@ const SelectOptions = ({ index = '0' }) => {
             const enableSelectAllButton =
                 selectProps.multiSelect && selectProps.enableSearch && selectProps.enableSelectAllButton
 
+            gsap.to(`.select-options[index="${index}"] .disable-pointer-events-layer`, {
+                pointerEvents: thisSelectIsActiveNow ? 'none' : 'auto',
+                duration: 0
+            })
+
             gsap.to(`.select-options[index="${index}"] .select-options-actions`, {
                 minHeight: parsePixel(selectProps.enableSearch ? selectOptionsActionsScrollHeight : 0),
                 maxHeight: parsePixel(selectProps.enableSearch ? selectOptionsActionsScrollHeight : 0),
                 opacity: selectProps.enableSearch ? 1 : 0,
                 paddingTop: parsePixel(selectProps.enableSearch ? 1 : 0),
-                pointerEvents: wasShown && selectProps.enableSearch && thisSelectIsActiveNow ? 'auto' : 'none',
+                //pointerEvents: wasShown && selectProps.enableSearch && thisSelectIsActiveNow ? 'auto' : 'none',
                 duration: 0.2,
                 delay: 0.2
             })
@@ -464,8 +467,7 @@ const SelectOptions = ({ index = '0' }) => {
 
             gsap.to(`.select-options[index="${index}"] .select-options-actions .select-options-search-field input`, {
                 opacity: selectProps.showSelectedParallel ? 0 : 1,
-                pointerEvents:
-                    !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
+                //pointerEvents: !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
                 duration: 0.2,
                 delay: 0.2
             })
@@ -474,8 +476,7 @@ const SelectOptions = ({ index = '0' }) => {
                 `.select-options[index="${index}"] .select-options-actions .select-options-search-field .clear-button`,
                 {
                     opacity: selectProps.showSelectedParallel ? 0 : 1,
-                    pointerEvents:
-                        !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
+                    //pointerEvents: !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
                     duration: 0.2,
                     delay: 0.2
                 }
@@ -486,7 +487,7 @@ const SelectOptions = ({ index = '0' }) => {
                 {
                     borderTopRightRadius: parsePixel(selectProps.showSelectedParallel ? 10 : 0),
                     borderBottomRightRadius: parsePixel(selectProps.showSelectedParallel ? 10 : 0),
-                    pointerEvents: wasShown && enableSelectAllButton && thisSelectIsActiveNow ? 'auto' : 'none',
+                    //pointerEvents: wasShown && enableSelectAllButton && thisSelectIsActiveNow ? 'auto' : 'none',
                     opacity: enableSelectAllButton ? 1 : 0,
                     translateX: parsePixel(enableSelectAllButton ? 0 : -20),
                     duration: 0.2,
@@ -575,14 +576,14 @@ const SelectOptions = ({ index = '0' }) => {
                 gsap.to(`.select-options[index="${index}"]`, {
                     opacity: selectProps.show ? 1 : 0,
                     filter: `blur(${selectProps.show && thisSelectIsActiveNow ? 0 : 1}px)`,
-                    pointerEvents: selectProps.show && thisSelectIsActiveNow ? 'auto' : 'none',
+                    //pointerEvents: selectProps.show && thisSelectIsActiveNow ? 'auto' : 'none',
                     duration: selectLengthWasDownscalled ? 0.05 : distanceToSeconds,
                     onComplete: () => {
                         prevData.current = {
                             wasClosed: !selectProps.show,
                             showSelectedParallel: selectProps.showSelectedParallel,
                             x: x,
-                            y: parseFloat(y) - (index !== '0' ? 10 : 0), // if submenu subtract 5px
+                            y: y,
                             lengthAllSelects: lengthAllSelects
                         }
                         firstTimeRender.current = false
@@ -599,7 +600,7 @@ const SelectOptions = ({ index = '0' }) => {
                         const { x, y } = nextXY
                         gsap.to(`.select-options[index="${index}"]`, {
                             x: selectProps.show ? x : prevX,
-                            y: parseFloat(selectProps.show ? y : prevY) - (index !== '0' ? 10 : 0), // if submenu subtract 5px,
+                            y: selectProps.show ? y : prevY,
                             duration: 0.35,
                             delay: 0.15,
                             onComplete: () => {
@@ -611,7 +612,7 @@ const SelectOptions = ({ index = '0' }) => {
             } else {
                 gsap.to(`.select-options[index="${index}"]`, {
                     x: selectProps.show ? x : prevX,
-                    y: parseFloat(selectProps.show ? y : prevY) - (index !== '0' ? 10 : 0), // if submenu subtract 5px,
+                    y: selectProps.show ? y : prevY,
                     delay: 0.15,
                     duration: selectProps.show && !wasClosed ? distanceToSeconds : 0,
                     onComplete: () => {
@@ -975,6 +976,12 @@ const SelectOptions = ({ index = '0' }) => {
                     })}
                 </div>
             </div>
+            <div
+                className="disable-pointer-events-layer"
+                onClick={() => {
+                    dispatch('DELETE_SUB_SELECT', String(parseInt(index) + 1))
+                }}
+            />
         </div>
     )
 }
