@@ -576,7 +576,7 @@ const SelectOptions = ({ index = '0' }) => {
                 gsap.to(`.select-options[index="${index}"]`, {
                     opacity: selectProps.show ? 1 : 0,
                     filter: `blur(${selectProps.show && thisSelectIsActiveNow ? 0 : 1}px)`,
-                    //pointerEvents: selectProps.show && thisSelectIsActiveNow ? 'auto' : 'none',
+                    pointerEvents: selectProps.show ? 'auto' : 'none',
                     duration: selectLengthWasDownscalled ? 0.05 : distanceToSeconds,
                     onComplete: () => {
                         prevData.current = {
