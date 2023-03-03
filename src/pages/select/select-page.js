@@ -20,7 +20,6 @@ const SelectPage = () => {
                 headerText={'Multiselector'}
                 enableSearch
                 multiSelect
-                enableCloseButton
                 enableSelectAllButton
                 options={_fakeList}
                 onSelect={selectedOption => {
@@ -34,7 +33,6 @@ const SelectPage = () => {
                 enableSearch
                 multiSelect
                 showSelectedParallel
-                enableCloseButton
                 enableSelectAllButton
                 options={_fakeList}
                 onSelect={selectedOption => {

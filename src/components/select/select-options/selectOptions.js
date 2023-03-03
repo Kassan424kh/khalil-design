@@ -753,9 +753,7 @@ const SelectOptions = ({ index = '0' }) => {
                 selectProps.multiSelect ? ' multi-select' : ' single-select'
             }${selectProps.headerText ? ' with-header-text' : ''}${
                 selectProps.enableSearch
-                    ? ` with-search${selectProps.enableSelectAllButton ? ' with-select-all-buttons' : ''}${
-                          selectProps.enableCloseButton ? ' with-close-button' : ''
-                      }`
+                    ? ` with-search${selectProps.enableSelectAllButton ? ' with-select-all-buttons' : ''}`
                     : ''
             }`}
             index={index}

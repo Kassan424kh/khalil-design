@@ -17,8 +17,6 @@ const SelectOptionsDataTransmitter = ({
     filterOnly,
     searchPlaceHolder,
     enableSelectAllButton,
-    enableCloseButton,
-    closeButtonText,
     setShow,
     options,
     additionalFilterInformation,
@@ -77,8 +75,6 @@ const SelectOptionsDataTransmitter = ({
             filterOnly: filterOnly,
             searchPlaceHolder: searchPlaceHolder,
             enableSelectAllButton: enableSelectAllButton,
-            enableCloseButton: enableCloseButton,
-            closeButtonText: closeButtonText,
             setShow: setShow,
             additionalFilterInformation: additionalFilterInformation,
             multiSelect: multiSelect,
@@ -92,10 +88,12 @@ const SelectOptionsDataTransmitter = ({
             lastUpdate: clicked,
             sort: sort,
             index: index,
-            ...(mainSelectId && parentSelectId ? {
-                mainSelectId: mainSelectId,
-                parentSelectId: parentSelectId,
-            } : {})
+            ...(mainSelectId && parentSelectId
+                ? {
+                      mainSelectId: mainSelectId,
+                      parentSelectId: parentSelectId
+                  }
+                : {})
         })
     }, [
         selectId,
@@ -113,11 +111,9 @@ const SelectOptionsDataTransmitter = ({
     useEffect(() => {
         dispatch('UPDATE_SELECT_OPTIONS', {
             options: options,
-            index: index,
+            index: index
         })
-    }, [
-        options,
-    ])
+    }, [options])
 
     const showTimeout = useRef()
     useEffect(() => {

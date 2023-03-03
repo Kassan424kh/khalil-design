@@ -19,11 +19,10 @@ import { useStore } from '../../hooks-store/store'
  *
  * <b>selected includes submenu/s:</b> ["parentOptionKey", ["submenuOptionKey", ["optionKey", "optionKey"]]]
  *
- * <b>onSelect(selectedOption/s):</b> Return a single option (e.g. ["key", "value"]) or multible options (e.g. [["key", "values"], ...])
+ * <b>onSelect(selectedOption/s, flatSelectedOption=undefined):</b> Return a single option (e.g. ["key", "value"]) or multible options (e.g. [["key", "values"], ...])
  * <br/> . . . . called only if there was option/s selected/deselected
  * <br/> . . . . with submenu selected it return the selected option with this format ["parentOptionKey", ["submenuOptionKey", ["optionKey", "optionKey"]]]
- *
- * <b>flatOnSelect(selectedOption):</b> Return a single option like without submenu/s options e. g. ["key", "value"]
+ * <br/> . . . . flatSelectedOption => ["key", "value"], this attribute give you the submenu selected option without his parents, if the selected option donot has a selected submenu option it would be undefined
  *
  * <b>onActive:</b> Return a status of the current SelectOptions window if it is open/closed
  * <br/> . . . . called only if SelectOptions window was opened or closed
@@ -44,7 +43,6 @@ const Select = ({
     updatePosition,
     onActive,
     onSelect,
-    flatOnSelect, // can only used with submenu/s 
     selected,
     clearAllOptions,
     toggleAllOptions,
@@ -57,8 +55,6 @@ const Select = ({
     filterOnly,
     searchPlaceHolder,
     enableSelectAllButton,
-    enableCloseButton,
-    closeButtonText,
     top,
     bottom,
     left,
@@ -296,8 +292,6 @@ const Select = ({
                     filterOnly={filterOnly}
                     searchPlaceHolder={searchPlaceHolder}
                     enableSelectAllButton={enableSelectAllButton}
-                    enableCloseButton={enableCloseButton}
-                    closeButtonText={closeButtonText}
                     selectButtonProperties={selectButtonProperties}
                     show={showOptions && !close}
                     setShow={setShowOptions}
