@@ -390,16 +390,17 @@ const SelectOptions = ({ index = '0' }) => {
 
     // update options
     const prevSelectOptions = useRef()
-    useEffect(() => {
-        const _options = selectOptionsGetByIndex.options
-        if (!_.isEqual(prevSelectOptions.current, _options)) {
-            prevSelectOptions.current = _options
-            calcOptionsListWidth(_options)
-            setSelectOptions(_options)
-            setSortedOptions(sortOptions(_options))
-            setListTilesInView(initListTilesInView)
-        }
-    }, [selectOptionsGetByIndex.options])
+    if (selectOptionsGetByIndex)
+        useEffect(() => {
+            const _options = selectOptionsGetByIndex.options
+            if (!_.isEqual(prevSelectOptions.current, _options)) {
+                prevSelectOptions.current = _options
+                calcOptionsListWidth(_options)
+                setSelectOptions(_options)
+                setSortedOptions(sortOptions(_options))
+                setListTilesInView(initListTilesInView)
+            }
+        }, [selectOptionsGetByIndex.options])
 
     // set search field focused after change selector
     const searchFieldRef = useRef()
