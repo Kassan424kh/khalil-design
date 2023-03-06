@@ -406,9 +406,9 @@ const SelectOptions = ({ index = '0' }) => {
     const searchFieldRef = useRef()
     useEffect(() => {
         if (searchFieldRef.current && selectProps.show && selectProps.selectId) {
-            searchFieldRef.current && searchFieldRef.current.focus()
+            searchFieldRef.current.focus()
         }
-    }, [searchFieldRef, selectProps])
+    }, [searchFieldRef, selectProps.show])
 
     const animateTimeout = useRef()
     const prevData = useRef({

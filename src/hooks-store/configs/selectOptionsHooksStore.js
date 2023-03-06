@@ -119,24 +119,22 @@ const configureStore = () => {
             return newDataNotEqualToOldData ? nextState : prevState
         },
         CLOASE_ALL_SELECT: prevState => {
-            const nextState = deepCopy(prevState)
-            Object.keys(nextState.selectProps).map(soKey => {
+            Object.keys(prevState.selectProps).map(soKey => {
                 if (soKey !== '0') {
-                    delete nextState.selectProps[soKey]
-                    delete nextState.selectOptions[soKey]
+                    delete prevState.selectProps[soKey]
+                    delete prevState.selectOptions[soKey]
                     return
                 }
 
-                nextState.selectProps[soKey]['show'] = false
-                nextState.selectProps[soKey]['lastUpdate'] = Date.now()
+                prevState.selectProps[soKey]['show'] = false
+                prevState.selectProps[soKey]['lastUpdate'] = Date.now()
             })
-            return nextState
+            return prevState
         },
         CLOSE_SELECT: (prevState, index) => {
-            const nextState = deepCopy(prevState)
-            nextState.selectProps[index]['show'] = false
-            nextState.selectProps[index]['lastUpdate'] = Date.now()
-            return nextState
+            prevState.selectProps[index]['show'] = false
+            prevState.selectProps[index]['lastUpdate'] = Date.now()
+            return prevState
         },
         DELETE_SUB_SELECT: (prevState, index) => {
             if (index !== '0') {

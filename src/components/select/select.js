@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import SelectOptionsDataTransmitter from './select-options/_selectOptionsDataTransmitter'
 import './styles.sass'
 import $ from 'jquery'
@@ -13,7 +13,7 @@ import { useStore } from '../../hooks-store/store'
  * <br/> to active submenu/s mode, you should set the options to this formats:
  * <br/> . . . . Object: { 1: 'test1', 2: 'test2', 3: ['test3', ["subTest1", ["subSubTest1", "subSubTest2"]]] }
  * <br/> . . . . Array:  ['test1', 'test2', ['test3', ["subTest1", ["subSubTest1", "subSubTest2"]]]]
- * 
+ *
  *
  * <b>selected:</b> the value can be a single option (e.g. ["key", "value"]) or multible options (e.g. [["key", "values"], ...])
  *
@@ -43,7 +43,7 @@ const Select = ({
     updatePosition,
     onActive,
     onSelect,
-    selected,
+    selected = 'selectedAttributeWasnotUsed',
     clearAllOptions,
     toggleAllOptions,
     selectAllOptions,
@@ -70,8 +70,11 @@ const Select = ({
 
     // hook store
     const [{ selectProps }, dispatch] = useStore()
-    const { selectId: selectIdParentSelectElement } = selectProps[0] ?? { selectId: uuidv4() }
-    const { selectId: selectIdOnStore } = selectProps[index] ?? { show: false, selectId: uuidv4() }
+    const { selectId: selectIdParentSelectElement } = selectProps['0'] ?? { selectId: uuidv4() }
+    const { selectId: selectIdOnStore, show: showIdOnStore } = selectProps[index] ?? {
+        show: false,
+        selectId: uuidv4()
+    }
 
     // useState variables
     const [_options, _setOptions] = useState([])
@@ -159,9 +162,9 @@ const Select = ({
     // get status of showOptions from outside using onActive attribute
     const showSelectOptionsRef = useRef()
     useEffect(() => {
-        if (onActive) onActive(showOptions)
-        showSelectOptionsRef.current = showOptions
-    }, [showOptions])
+        if (onActive) onActive(showIdOnStore)
+        showSelectOptionsRef.current = showIdOnStore
+    }, [showIdOnStore])
 
     // set selectOption/s if the selected attribute was updated
     useEffect(() => {
@@ -306,7 +309,7 @@ const Select = ({
                     selectedOption={selectedOption}
                     setSelectedOption={_so => {
                         if (!_.isEqual(_so, selectedOption)) {
-                            setSelectedOption(_so)
+                            if (selected === 'selectedAttributeWasnotUsed') setSelectedOption(_so)
                             if (onSelect) {
                                 const _submenuValue = Array.isArray(_so[1]) && _so[1].length === 2
                                 const getSubmenuSelectedOption = _selectedOption => {

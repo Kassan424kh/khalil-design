@@ -32,7 +32,7 @@ const SelectOption = forwardRef(
         },
         ref
     ) => {
-        const [_, dispatch] = useStore()
+        const [_state_, dispatch] = useStore()
         const [submenuShowNow, setSubmenuShowNow] = useState(false)
 
         const pauseClickTime = useRef(Date.now())
@@ -75,9 +75,7 @@ const SelectOption = forwardRef(
                         }
                         setDisableSelecting(true)
                         if (!multiSelect && !isOptionSubmenu) {
-                            setTimeout(() => {
-                                dispatch('CLOASE_ALL_SELECT')
-                            }, 450)
+                            dispatch('CLOASE_ALL_SELECT')
                         }
                         pauseClickTime.current = Date.now() + 350
                     }
@@ -88,7 +86,7 @@ const SelectOption = forwardRef(
                     <pre className={'option-text'}>
                         {(() => {
                             const optionText = String(isOptionSubmenu ? children[0] : children)
-                            return typeof optionText === 'string' && Boolean(searchText.replace(/  +/g, ''))
+                            return typeof optionText === 'string' && Boolean(searchText?.replace(/  +/g, ''))
                                 ? optionText.replaceJSX(
                                       searchText.replace(/  +/g, ''),
                                       <b>{searchText.replace(/  +/g, ' ')}</b>
@@ -114,7 +112,9 @@ const SelectOption = forwardRef(
                         mainSelectId={mainSelectId}
                         parentSelectId={parentSelectId}
                         selected={(() => {
-                            if (childOfSelectedOptionIsArray && selectedOption[0] === id) return selectedOption[1]
+                            return childOfSelectedOptionIsArray && selectedOption[0] === id
+                                ? selectedOption[1]
+                                : ['-1-', '']
                         })()}
                         onActive={setSubmenuShowNow}
                         onSelect={option => {
