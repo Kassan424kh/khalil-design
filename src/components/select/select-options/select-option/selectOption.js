@@ -2,6 +2,7 @@ import React, { useEffect, useRef, forwardRef, useState } from 'react'
 import './styles.sass'
 import Select from '../../select'
 import { useStore } from '../../../../hooks-store/store'
+import _ from 'underscore'
 
 String.prototype.replaceJSX = function (find, replace) {
     return find
@@ -37,7 +38,14 @@ const SelectOption = forwardRef(
 
         const pauseClickTime = useRef(Date.now())
         const isOptionSubmenu = Array.isArray(children) && children.length === 2
-        const childOfSelectedOptionIsArray = Array.isArray(selectedOption[1]) && selectedOption[1].length === 2
+        const _selectedOption = selectedOption ?? []
+        const childOfSelectedOptionIsArray = Array.isArray(_selectedOption.at(1)) && _selectedOption.at(1).length === 2
+
+        const isScreenMounted = useRef(true)
+        useEffect(() => {
+            isScreenMounted.current = true
+            return () => (isScreenMounted.current = false)
+        }, [])
 
         const selectOption = (
             <div
@@ -45,17 +53,17 @@ const SelectOption = forwardRef(
                 className={`select-option${isOptionSubmenu && submenuShowNow ? ' hover-effect' : ''}${
                     hide ? ' hide-option' : ''
                 }${defaultOption ? ' default-option' : ''}${hide ? ' hide-option' : ''}${
-                    selectedOption &&
+                    _selectedOption &&
                     (() => {
-                        if (selectedOption.length)
+                        if (_selectedOption.length)
                             return multiSelect
                                 ? (() => {
-                                      const foundSelectedOption = selectedOption.filter(option => {
+                                      const foundSelectedOption = _selectedOption.filter(option => {
                                           return option[0] === id
                                       })[0]
                                       return foundSelectedOption ? foundSelectedOption[0] === id : false
                                   })()
-                                : selectedOption[0] === id && (isOptionSubmenu ? childOfSelectedOptionIsArray : true)
+                                : _selectedOption[0] === id && (isOptionSubmenu ? childOfSelectedOptionIsArray : true)
                         else return false
                     })() &&
                     !defaultOption
@@ -65,19 +73,20 @@ const SelectOption = forwardRef(
                 onClick={() => {
                     if (Date.now() > pauseClickTime.current && !isOptionSubmenu) {
                         if (!defaultOption && setSelectedOption) {
-                            setSelectedOption(
-                                multiSelect
-                                    ? selectedOption.filter(option => option[0] === id).length
-                                        ? selectedOption.filter(option => option[0] !== id)
-                                        : [...selectedOption, [id, children]]
-                                    : [id, children]
-                            )
+                            const nextSelectedOption = multiSelect
+                                ? _selectedOption.filter(option => option[0] === id).length
+                                    ? _selectedOption.filter(option => option[0] !== id)
+                                    : [..._selectedOption, [id, children]]
+                                : [id, children]
+                            setSelectedOption(nextSelectedOption)
                         }
                         setDisableSelecting(true)
-                        if (!multiSelect && !isOptionSubmenu) {
-                            dispatch('CLOASE_ALL_SELECT')
-                        }
                         pauseClickTime.current = Date.now() + 350
+                        if (!multiSelect && !isOptionSubmenu) {
+                            setTimeout(() => {
+                                dispatch('CLOASE_ALL_SELECT')
+                            }, 450)
+                        }
                     }
                 }}
             >
@@ -111,19 +120,16 @@ const SelectOption = forwardRef(
                         enableSearch
                         mainSelectId={mainSelectId}
                         parentSelectId={parentSelectId}
-                        selected={(() => {
-                            return childOfSelectedOptionIsArray && selectedOption[0] === id
-                                ? selectedOption[1]
-                                : ['-1-', '']
-                        })()}
+                        selected={_selectedOption.at(1) ?? []}
                         onActive={setSubmenuShowNow}
                         onSelect={option => {
                             if (Date.now() > pauseClickTime.current) {
                                 if (!defaultOption && setSelectedOption) setSelectedOption([id, option])
                                 setDisableSelecting(true)
-                                setTimeout(() => {
-                                    dispatch('CLOASE_ALL_SELECT')
-                                }, 450)
+                                if (isScreenMounted.current)
+                                    setTimeout(() => {
+                                        dispatch('CLOASE_ALL_SELECT')
+                                    }, 450)
                             }
                         }}
                     >

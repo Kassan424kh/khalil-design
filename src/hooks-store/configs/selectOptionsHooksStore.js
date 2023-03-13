@@ -2,7 +2,7 @@ import { initStore } from '../store'
 import { deepCopy } from '../../services/deepCopy'
 import _ from 'underscore'
 
-export const defaultSelectsProps = {
+export const initSelects = {
     selectProps: {
         0: {
             index: 0,
@@ -28,7 +28,6 @@ export const defaultSelectsProps = {
                 offset: undefined
             },
             show: false,
-            setShow: undefined,
             openDirections: {
                 top: true,
                 bottom: true,
@@ -69,9 +68,12 @@ const configureStore = () => {
             }
 
             const nextState = _.clone(prevState)
-            nextState.selectProps[data.index] = {
-                ...(nextState.selectProps[data.index] ?? {}),
-                ...data
+            nextState.selectProps = {
+                ...nextState.selectProps,
+                [data.index]: {
+                    ...(nextState.selectProps[data.index] ?? {}),
+                    ...data
+                }
             }
 
             const newDataNotEqualToOldData =
@@ -80,7 +82,7 @@ const configureStore = () => {
                     lastUpdate: 0,
                     headerText: '',
                     selectButtonProperties: {
-                        ...nextState.selectProps[data.index].selectButtonProperties,
+                        ...nextState.selectProps[data.index]?.selectButtonProperties,
                         offset: null
                     }
                 }) !==
@@ -89,7 +91,7 @@ const configureStore = () => {
                     lastUpdate: 0,
                     headerText: '',
                     selectButtonProperties: {
-                        ...prevState.selectProps[data.index].selectButtonProperties,
+                        ...prevState.selectProps[data.index]?.selectButtonProperties,
                         offset: null
                     }
                 })
@@ -106,9 +108,13 @@ const configureStore = () => {
             }
 
             const nextState = _.clone(prevState)
-            nextState.selectOptions[data.index] = {
-                options: data.options,
-                length: data.options.length
+            nextState.selectOptions = {
+                ...nextState.selectOptions,
+                [data.index]: {
+                    ...nextState.selectOptions[data.index],
+                    options: data.options,
+                    length: data.options.length
+                }
             }
 
             const newDataNotEqualToOldData = !_.isEqual(
@@ -125,32 +131,86 @@ const configureStore = () => {
                     delete prevState.selectOptions[soKey]
                     return
                 }
-
-                prevState.selectProps[soKey]['show'] = false
-                prevState.selectProps[soKey]['lastUpdate'] = Date.now()
+                prevState.selectProps = {
+                    ...prevState.selectProps,
+                    ...{
+                        [soKey]: {
+                            ...prevState.selectProps[soKey],
+                            show: false,
+                            lastUpdate: Date.now()
+                        }
+                    }
+                }
+                prevState.selectOptions = {
+                    ...prevState.selectOptions
+                }
             })
-            return prevState
+            return { ...prevState }
         },
         CLOSE_SELECT: (prevState, index) => {
-            prevState.selectProps[index]['show'] = false
-            prevState.selectProps[index]['lastUpdate'] = Date.now()
-            return prevState
+            const nextState = { ...prevState }
+            return {
+                ...prevState,
+                selectProps: {
+                    ...prevState.selectProps,
+                    ...{
+                        [index]: {
+                            ...prevState.selectProps[index],
+                            show: false,
+                            lastUpdate: Date.now()
+                        }
+                    }
+                }
+            }
+        },
+        OPEN_SELECT: (prevState, index) => {
+            const nextState = { ...prevState }
+            return {
+                ...prevState,
+                selectProps: {
+                    ...prevState.selectProps,
+                    ...{
+                        [index]: {
+                            ...prevState.selectProps[index],
+                            show: true,
+                            lastUpdate: Date.now()
+                        }
+                    }
+                }
+            }
+        },
+        TOGGLE_SELECT: (prevState, index) => {
+            const nextState = { ...prevState }
+            return {
+                ...prevState,
+                selectProps: {
+                    ...prevState.selectProps,
+                    ...{
+                        [index]: {
+                            ...prevState.selectProps[index],
+                            show: !prevState.selectProps[index].show,
+                            lastUpdate: Date.now()
+                        }
+                    }
+                }
+            }
         },
         DELETE_SUB_SELECT: (prevState, index) => {
             if (index !== '0') {
                 delete prevState.selectProps[index]
                 delete prevState.selectOptions[index]
             }
-            return prevState
+            return { ...prevState }
         },
         DELETE_SUB_SELECTS_UP_TARGET_INDEX: (prevState, index) => {
-            Object.keys(prevState.selectProps).forEach(soIndex => {
+            const nextState = _.clone(prevState)
+            Object.keys(nextState.selectProps).forEach(soIndex => {
                 if (parseInt(soIndex) > parseInt(index)) {
-                    delete prevState.selectProps[soIndex]
-                    delete prevState.selectOptions[soIndex]
+                    delete nextState.selectProps[soIndex]
+                    delete nextState.selectOptions[soIndex]
                 }
             })
-            return prevState
+            return nextState
         },
         DELETE_ALL_SUB_SELECT: prevState => {
             Object.keys(prevState.selectProps).forEach(soIndex => {
@@ -159,10 +219,10 @@ const configureStore = () => {
                     delete prevState.selectOptions[soIndex]
                 }
             })
-            return prevState
+            return { ...prevState }
         }
     }
-    initStore(actions, defaultSelectsProps)
+    initStore(actions, initSelects)
 }
 
 export default configureStore

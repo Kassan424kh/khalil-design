@@ -48,9 +48,6 @@ const SelectPage = () => {
                 onSelect={selectedOption => {
                     console.log('[onSelect]: ', selectedOption)
                 }}
-                flatOnSelect={selectedOption => {
-                    console.log('[flatOnSelect]: ', selectedOption)
-                }}
             >
                 click me to open select options
             </Select>
@@ -61,8 +58,13 @@ const SelectPage = () => {
                 onSelect={selectedOption => {
                     console.log('[onSelect]: ', selectedOption)
                 }}
-                flatOnSelect={selectedOption => {
-                    console.log('[flatOnSelect]: ', selectedOption)
+            >
+                click me to open select options
+            </Select>
+            <Select
+                options={{ 1: 'asdf1', 2: 'asdf2', 3: ['asdf3', [0, [1, _fakeList]]] }}
+                onSelect={selectedOption => {
+                    console.log('[onSelect]: ', selectedOption)
                 }}
             >
                 click me to open select options

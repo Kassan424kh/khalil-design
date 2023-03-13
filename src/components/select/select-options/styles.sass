@@ -1,9 +1,10 @@
-@import "../../../variables"
-@import "../../../colors"
+@import "src/variables"
+@import "src/colors"
 
-$background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1px, rgba($blue-rgb, .3) 2px, transparent 2px, transparent 7px)
+$background-effect-lines: repeating-linear-gradient(45deg, rgba($nav-border-color-rgb, .3) 1px, rgba($nav-border-color-rgb, .3) 2px, transparent 2px, transparent 7px)
 
 .select-options
+    @include disable-selecting
     position: fixed
     font-family: $font-family
     display: flex
@@ -12,7 +13,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
     padding: 15px 0 15px 15px
     background-color: $white
     border-radius: 15px
-    border: 1px solid $blue
+    border: 1px solid $nav-border-color
     min-width: 250px
     width: max-content
     max-height: 300px
@@ -21,7 +22,6 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
     opacity: 0
     z-index: 9999999999
     overflow: hidden
-    @include disable-selecting
     top: 0
     left: 0
     pointer-events: none
@@ -42,6 +42,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
     .tv-tool-button
         box-shadow: 0 5px 20px rgba(0, 0, 0, .04) !important
         border: 1px solid $grey !important
+
         > span
             color: rgba($black-rgb, .5)
             -webkit-text-stroke: 0 $black
@@ -56,7 +57,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
         z-index: -1
         top: 0
         left: 0
-        background: linear-gradient(180deg, transparent -51px, $white 70px, $white 70px), $background-effect-lines
+        background: linear-gradient(180deg, $white -51px, $white 70px, $white 70px), $background-effect-lines
 
     .select-options-body
         display: contents
@@ -100,7 +101,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
         text-align: center
         font-weight: bolder
         font-size: 17px
-        color: $blue-dark
+        color: $nav-border-color
         margin-bottom: 0
         display: flex
         justify-content: center
@@ -253,6 +254,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
     &.single-select
         .select-options-column
             display: inherit
+
             .select-option
                 &.selected
                     position: sticky
@@ -367,6 +369,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                     .options-list
                         direction: rtl
                         padding-left: 10px
+
                         > div
                             direction: ltr
 
@@ -389,7 +392,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($blue-rgb, .3) 1
                 width: 1px
                 padding: 0 1px
                 background: linear-gradient(180deg, transparent 60px, rgba($blue-rgb, .2) calc(50% + 60px), transparent 100%)
-    
+
         &.with-header-text
             .options-list
                 $content-height: calc(100% - 90px) !important

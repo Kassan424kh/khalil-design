@@ -43,7 +43,7 @@ const Select = ({
     updatePosition,
     onActive,
     onSelect,
-    selected = 'selectedAttributeWasnotUsed',
+    selected,
     clearAllOptions,
     toggleAllOptions,
     selectAllOptions,
@@ -71,17 +71,20 @@ const Select = ({
     // hook store
     const [{ selectProps }, dispatch] = useStore()
     const { selectId: selectIdParentSelectElement } = selectProps['0'] ?? { selectId: uuidv4() }
-    const { selectId: selectIdOnStore, show: showIdOnStore } = selectProps[index] ?? {
+    const { selectId: selectIdOnStore, show: showOnStore } = selectProps[index] ?? {
         show: false,
         selectId: uuidv4()
     }
+
+    // check if this select componen is the last used one
+    const isActiveSelectNow = selectIdOnStore === selectId
+    const isOpen = (isActiveSelectNow && showOnStore) ?? false
 
     // useState variables
     const [_options, _setOptions] = useState([])
     const [_additionalFilterInformation, _setAdditionalFilterInformation] = useState([])
     const [click, setClick] = useState()
     const [hover, setHover] = useState()
-    const [showOptions, setShowOptions] = useState(false)
 
     // get select component id from outside
     useEffect(() => {
@@ -93,7 +96,6 @@ const Select = ({
         if (open) {
             setClick(Date.now())
             setHover(Date.now())
-            setShowOptions(true)
         }
     }, [open])
 
@@ -101,11 +103,7 @@ const Select = ({
     useEffect(() => {
         if (close) {
             dispatch('CLOASE_ALL_SELECT')
-            setShowOptions(false)
-            const t = setTimeout(() => {
-                dispatch('CLOASE_ALL_SELECT')
-                dispatch('DELETE_ALL_SUB_SELECT')
-            }, 150)
+            dispatch('DELETE_ALL_SUB_SELECT')
 
             return () => clearTimeout(t)
         }
@@ -117,15 +115,14 @@ const Select = ({
     useEffect(() => {
         if (selectIdOnStore !== selectId) {
             setClick()
-            setShowOptions(false)
         }
     }, [selectIdOnStore])
 
-    const [lastTimeUpdatedSelectedOptions, setLastTimeUpdatedSelectedOptions] = useState()
     const myRef = useRef([])
     const [selectedOption, setSelectedOption] = useState(
         multiSelect && defaultAllSelected ? _options.map(option => [option[0], option[1]]) : []
     )
+    const _selectedOption = selected ?? selectedOption ?? []
     const [selectMouseEnter, setSelectMouseEnter] = useState(false)
     const selectButtonProperties = useContainerDimensions({
         ref: myRef,
@@ -162,20 +159,9 @@ const Select = ({
     // get status of showOptions from outside using onActive attribute
     const showSelectOptionsRef = useRef()
     useEffect(() => {
-        if (onActive) onActive(showIdOnStore)
-        showSelectOptionsRef.current = showIdOnStore
-    }, [showIdOnStore])
-
-    // set selectOption/s if the selected attribute was updated
-    useEffect(() => {
-        setSelectedOption(_currentSelectedOption => {
-            if (selected && !_.isEqual(_currentSelectedOption, selected)) {
-                setLastTimeUpdatedSelectedOptions(Date.now())
-                return selected
-            }
-            return _currentSelectedOption
-        })
-    }, [selected])
+        if (onActive) onActive(isOpen)
+        showSelectOptionsRef.current = isOpen
+    }, [isOpen])
 
     // clear all selected options from outside
     const firstLoading2 = useRef(true)
@@ -190,7 +176,7 @@ const Select = ({
     useEffect(() => {
         if (!firstLoading3.current && multiSelect) {
             setSelectedOption(
-                selectedOption.length === _options.length ? [] : _options.map(option => [option[0], option[1]])
+                _selectedOption.length === _options.length ? [] : _options.map(option => [option[0], option[1]])
             )
         }
         if (firstLoading3.current) firstLoading3.current = false
@@ -234,9 +220,9 @@ const Select = ({
         <div
             {...props}
             ref={ele => (myRef.current[0] = ele)}
-            className={`select disable-selecting ${className ? className : ''} ${showOptions ? ' active' : ''} ${
-                selectedOption.length &&
-                _options.filter(([_optionKey, _]) => _optionKey === selectedOption[0]).length &&
+            className={`select disable-selecting ${className ? className : ''} ${isOpen ? ' active' : ''} ${
+                _selectedOption.length &&
+                _options.filter(([_optionKey, _]) => _optionKey === _selectedOption[0]).length &&
                 enableSelectedStatusDot
                     ? 'options-selected'
                     : ''
@@ -245,7 +231,6 @@ const Select = ({
             index={index}
             onMouseEnter={() => {
                 setSelectMouseEnter(true)
-                setHover(Date.now())
             }}
             onMouseMove={() => {
                 setSelectMouseEnter(true)
@@ -258,29 +243,12 @@ const Select = ({
             onMouseLeave={() => {
                 setSelectMouseEnter(false)
             }}
-            onClick={() => {
-                setHover(Date.now())
-                setClick(Date.now())
-                setShowOptions(true)
-            }}
-            onMouseDown={() => {
-                setClick(Date.now())
-            }}
             onMouseUp={() => {
                 setClick(Date.now())
+                dispatch('OPEN_SELECT', index)
             }}
         >
-            <div
-                ref={ele => (myRef.current[1] = ele)}
-                onClick={() => {
-                    setShowOptions(!showOptions)
-                    setTimeout(() => {
-                        setUpdateOptionsProperties(updateOptionsProperties + 1)
-                    }, 150)
-                }}
-            >
-                {children}{' '}
-            </div>
+            <div ref={ele => (myRef.current[1] = ele)}>{children} </div>
             {click ? (
                 <SelectOptionsDataTransmitter
                     selectId={selectId}
@@ -296,8 +264,7 @@ const Select = ({
                     searchPlaceHolder={searchPlaceHolder}
                     enableSelectAllButton={enableSelectAllButton}
                     selectButtonProperties={selectButtonProperties}
-                    show={showOptions && !close}
-                    setShow={setShowOptions}
+                    show={isOpen && !close}
                     top={top}
                     bottom={bottom}
                     left={left}
@@ -306,27 +273,23 @@ const Select = ({
                     options={_options}
                     additionalFilterInformation={_additionalFilterInformation}
                     multiSelect={multiSelect}
-                    selectedOption={selectedOption}
+                    selectedOption={_selectedOption}
                     setSelectedOption={_so => {
-                        if (!_.isEqual(_so, selectedOption)) {
-                            if (selected === 'selectedAttributeWasnotUsed') setSelectedOption(_so)
-                            if (onSelect) {
-                                const _submenuValue = Array.isArray(_so[1]) && _so[1].length === 2
-                                const getSubmenuSelectedOption = _selectedOption => {
-                                    if (!_selectedOption) return
-                                    const childOfSelectedOptionIsArray =
-                                        Array.isArray(_selectedOption[1]) && _selectedOption[1].length === 2
-                                    if (childOfSelectedOptionIsArray) {
-                                        return getSubmenuSelectedOption(_selectedOption[1])
-                                    }
-                                    return _selectedOption
+                        setSelectedOption(_so)
+                        if (onSelect) {
+                            const _submenuValue = Array.isArray(_so[1]) && _so[1].length === 2
+                            const getSubmenuSelectedOption = __selectedOption => {
+                                if (!__selectedOption) return
+                                const childOfSelectedOptionIsArray =
+                                    Array.isArray(__selectedOption[1]) && __selectedOption[1].length === 2
+                                if (childOfSelectedOptionIsArray) {
+                                    return getSubmenuSelectedOption(__selectedOption[1])
                                 }
-                                onSelect(_so, _submenuValue && !multiSelect ? getSubmenuSelectedOption(_so) : undefined)
-                                if (selected === null) setSelectedOption([])
+                                return __selectedOption
                             }
+                            onSelect(_so, _submenuValue && !multiSelect ? getSubmenuSelectedOption(_so) : undefined)
                         }
                     }}
-                    lastTimeUpdatedSelectedOptions={lastTimeUpdatedSelectedOptions}
                     defaultOption={defaultOption}
                     defaultOptionText={defaultOptionText}
                     updatePosition={updatePosition}

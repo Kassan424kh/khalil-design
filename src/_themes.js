@@ -1,5 +1,6 @@
 import $ from 'jquery'
 
+
 export default class Theme {
     static updateColorVariable = (key, newColor) => $('html').css(key, newColor)
 
@@ -71,13 +72,9 @@ export default class Theme {
         Theme.updateColorVariable('--nav-background-color', dark ? '#010409' : '#fff')
         Theme.updateColorVariable('--nav-box-shadow-color', dark ? '0, 122, 239' : '0, 0, 0')
         Theme.updateColorVariable('--nav-border-color', dark ? '#007aef' : '#333')
+        Theme.updateColorVariable('--nav-border-color-rgb', dark ? '0, 122, 239' : '51, 51, 51')
         Theme.updateColorVariable('--text-field-button-border-color', dark ? '0, 122, 239' : '0, 0, 0')
         Theme.updateColorVariable('--text-field-button-border-alpha', dark ? '0.5' : '0')
-
-        Theme.updateColorVariable("--base-color", dark ? "#f893ba" : "#FF728C");
-        Theme.updateColorVariable("--base-color-accent", dark ? "#34081c" : "#efdfe4");
-        Theme.updateColorVariable("--base-color-rgb",dark ? "248, 147, 186" : "255, 114, 140");
-        Theme.updateColorVariable("--base-color-accent-rgb",dark ? "52, 8, 28" : "239, 223, 228");
     }
 
     static lightTheme = () => Theme.themes()

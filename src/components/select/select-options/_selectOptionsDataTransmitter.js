@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useStore } from '../../../hooks-store/store'
+import _ from 'underscore'
 
 const SelectOptionsDataTransmitter = ({
     mainSelectId,
@@ -17,13 +18,11 @@ const SelectOptionsDataTransmitter = ({
     filterOnly,
     searchPlaceHolder,
     enableSelectAllButton,
-    setShow,
     options,
     additionalFilterInformation,
     multiSelect,
     selectedOption,
     setSelectedOption,
-    lastTimeUpdatedSelectedOptions,
     defaultOption,
     defaultOptionText,
     clearSelectedOptions,
@@ -61,10 +60,8 @@ const SelectOptionsDataTransmitter = ({
     }, [top, bottom, left, right])
 
     const showSelectOptions = useRef(false)
-    const currentAndNextSelectIds = useRef(false)
     useEffect(() => {
         showSelectOptions.current = selectId !== currentSelectId.current ? true : show
-        currentAndNextSelectIds.current = { current: currentSelectId.current, next: selectId }
 
         dispatch('UPDATE_SELECT_PROPS', {
             selectId: selectId,
@@ -75,10 +72,8 @@ const SelectOptionsDataTransmitter = ({
             filterOnly: filterOnly,
             searchPlaceHolder: searchPlaceHolder,
             enableSelectAllButton: enableSelectAllButton,
-            setShow: setShow,
             additionalFilterInformation: additionalFilterInformation,
             multiSelect: multiSelect,
-            selectedOption: selectedOption,
             setSelectedOption: setSelectedOption,
             defaultOption: defaultOption,
             defaultOptionText: defaultOptionText,
@@ -95,17 +90,18 @@ const SelectOptionsDataTransmitter = ({
                   }
                 : {})
         })
-    }, [
-        selectId,
-        selectedOption,
-        lastTimeUpdatedSelectedOptions,
-        additionalFilterInformation,
-        clearSelectedOptions,
-        disableSelecting,
-        clicked,
-        showSelectedParallel,
-        show
-    ])
+    }, [additionalFilterInformation, clearSelectedOptions, disableSelecting, clicked, show])
+
+    const prevSelectedOption = useRef()
+    useEffect(() => {
+        if (selectedOption && !_.isEqual(selectedOption, prevSelectedOption.current)) {
+            dispatch('UPDATE_SELECT_PROPS', {
+                selectedOption: selectedOption,
+                index: index
+            })
+            prevSelectedOption.current = selectedOption
+        }
+    }, [selectedOption])
 
     // set and update options
     useEffect(() => {

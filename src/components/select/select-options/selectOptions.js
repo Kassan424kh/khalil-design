@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { defaultSelectsProps } from '../../../hooks-store/configs/selectOptionsHooksStore'
+import { initSelects } from '../../../hooks-store/configs/selectOptionsHooksStore'
 import { useStore } from '../../../hooks-store/store'
 import { getDimensions } from '../../../services/useContainerDimensions'
 import { charsWidth } from '../../../services/calcCharsWidth'
@@ -10,23 +10,25 @@ import './styles.sass'
 import $ from 'jquery'
 import _ from 'underscore'
 import gsap from 'gsap'
+import { useClickOutside } from '../../../services/useClickOutside'
 
 const SelectOptions = ({ index = '0' }) => {
-    const [{ selectProps: selectPropsFromStore, selectOptions: selectOptionsFromStore }, dispatch] = useStore()
+    const [state, dispatch] = useStore()
+    const { selectProps: selectPropsFromStore, selectOptions: selectOptionsFromStore } = state
     const selectOptionsGetByIndex = selectOptionsFromStore[index]
     const selectPropsGetByIndex = selectPropsFromStore[index]
-    const lengthAllSelects = Object.values(selectPropsFromStore).length
-    const thisSelectIsActiveNow = lengthAllSelects - 1 <= index
-    const [selectProps, setSelectProps] = useState(defaultSelectsProps.selectProps[0])
-    const [selectOptions, setSelectOptions] = useState([])
+    const lengthAllSelects = Object.keys(selectPropsFromStore).length
+    const thisSelectIsActiveNow = lengthAllSelects - 1 <= parseInt(index)
+    const [selectProps, setSelectProps] = useState(initSelects.selectProps['0'])
+    const [selectOptions, setSelectOptions] = useState(initSelects.selectOptions['0'])
     const [updateSelectPropsTimes, setUpdateSelectPropsTimes] = useState(0)
     const [searchText, setSearchText] = useState('')
     const [searchTextSelectedTail, setSearchTextSelectedTail] = useState('')
     const [searchTextUnselectedTail, setSearchTextUnselectedTail] = useState('')
     const _charsWidth = useState(charsWidth())[0]
     const initListTilesInView = {
-        1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(String), // key is the viewport on parallel view, item is list of options indexes can render in view
-        3: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(String) // same ^
+        1: Object.keys([...Array(16)]), // key is the viewport on parallel view, item is list of options indexes can render in view
+        3: Object.keys([...Array(16)]) // same ^
     }
     const [listTilesInView, setListTilesInView] = useState(initListTilesInView)
 
@@ -95,7 +97,7 @@ const SelectOptions = ({ index = '0' }) => {
         defaultPosition = 0,
         effectUsage = false
     ) => {
-        if (selectProps.selectButtonProperties.offset) {
+        if (selectProps.selectButtonProperties?.offset) {
             const // directions
                 directions = selectProps.openDirections,
                 directionTop = selectProps.openDirections.top,
@@ -195,7 +197,7 @@ const SelectOptions = ({ index = '0' }) => {
         centerPosition = null,
         effectUsage = false
     ) => {
-        if (selectProps.selectButtonProperties.offset) {
+        if (selectProps.selectButtonProperties?.offset) {
             const // directions
                 directions = selectProps.openDirections,
                 directionLeft = selectProps.openDirections.left,
@@ -390,17 +392,16 @@ const SelectOptions = ({ index = '0' }) => {
 
     // update options
     const prevSelectOptions = useRef()
-    if (selectOptionsGetByIndex)
-        useEffect(() => {
-            const _options = selectOptionsGetByIndex.options
-            if (!_.isEqual(prevSelectOptions.current, _options)) {
-                prevSelectOptions.current = _options
-                calcOptionsListWidth(_options)
-                setSelectOptions(_options)
-                setSortedOptions(sortOptions(_options))
-                setListTilesInView(initListTilesInView)
-            }
-        }, [selectOptionsGetByIndex.options])
+    const options = selectOptionsGetByIndex?.options
+    useEffect(() => {
+        if (options && !_.isEqual(prevSelectOptions.current, options)) {
+            calcOptionsListWidth(options)
+            setSelectOptions(options)
+            setSortedOptions(sortOptions(options))
+            setListTilesInView(initListTilesInView)
+            prevSelectOptions.current = options
+        }
+    }, [options])
 
     // set search field focused after change selector
     const searchFieldRef = useRef()
@@ -426,79 +427,89 @@ const SelectOptions = ({ index = '0' }) => {
     useEffect(() => {
         if (animateTimeout.current) clearTimeout(animateTimeout.current)
 
-        animateTimeout.current = setTimeout(() => {
-            const $header = $(`.select-options[index="${index}"] .select-options-headline`)
-            const headerChildHeight = $header.children().first().prop('scrollHeight')
-            gsap.to(`.select-options[index="${index}"] .select-options-headline`, {
-                minHeight: parsePixel(selectProps.headerText ? Math.max(headerChildHeight, 35) : 0),
-                maxHeight: parsePixel(selectProps.headerText ? Math.max(headerChildHeight, 35) : 0),
-                opacity: selectProps.headerText ? 1 : 0,
-                marginBottom: parsePixel(selectProps.headerText ? -15 : 0),
-                duration: 0.2
-            })
+        animateTimeout.current = setTimeout(
+            () => {
+                const $header = $(`.select-options[index="${index}"] .select-options-headline`)
+                const headerChildHeight = $header.children().first().prop('scrollHeight')
+                gsap.to(`.select-options[index="${index}"] .select-options-headline`, {
+                    minHeight: parsePixel(selectProps.headerText ? Math.max(headerChildHeight, 35) : 0),
+                    maxHeight: parsePixel(selectProps.headerText ? Math.max(headerChildHeight, 35) : 0),
+                    opacity: selectProps.headerText ? 1 : 0,
+                    marginBottom: parsePixel(selectProps.headerText ? -15 : 0),
+                    duration: 0.2
+                })
 
-            const $el = $(`.select-options[index="${index}"] .select-options-actions`)
-            const selectOptionsActionsScrollHeight = $el.prop('scrollHeight')
-            const wasShown = selectProps.show
+                const $el = $(`.select-options[index="${index}"] .select-options-actions`)
+                const selectOptionsActionsScrollHeight = $el.prop('scrollHeight')
+                const wasShown = selectProps.show
 
-            const enableSelectAllButton =
-                selectProps.multiSelect && selectProps.enableSearch && selectProps.enableSelectAllButton
+                const enableSelectAllButton =
+                    selectProps.multiSelect && selectProps.enableSearch && selectProps.enableSelectAllButton
 
-            gsap.to(`.select-options[index="${index}"] .disable-pointer-events-layer`, {
-                pointerEvents: thisSelectIsActiveNow ? 'none' : 'auto',
-                duration: 0
-            })
+                gsap.to(`.select-options[index="${index}"] .disable-pointer-events-layer`, {
+                    pointerEvents: thisSelectIsActiveNow ? 'none' : 'auto',
+                    duration: 0
+                })
 
-            gsap.to(`.select-options[index="${index}"] .select-options-actions`, {
-                minHeight: parsePixel(selectProps.enableSearch ? selectOptionsActionsScrollHeight : 0),
-                maxHeight: parsePixel(selectProps.enableSearch ? selectOptionsActionsScrollHeight : 0),
-                opacity: selectProps.enableSearch ? 1 : 0,
-                paddingTop: parsePixel(selectProps.enableSearch ? 1 : 0),
-                //pointerEvents: wasShown && selectProps.enableSearch && thisSelectIsActiveNow ? 'auto' : 'none',
-                duration: 0.2,
-                delay: 0.2
-            })
-
-            gsap.to(`.select-options[index="${index}"] .select-options-actions .select-options-search-field input`, {
-                width: !enableSelectAllButton ? 'calc(100%)' : '100%',
-                paddingLeft: parsePixel(enableSelectAllButton ? 95 : 10),
-                duration: 0.2,
-                delay: 0.2
-            })
-
-            gsap.to(`.select-options[index="${index}"] .select-options-actions .select-options-search-field input`, {
-                opacity: selectProps.showSelectedParallel ? 0 : 1,
-                //pointerEvents: !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
-                duration: 0.2,
-                delay: 0.2
-            })
-
-            gsap.to(
-                `.select-options[index="${index}"] .select-options-actions .select-options-search-field .clear-button`,
-                {
-                    opacity: selectProps.showSelectedParallel ? 0 : 1,
-                    //pointerEvents: !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
+                gsap.to(`.select-options[index="${index}"] .select-options-actions`, {
+                    minHeight: parsePixel(selectProps.enableSearch ? selectOptionsActionsScrollHeight : 0),
+                    maxHeight: parsePixel(selectProps.enableSearch ? selectOptionsActionsScrollHeight : 0),
+                    opacity: selectProps.enableSearch ? 1 : 0,
+                    paddingTop: parsePixel(selectProps.enableSearch ? 1 : 0),
+                    //pointerEvents: wasShown && selectProps.enableSearch && thisSelectIsActiveNow ? 'auto' : 'none',
                     duration: 0.2,
                     delay: 0.2
-                }
-            )
+                })
 
-            gsap.to(
-                `.select-options[index="${index}"] .select-options-actions .select-options-search-field .select-all-buttons`,
-                {
-                    borderTopRightRadius: parsePixel(selectProps.showSelectedParallel ? 10 : 0),
-                    borderBottomRightRadius: parsePixel(selectProps.showSelectedParallel ? 10 : 0),
-                    //pointerEvents: wasShown && enableSelectAllButton && thisSelectIsActiveNow ? 'auto' : 'none',
-                    opacity: enableSelectAllButton ? 1 : 0,
-                    translateX: parsePixel(enableSelectAllButton ? 0 : -20),
-                    duration: 0.2,
-                    delay: 0.2,
-                    onComplete: () => {
-                        setUpdateSelectPropsTimes(_ => _ + 1)
+                gsap.to(
+                    `.select-options[index="${index}"] .select-options-actions .select-options-search-field input`,
+                    {
+                        width: !enableSelectAllButton ? 'calc(100%)' : '100%',
+                        paddingLeft: parsePixel(enableSelectAllButton ? 95 : 10),
+                        duration: 0.2,
+                        delay: 0.2
                     }
-                }
-            )
-        }, 150)
+                )
+
+                gsap.to(
+                    `.select-options[index="${index}"] .select-options-actions .select-options-search-field input`,
+                    {
+                        opacity: selectProps.showSelectedParallel ? 0 : 1,
+                        //pointerEvents: !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
+                        duration: 0.2,
+                        delay: 0.2
+                    }
+                )
+
+                gsap.to(
+                    `.select-options[index="${index}"] .select-options-actions .select-options-search-field .clear-button`,
+                    {
+                        opacity: selectProps.showSelectedParallel ? 0 : 1,
+                        //pointerEvents: !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
+                        duration: 0.2,
+                        delay: 0.2
+                    }
+                )
+
+                gsap.to(
+                    `.select-options[index="${index}"] .select-options-actions .select-options-search-field .select-all-buttons`,
+                    {
+                        borderTopRightRadius: parsePixel(selectProps.showSelectedParallel ? 10 : 0),
+                        borderBottomRightRadius: parsePixel(selectProps.showSelectedParallel ? 10 : 0),
+                        //pointerEvents: wasShown && enableSelectAllButton && thisSelectIsActiveNow ? 'auto' : 'none',
+                        opacity: enableSelectAllButton ? 1 : 0,
+                        translateX: parsePixel(enableSelectAllButton ? 0 : -20),
+                        duration: 0.2,
+                        delay: 0.2,
+                        onComplete: () => {
+                            setUpdateSelectPropsTimes(_ => _ + 1)
+                        }
+                    }
+                )
+            },
+            selectProps.show ? 150 : 0
+        )
+
         return () => clearTimeout(animateTimeout.current)
     }, [selectProps, lengthAllSelects, selectOptions])
 
@@ -509,7 +520,7 @@ const SelectOptions = ({ index = '0' }) => {
         const x = moveHorizontal(
             optionsProperties,
             `${
-                selectProps.selectButtonProperties.offset
+                selectProps.selectButtonProperties?.offset
                     ? selectProps.selectButtonProperties.offset.left + selectProps.selectButtonProperties.width
                     : 0
             }px`,
@@ -575,10 +586,9 @@ const SelectOptions = ({ index = '0' }) => {
 
             const _toggleSelectOptions = () => {
                 gsap.to(`.select-options[index="${index}"]`, {
-                    opacity: selectProps.show ? 1 : 0,
-                    filter: `blur(${selectProps.show && thisSelectIsActiveNow ? 0 : 1}px)`,
+                    opacity: selectProps.show ? (thisSelectIsActiveNow ? 1 : 0.95) : 0,
                     pointerEvents: selectProps.show ? 'auto' : 'none',
-                    duration: selectLengthWasDownscalled ? 0.05 : distanceToSeconds,
+                    duration: selectProps.show ? distanceToSeconds : 0.05,
                     onComplete: () => {
                         prevData.current = {
                             wasClosed: !selectProps.show,
@@ -603,7 +613,7 @@ const SelectOptions = ({ index = '0' }) => {
                             x: selectProps.show ? x : prevX,
                             y: selectProps.show ? y : prevY,
                             duration: 0.35,
-                            delay: 0.15,
+                            delay: 0.2,
                             onComplete: () => {
                                 _toggleSelectOptions()
                             }
@@ -614,7 +624,7 @@ const SelectOptions = ({ index = '0' }) => {
                 gsap.to(`.select-options[index="${index}"]`, {
                     x: selectProps.show ? x : prevX,
                     y: selectProps.show ? y : prevY,
-                    delay: 0.15,
+                    delay: 0.2,
                     duration: selectProps.show && !wasClosed ? distanceToSeconds : 0,
                     onComplete: () => {
                         _toggleSelectOptions()
@@ -624,7 +634,14 @@ const SelectOptions = ({ index = '0' }) => {
         }, 150)
 
         return () => clearTimeout(firstRenderTimeout.current)
-    }, [updateSelectPropsTimes, selectProps.show, lengthAllSelects, optionsListWidth])
+    }, [
+        updateSelectPropsTimes,
+        selectProps.show,
+        lengthAllSelects,
+        thisSelectIsActiveNow,
+        optionsListWidth,
+        selectPropsFromStore
+    ])
 
     // change headline to empty after 1 second if the next one is empty
     // this is for more stabile animation
@@ -714,7 +731,7 @@ const SelectOptions = ({ index = '0' }) => {
                 const optionId = String(option[0])
                 const optionWasSelected = wasSelected(option)
                 if (selectProps.multiSelect && selectProps.showSelectedParallel) {
-                    let pushToViewport = !optionWasSelected ? '1' : '3'
+                    const pushToViewport = !optionWasSelected ? '1' : '3'
 
                     if (!hideOption(option, pushToViewport)) nextViewportOptionsIds[pushToViewport].push(optionId)
                 } else {
@@ -912,8 +929,7 @@ const SelectOptions = ({ index = '0' }) => {
                                                         id={''}
                                                         disableSelecting={selectProps.disableSelecting}
                                                         setDisableSelecting={selectProps.setDisableSelecting}
-                                                        selectedOption={selectProps}
-                                                        setShowOptions={selectProps.setShowOptions}
+                                                        selectedOption={selectProps.selectedOption}
                                                         setSelectedOption={selectProps.setSelectedOption}
                                                         hide={selectProps.searchText}
                                                         defaultOption
