@@ -104,7 +104,7 @@ const SelectOption = forwardRef(
                         })()}
                     </pre>
                     {isOptionSubmenu && !multiSelect ? (
-                        <span className={'select-option-icon submenu material-symbols-outlined'}>list</span>
+                        <span className={'select-option-icon submenu material-symbols-outlined'}>expand_more</span>
                     ) : null}
                 </div>
             </div>
