@@ -90,7 +90,7 @@ const SelectOptionsDataTransmitter = ({
                   }
                 : {})
         })
-    }, [additionalFilterInformation, clearSelectedOptions, disableSelecting, clicked, show])
+    }, [additionalFilterInformation, showSelectedParallel, clearSelectedOptions, disableSelecting, clicked, show])
 
     const prevSelectedOption = useRef()
     useEffect(() => {

@@ -586,7 +586,7 @@ const SelectOptions = ({ index = '0' }) => {
 
             const _toggleSelectOptions = () => {
                 gsap.to(`.select-options[index="${index}"]`, {
-                    opacity: selectProps.show ? (thisSelectIsActiveNow ? 1 : 0.95) : 0,
+                    opacity: selectProps.show ? 1 : 0,
                     pointerEvents: selectProps.show ? 'auto' : 'none',
                     duration: selectProps.show ? distanceToSeconds : 0.05,
                     onComplete: () => {
