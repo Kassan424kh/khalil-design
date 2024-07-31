@@ -2,15 +2,28 @@ import React, { useEffect, useRef, forwardRef, useState } from 'react'
 import './styles.sass'
 import Select from '../../select'
 import { useStore } from '../../../../hooks-store/store'
-import _ from 'underscore'
 
 String.prototype.replaceJSX = function (find, replace) {
     return find
+        .toUpperCase()
         .split(/  +/g)
         .filter(Boolean)
         .flatMap(splitedSearchWord => {
-            const splitedText = this.split(splitedSearchWord)
-            return splitedText.flatMap((item, index) => [item, index !== splitedText.length - 1 ? replace : ''])
+            const findOriginalText = (originalText, splitedText) => {
+                const getSplitedTextIndexInOriginalText = originalText
+                    .toUpperCase()
+                    .search(splitedText.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1').toUpperCase())
+                return originalText.slice(
+                    getSplitedTextIndexInOriginalText,
+                    getSplitedTextIndexInOriginalText + splitedText.length
+                )
+            }
+
+            const splitedText = this.toUpperCase().split(splitedSearchWord)
+            return splitedText.flatMap((item, index) => [
+                findOriginalText(this, item),
+                index !== splitedText.length - 1 ? replace(findOriginalText(this, splitedSearchWord)) : ''
+            ])
         })
 }
 
@@ -29,7 +42,8 @@ const SelectOption = forwardRef(
             selectOptionsIndex,
             mainSelectId,
             parentSelectId,
-            searchText
+            searchText,
+            loadingOption
         },
         ref
     ) => {
@@ -69,7 +83,7 @@ const SelectOption = forwardRef(
                     !defaultOption
                         ? ' selected'
                         : ''
-                }`}
+                }${loadingOption ? ' loading-option' : ''}`}
                 onClick={() => {
                     if (Date.now() > pauseClickTime.current && !isOptionSubmenu) {
                         if (!defaultOption && setSelectedOption) {
@@ -84,22 +98,21 @@ const SelectOption = forwardRef(
                         pauseClickTime.current = Date.now() + 350
                         if (!multiSelect && !isOptionSubmenu) {
                             setTimeout(() => {
-                                dispatch('CLOASE_ALL_SELECT')
+                                dispatch('CLOSE_ALL_SELECT')
                             }, 450)
                         }
                     }
                 }}
             >
                 <div className={'option-content'}>
-                    <span className={'select-option-icon material-symbols-outlined'}>arrow_right</span>
+                    <span className={'select-option-icon material-symbols-outlined'}>check</span>
                     <pre className={'option-text'}>
                         {(() => {
                             const optionText = String(isOptionSubmenu ? children[0] : children)
                             return typeof optionText === 'string' && Boolean(searchText?.replace(/  +/g, ''))
-                                ? optionText.replaceJSX(
-                                      searchText.replace(/  +/g, ''),
-                                      <b>{searchText.replace(/  +/g, ' ')}</b>
-                                  )
+                                ? optionText.replaceJSX(searchText.replace(/  +/g, ''), originalText => (
+                                      <b>{originalText.replace(/  +/g, ' ')}</b>
+                                  ))
                                 : optionText
                         })()}
                     </pre>
@@ -111,13 +124,15 @@ const SelectOption = forwardRef(
         )
 
         return (
-            <div className={`select-option-container`} style={{ top: top }}>
+            <div
+                className={`select-option-container`}
+                style={{ transform: `perspective(1px) translateY(${top}px) translateZ(0)` }}
+            >
                 {isOptionSubmenu && !multiSelect ? (
                     <Select
                         className={'submenu-selector'}
                         options={children[1]}
                         index={String(parseInt(selectOptionsIndex) + 1)}
-                        enableSearch
                         mainSelectId={mainSelectId}
                         parentSelectId={parentSelectId}
                         selected={_selectedOption.at(1) ?? []}
@@ -128,7 +143,7 @@ const SelectOption = forwardRef(
                                 setDisableSelecting(true)
                                 if (isScreenMounted.current)
                                     setTimeout(() => {
-                                        dispatch('CLOASE_ALL_SELECT')
+                                        dispatch('CLOSE_ALL_SELECT')
                                     }, 450)
                             }
                         }}

@@ -1,5 +1,4 @@
 import { initStore } from '../store'
-import { deepCopy } from '../../services/deepCopy'
 import _ from 'underscore'
 
 export const initSelects = {
@@ -45,7 +44,8 @@ export const initSelects = {
             disableSelecting: false,
             setDisableSelecting: undefined,
             sort: '',
-            lastUpdate: 0
+            lastUpdate: 0,
+            loading: false
         }
     },
     selectOptions: {
@@ -77,24 +77,8 @@ const configureStore = () => {
             }
 
             const newDataNotEqualToOldData =
-                JSON.stringify({
-                    ...nextState.selectProps[data.index],
-                    lastUpdate: 0,
-                    headerText: '',
-                    selectButtonProperties: {
-                        ...nextState.selectProps[data.index]?.selectButtonProperties,
-                        offset: null
-                    }
-                }) !==
-                JSON.stringify({
-                    ...prevState.selectProps[data.index],
-                    lastUpdate: 0,
-                    headerText: '',
-                    selectButtonProperties: {
-                        ...prevState.selectProps[data.index]?.selectButtonProperties,
-                        offset: null
-                    }
-                })
+                JSON.stringify(nextState.selectProps[data.index]) !==
+                JSON.stringify(prevState.selectProps[data.index])
 
             return newDataNotEqualToOldData ? nextState : prevState
         },
@@ -124,7 +108,7 @@ const configureStore = () => {
 
             return newDataNotEqualToOldData ? nextState : prevState
         },
-        CLOASE_ALL_SELECT: prevState => {
+        CLOSE_ALL_SELECT: prevState => {
             Object.keys(prevState.selectProps).map(soKey => {
                 if (soKey !== '0') {
                     delete prevState.selectProps[soKey]

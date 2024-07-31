@@ -1,4 +1,4 @@
-@import "../../colors"
+@import "src/sass/colors"
 
 .select
     position: relative
@@ -22,7 +22,7 @@
         opacity: 0
         transition: opacity 350ms cubic-bezier(.4, .2, 0, 1)
 
-    &.options-selected
+    &.options-selected, &.show-dot
         &:after
             opacity: 1
 

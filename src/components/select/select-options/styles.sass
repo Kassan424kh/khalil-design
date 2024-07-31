@@ -1,10 +1,12 @@
-@import "src/variables"
-@import "src/colors"
+@use "src/sass/mixins" as m
+@use "src/sass/functions" as f
+@import src/sass/colors
+@import src/sass/variables
 
-$background-effect-lines: repeating-linear-gradient(45deg, rgba($nav-border-color-rgb, .3) 1px, rgba($nav-border-color-rgb, .3) 2px, transparent 2px, transparent 7px)
+$gradient-background-effect: url("../../../images/table-gradient-background-image.png")
 
 .select-options
-    @include disable-selecting
+    @include m.disable-selecting
     position: fixed
     font-family: $font-family
     display: flex
@@ -12,12 +14,12 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($nav-border-colo
     justify-content: flex-start
     padding: 15px 0 15px 15px
     background-color: $white
-    border-radius: 15px
-    border: 1px solid $nav-border-color
+    border-radius: 20px
+    border: 3px solid $white
     min-width: 250px
     width: max-content
     max-height: 300px
-    box-shadow: 0 15px 50px rgba(#000, .1)
+    box-shadow: 0 5px 10px rgba(#000, .1)
     box-sizing: border-box
     opacity: 0
     z-index: 9999999999
@@ -39,9 +41,9 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($nav-border-colo
         z-index: 50
         display: block
 
-    .tv-tool-button
+    .lhub-custom-button
         box-shadow: 0 5px 20px rgba(0, 0, 0, .04) !important
-        border: 1px solid $grey !important
+        border: 1px solid rgba($black-rgb, .75) !important
 
         > span
             color: rgba($black-rgb, .5)
@@ -51,13 +53,16 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($nav-border-colo
         content: " "
         display: block
         position: absolute
-        background: $white
+        background: $background-color
         height: 100%
         width: 100%
         z-index: -1
         top: 0
         left: 0
-        background: linear-gradient(180deg, $white -51px, $white 70px, $white 70px), $background-effect-lines
+        background: linear-gradient(180deg, rgba($white-rgb, .4) 0, $background-color 70px), $gradient-background-effect
+        background-repeat: no-repeat
+        background-position: left center
+        background-size: 250%
 
     .select-options-body
         display: contents
@@ -79,7 +84,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($nav-border-colo
 
                 > span
                     font-size: 50px
-                    color: $grey
+                    color: rgba($black-rgb, .75)
 
             .options-list
                 padding-right: 15px
@@ -101,35 +106,60 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($nav-border-colo
         text-align: center
         font-weight: bolder
         font-size: 17px
-        color: $nav-border-color
+        color: rgba($black-rgb, .8)
         margin-bottom: 0
         display: flex
         justify-content: center
         align-items: center
+
+        &:after
+            width: 85%
+            height: 2px
+            content: ""
+            display: block
+            background: rgba($white-rgb, .3)
+            position: absolute
+            border-radius: 5px
+            bottom: 0
 
         > span
             width: 100%
 
     &.show-gradient-effect
         &:before
-            background: linear-gradient(180deg, transparent -51px, $white 70px), $background-effect-lines
+            background: linear-gradient(180deg, rgba($white-rgb, .7) 0, $background-color 80px), $gradient-background-effect
+            background-repeat: no-repeat
+            background-position: left center
+            background-size: 250%
 
         &.with-search
             &:before
-                background: linear-gradient(180deg, transparent -51px, $white 70px), $background-effect-lines
+                background: linear-gradient(180deg, rgba($white-rgb, .7) 0, $background-color 80px), $gradient-background-effect
+                background-repeat: no-repeat
+                background-position: left center
+                background-size: 250%
 
         &.with-header-text
             &:before
-                background: linear-gradient(180deg, transparent -51px, $white 60px), $background-effect-lines
+                background: linear-gradient(180deg, rgba($white-rgb, .7) 0, $background-color 70px), $gradient-background-effect
+                background-repeat: no-repeat
+                background-position: left center
+                background-size: 250%
 
             &.with-search
                 &:before
-                    background: linear-gradient(180deg, transparent -51px, $white 130px), $background-effect-lines
+                    background: linear-gradient(180deg, rgba($white-rgb, .7) 0, $background-color 1340px), $gradient-background-effect
+                    background-repeat: no-repeat
+                    background-position: left center
+                    background-size: 250%
 
         &.multi-select
             &.show-selected-parallel
                 &:before
-                    background: linear-gradient(180deg, transparent -51px, $white 150px), $background-effect-lines
+                    background: linear-gradient(180deg, rgba($white-rgb, .7) 0, $background-color 160px), $gradient-background-effect
+                    background-repeat: no-repeat
+                    background-position: left center
+                    background-size: 250%
 
     .select-options-actions
         display: flex
@@ -155,7 +185,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($nav-border-colo
                 align-items: center
                 position: absolute
                 border-radius: 10px
-                border: 1px solid $grey !important
+                border: 1px solid rgba($black-rgb, .75) !important
                 background-color: $white
                 overflow: hidden
                 z-index: 22
@@ -189,7 +219,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($nav-border-colo
                         color: $black
 
                     &:first-child
-                        border-right-color: $grey !important
+                        border-right-color: rgba($black-rgb, .75) !important
 
             &.hide
                 opacity: 0
@@ -200,7 +230,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($nav-border-colo
                 box-sizing: border-box
                 line-height: 40px
                 font-size: 15px
-                border: 1px solid $grey
+                border: 1px solid rgba($black-rgb, .75)
                 position: relative
                 z-index: 20
                 background-color: $white
@@ -226,7 +256,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($nav-border-colo
 
         .close-button
             box-shadow: 0 0 0 transparent !important
-            border-color: rgba($red-rgb, .5) !important
+            border-color: rgba($green-rgb, .5) !important
             padding: 0 0 !important
             top: 0
             width: 42px
@@ -240,7 +270,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($nav-border-colo
             color: $black
             font-weight: normal
             line-height: 0
-            background: repeating-linear-gradient(45deg, rgba($red-rgb, .15) 1px, rgba($red-rgb, .15) 2px, transparent 2px, transparent 7px), $white
+            background: repeating-linear-gradient(45deg, rgba($green-rgb, .15) 1px, rgba($green-rgb, .15) 2px, transparent 2px, transparent 7px), $white
 
             .button-icon
                 font-size: 15px
@@ -248,7 +278,7 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($nav-border-colo
                 max-height: 0
                 line-height: 40px
                 padding: 0
-                color: $red
+                color: $green
                 font-variation-settings: 'FILL' 0, 'wght' 800, 'GRAD' 0, 'opsz' 48
 
     &.single-select
@@ -308,11 +338,10 @@ $background-effect-lines: repeating-linear-gradient(45deg, rgba($nav-border-colo
                     box-sizing: border-box
 
                     input
-                        position: absolute
                         width: 100%
                         line-height: 40px
                         font-size: 15px
-                        border: 1px solid $grey
+                        border: 1px solid rgba($black-rgb, .75)
                         position: relative
                         z-index: 20
                         background-color: $white

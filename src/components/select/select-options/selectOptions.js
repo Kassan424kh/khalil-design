@@ -1,8 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { initSelects } from '../../../hooks-store/configs/selectOptionsHooksStore'
-import { useStore } from '../../../hooks-store/store'
-import { getDimensions } from '../../../services/useContainerDimensions'
-import { charsWidth } from '../../../services/calcCharsWidth'
 import Button from '../../button/button'
 import TextField from '../../textfield/textfield'
 import SelectOption from './select-option/selectOption'
@@ -10,14 +6,16 @@ import './styles.sass'
 import $ from 'jquery'
 import _ from 'underscore'
 import gsap from 'gsap'
-import { useClickOutside } from '../../../services/useClickOutside'
-
+import {charsWidth} from "../../../common/calcCharsWidth";
+import {getDimensions} from "../../../common/useContainerDimensions";
+import {useStore} from "../../../hooks-store/store";
+import { initSelects } from '../../../hooks-store/configs/selectOptionsHooksStore'
 const SelectOptions = ({ index = '0' }) => {
     const [state, dispatch] = useStore()
     const { selectProps: selectPropsFromStore, selectOptions: selectOptionsFromStore } = state
     const selectOptionsGetByIndex = selectOptionsFromStore[index]
     const selectPropsGetByIndex = selectPropsFromStore[index]
-    const lengthAllSelects = Object.keys(selectPropsFromStore).length
+    const lengthAllSelects = Object.keys(selectOptionsFromStore).length
     const thisSelectIsActiveNow = lengthAllSelects - 1 <= parseInt(index)
     const [selectProps, setSelectProps] = useState(initSelects.selectProps['0'])
     const [selectOptions, setSelectOptions] = useState(initSelects.selectOptions['0'])
@@ -71,19 +69,20 @@ const SelectOptions = ({ index = '0' }) => {
                 )
                     return false
 
-            const regex = new RegExp(__searchText.toUpperCase(), 'g')
-
             const isOptionSubmenu = Array.isArray(option[1]) && option[1].length === 2
-            let optionText = isOptionSubmenu ? option[1][0] : option[1]
+            const optionText = isOptionSubmenu ? option[1][0] : option[1]
 
             // return true if there are matching parts in the publisher name which is passed as additional filter information
+            let additionalFilterInfoText = ''
             if (
                 selectPropsGetByIndex.additionalFilterInformation &&
                 option[0] in selectPropsGetByIndex.additionalFilterInformation
             )
-                optionText = selectPropsGetByIndex.additionalFilterInformation[option[0]]
+                additionalFilterInfoText = selectPropsGetByIndex.additionalFilterInformation[option[0]]
 
-            return !String(optionText ?? '')
+            const regex = new RegExp(__searchText.toUpperCase().replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g')
+
+            return !String((optionText ?? '') + ' ' + additionalFilterInfoText)
                 .toUpperCase()
                 .match(regex)
         },
@@ -336,7 +335,6 @@ const SelectOptions = ({ index = '0' }) => {
                 JSON.stringify({
                     ...selectPropsGetByIndex,
                     lastUpdate: 0,
-                    headerText: '',
                     selectButtonProperties: {
                         ...selectPropsGetByIndex.selectButtonProperties,
                         offset: null
@@ -345,7 +343,6 @@ const SelectOptions = ({ index = '0' }) => {
                     JSON.stringify({
                         ...currentSelectOptionsData,
                         lastUpdate: 0,
-                        headerText: '',
                         selectButtonProperties: {
                             ...currentSelectOptionsData.selectButtonProperties,
                             offset: null
@@ -362,10 +359,6 @@ const SelectOptions = ({ index = '0' }) => {
             }
             return currentSelectOptionsData
         })
-
-        return () => {
-            setSearchText('')
-        }
     }, [selectPropsGetByIndex, lengthAllSelects])
 
     const [optionsListWidth, setOptionsListWidth] = useState(0)
@@ -401,15 +394,18 @@ const SelectOptions = ({ index = '0' }) => {
             setListTilesInView(initListTilesInView)
             prevSelectOptions.current = options
         }
-    }, [options])
+    }, [options, selectProps.sort])
 
     // set search field focused after change selector
     const searchFieldRef = useRef()
     useEffect(() => {
         if (searchFieldRef.current && selectProps.show && selectProps.selectId) {
+            setSearchText('')
+            setSearchTextSelectedTail('')
+            setSearchTextUnselectedTail('')
             searchFieldRef.current.focus()
         }
-    }, [searchFieldRef, selectProps.show])
+    }, [searchFieldRef, selectProps.show, selectProps.selectId])
 
     const animateTimeout = useRef()
     const prevData = useRef({
@@ -423,6 +419,7 @@ const SelectOptions = ({ index = '0' }) => {
         return number + 'px'
     }
 
+    const duration = 0.1
     // animate other components before move the selectOptions window to another selector
     useEffect(() => {
         if (animateTimeout.current) clearTimeout(animateTimeout.current)
@@ -436,7 +433,7 @@ const SelectOptions = ({ index = '0' }) => {
                     maxHeight: parsePixel(selectProps.headerText ? Math.max(headerChildHeight, 35) : 0),
                     opacity: selectProps.headerText ? 1 : 0,
                     marginBottom: parsePixel(selectProps.headerText ? -15 : 0),
-                    duration: 0.2
+                    duration: duration
                 })
 
                 const $el = $(`.select-options[index="${index}"] .select-options-actions`)
@@ -448,7 +445,7 @@ const SelectOptions = ({ index = '0' }) => {
 
                 gsap.to(`.select-options[index="${index}"] .disable-pointer-events-layer`, {
                     pointerEvents: thisSelectIsActiveNow ? 'none' : 'auto',
-                    duration: 0
+                    duration: 0 //
                 })
 
                 gsap.to(`.select-options[index="${index}"] .select-options-actions`, {
@@ -457,8 +454,7 @@ const SelectOptions = ({ index = '0' }) => {
                     opacity: selectProps.enableSearch ? 1 : 0,
                     paddingTop: parsePixel(selectProps.enableSearch ? 1 : 0),
                     //pointerEvents: wasShown && selectProps.enableSearch && thisSelectIsActiveNow ? 'auto' : 'none',
-                    duration: 0.2,
-                    delay: 0.2
+                    duration: duration
                 })
 
                 gsap.to(
@@ -466,8 +462,7 @@ const SelectOptions = ({ index = '0' }) => {
                     {
                         width: !enableSelectAllButton ? 'calc(100%)' : '100%',
                         paddingLeft: parsePixel(enableSelectAllButton ? 95 : 10),
-                        duration: 0.2,
-                        delay: 0.2
+                        duration: duration
                     }
                 )
 
@@ -476,8 +471,7 @@ const SelectOptions = ({ index = '0' }) => {
                     {
                         opacity: selectProps.showSelectedParallel ? 0 : 1,
                         //pointerEvents: !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
-                        duration: 0.2,
-                        delay: 0.2
+                        duration: duration
                     }
                 )
 
@@ -485,9 +479,9 @@ const SelectOptions = ({ index = '0' }) => {
                     `.select-options[index="${index}"] .select-options-actions .select-options-search-field .clear-button`,
                     {
                         opacity: selectProps.showSelectedParallel ? 0 : 1,
-                        //pointerEvents: !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
-                        duration: 0.2,
-                        delay: 0.2
+                        pointerEvents:
+                            !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
+                        duration: duration
                     }
                 )
 
@@ -496,18 +490,17 @@ const SelectOptions = ({ index = '0' }) => {
                     {
                         borderTopRightRadius: parsePixel(selectProps.showSelectedParallel ? 10 : 0),
                         borderBottomRightRadius: parsePixel(selectProps.showSelectedParallel ? 10 : 0),
-                        //pointerEvents: wasShown && enableSelectAllButton && thisSelectIsActiveNow ? 'auto' : 'none',
+                        pointerEvents: wasShown && enableSelectAllButton && thisSelectIsActiveNow ? 'auto' : 'none',
                         opacity: enableSelectAllButton ? 1 : 0,
                         translateX: parsePixel(enableSelectAllButton ? 0 : -20),
-                        duration: 0.2,
-                        delay: 0.2,
+                        duration: duration,
                         onComplete: () => {
                             setUpdateSelectPropsTimes(_ => _ + 1)
                         }
                     }
                 )
             },
-            selectProps.show ? 150 : 0
+            selectProps.show ? (duration + 0.05) * 100 : 0
         )
 
         return () => clearTimeout(animateTimeout.current)
@@ -517,39 +510,30 @@ const SelectOptions = ({ index = '0' }) => {
         const optionsProperties = getDimensions({
             ref: myRef
         })
-        const x = moveHorizontal(
-            optionsProperties,
-            `${
-                selectProps.selectButtonProperties?.offset
-                    ? selectProps.selectButtonProperties.offset.left + selectProps.selectButtonProperties.width
-                    : 0
-            }px`,
-            `${
-                selectProps.selectButtonProperties.offset
-                    ? selectProps.selectButtonProperties.offset.left - optionsProperties.width
-                    : 0
-            }px`,
-            selectProps.selectButtonProperties.offset
-                ? selectProps.selectButtonProperties.offset.left -
-                      optionsProperties.width / 2 +
-                      selectProps.selectButtonProperties.width / 2
-                : 0
-        )
+        let x = moveHorizontal(optionsProperties, `0px`, `0px`, 0)
+        let y = moveVertikal(optionsProperties, `0px`, `0px`, `0px`)
 
-        const y = moveVertikal(
-            optionsProperties,
-            `${
-                selectProps.selectButtonProperties.offset
-                    ? selectProps.selectButtonProperties.offset.top + selectProps.selectButtonProperties.height
-                    : 0
-            }px`,
-            `${
-                selectProps.selectButtonProperties.offset
-                    ? selectProps.selectButtonProperties.offset.top - optionsProperties.height
-                    : 0
-            }px`,
-            `${selectProps.selectButtonProperties.top}px`
-        )
+        if (selectProps.selectButtonProperties?.offset) {
+            x = parseInt(
+                moveHorizontal(
+                    optionsProperties,
+                    `${selectProps.selectButtonProperties.offset.left + selectProps.selectButtonProperties.width}px`,
+                    `${selectProps.selectButtonProperties.offset.left - optionsProperties.width}px`,
+                    selectProps.selectButtonProperties.offset.left -
+                        optionsProperties.width / 2 +
+                        selectProps.selectButtonProperties.width / 2
+                )
+            )
+            y = parseInt(
+                moveVertikal(
+                    optionsProperties,
+                    `${selectProps.selectButtonProperties.offset.top + selectProps.selectButtonProperties.height}px`,
+                    `${selectProps.selectButtonProperties.offset.top - optionsProperties.height}px`,
+                    `${selectProps.selectButtonProperties.top}px`
+                )
+            )
+        }
+
         return { x, y }
     }
 
@@ -573,65 +557,61 @@ const SelectOptions = ({ index = '0' }) => {
 
         gsap.to(`.select-options[index="${index}"] .select-options-column .options-list`, {
             width: optionWidth + 75,
-            duration: 0.2
+            duration: duration
         })
 
-        firstRenderTimeout.current = setTimeout(() => {
-            let nextXY = getNextXY()
-            const { x, y } = nextXY
-            const distance = Math.sqrt(
-                Math.pow(parseFloat(prevX) - parseFloat(x), 2) + Math.pow(parseFloat(prevY) - parseFloat(y), 2)
-            )
-            const distanceToSeconds = Math.min(Math.max((distance / 50) * 0.04, 0.1), 0.25)
-
-            const _toggleSelectOptions = () => {
-                gsap.to(`.select-options[index="${index}"]`, {
-                    opacity: selectProps.show ? 1 : 0,
-                    pointerEvents: selectProps.show ? 'auto' : 'none',
-                    duration: selectProps.show ? distanceToSeconds : 0.05,
-                    onComplete: () => {
-                        prevData.current = {
-                            wasClosed: !selectProps.show,
-                            showSelectedParallel: selectProps.showSelectedParallel,
-                            x: x,
-                            y: y,
-                            lengthAllSelects: lengthAllSelects
-                        }
-                        firstTimeRender.current = false
-                    }
-                })
-            }
-
-            if (prevShowSelectedParallel || wasClosed || !selectProps.showSelectedParallel) {
-                gsap.to(`.select-options[index="${index}"] .select-options-column .options-list`, {
-                    width: optionWidth + 75,
-                    duration: 0,
-                    onComplete: () => {
-                        nextXY = getNextXY()
-                        const { x, y } = nextXY
-                        gsap.to(`.select-options[index="${index}"]`, {
-                            x: selectProps.show ? x : prevX,
-                            y: selectProps.show ? y : prevY,
-                            duration: 0.35,
-                            delay: 0.2,
-                            onComplete: () => {
-                                _toggleSelectOptions()
+        firstRenderTimeout.current = setTimeout(
+            () => {
+                let nextXY = getNextXY()
+                const { x, y } = nextXY
+                const _toggleSelectOptions = () => {
+                    gsap.to(`.select-options[index="${index}"]`, {
+                        opacity: selectProps.show ? 1 : 0,
+                        pointerEvents: selectProps.show ? 'auto' : 'none',
+                        duration: selectProps.show ? duration : 0.05,
+                        onComplete: () => {
+                            prevData.current = {
+                                wasClosed: !selectProps.show,
+                                showSelectedParallel: selectProps.showSelectedParallel,
+                                x: x,
+                                y: y,
+                                lengthAllSelects: lengthAllSelects
                             }
-                        })
-                    }
-                })
-            } else {
-                gsap.to(`.select-options[index="${index}"]`, {
-                    x: selectProps.show ? x : prevX,
-                    y: selectProps.show ? y : prevY,
-                    delay: 0.2,
-                    duration: selectProps.show && !wasClosed ? distanceToSeconds : 0,
-                    onComplete: () => {
-                        _toggleSelectOptions()
-                    }
-                })
-            }
-        }, 150)
+                            if (selectProps.show) firstTimeRender.current = false
+                        }
+                    })
+                }
+
+                if (prevShowSelectedParallel) {
+                    gsap.to(`.select-options[index="${index}"] .select-options-column .options-list`, {
+                        width: optionWidth + 75,
+                        duration: 0,
+                        onComplete: () => {
+                            nextXY = getNextXY()
+                            const { x, y } = nextXY
+                            gsap.to(`.select-options[index="${index}"]`, {
+                                x: selectProps.show ? x : prevX,
+                                y: selectProps.show ? y : prevY,
+                                duration: duration,
+                                onComplete: () => {
+                                    _toggleSelectOptions()
+                                }
+                            })
+                        }
+                    })
+                } else {
+                    gsap.to(`.select-options[index="${index}"]`, {
+                        x: selectProps.show ? x : prevX,
+                        y: selectProps.show ? y : prevY,
+                        duration: selectProps.show && !wasClosed ? duration : 0,
+                        onComplete: () => {
+                            _toggleSelectOptions()
+                        }
+                    })
+                }
+            },
+            selectProps.show ? (firstTimeRender.current ? 550 : duration * 100) : 0
+        )
 
         return () => clearTimeout(firstRenderTimeout.current)
     }, [
@@ -762,6 +742,14 @@ const SelectOptions = ({ index = '0' }) => {
         return () => clearTimeout(resetListTileInViewsTimeout.current)
     }, [searchText, searchTextSelectedTail, searchTextUnselectedTail, viewportOptionsIds, selectProps.selectedOption])
 
+    const _searchText = viewport =>
+        selectProps.multiSelect && selectProps.showSelectedParallel
+            ? {
+                  1: searchTextUnselectedTail,
+                  3: searchTextSelectedTail
+              }[viewport]
+            : searchText
+
     return (
         <div
             ref={myRef}
@@ -833,12 +821,12 @@ const SelectOptions = ({ index = '0' }) => {
                             />
                         }
                         value={searchText}
-                        placeholder={selectProps.searchPlaceHolder ?? 'finde options'}
+                        placeholder={selectProps.searchPlaceHolder ?? "search"}
                         onChange={setSearchText}
                     />
                     <Button
                         className={'close-button'}
-                        leftIcon={'close'}
+                        leftIcon={'done'}
                         onClick={() => {
                             closeSelectOptions()
                         }}
@@ -857,10 +845,12 @@ const SelectOptions = ({ index = '0' }) => {
                                         inputRef={
                                             viewport === 3 || !selectProps.enableSearch || !thisSelectIsActiveNow
                                                 ? null
-                                                : r => (searchFieldRef.current = r)
+                                                : r => {
+                                                      searchFieldRef.current = r
+                                                  }
                                         }
                                         value={viewport === 1 ? searchTextUnselectedTail : searchTextSelectedTail}
-                                        placeholder={selectProps.searchPlaceHolder ?? 'finde options'}
+                                        placeholder={selectProps.searchPlaceHolder ?? "search"}
                                         onChange={_searchText => {
                                             if (viewport === 1) {
                                                 setSearchTextUnselectedTail(_searchText)
@@ -904,86 +894,92 @@ const SelectOptions = ({ index = '0' }) => {
                                     </div>
                                 ) : null}
 
-                                {(() => {
-                                    return (
+                                {
+                                    <div
+                                        key={viewport}
+                                        className={`options-list ${viewport}-ct select-index-${index}`}
+                                        onScroll={e => {
+                                            handleScrollingOptionsList(
+                                                e,
+                                                String(viewport),
+                                                viewportOptionsIds[String(viewport)]
+                                            )
+                                        }}
+                                    >
                                         <div
-                                            key={viewport}
-                                            className={`options-list ${viewport}-ct select-index-${index}`}
-                                            onScroll={e => {
-                                                handleScrollingOptionsList(
-                                                    e,
-                                                    String(viewport),
-                                                    viewportOptionsIds[String(viewport)]
-                                                )
+                                            style={{
+                                                minHeight:
+                                                    selectProps.loading && !selectOptions.length
+                                                        ? selectProps.defaultOption
+                                                            ? 80
+                                                            : 40
+                                                        : parsePixel(viewportOptionsIds[String(viewport)].length * 40)
                                             }}
                                         >
-                                            <div
-                                                style={{
-                                                    minHeight: parsePixel(
-                                                        viewportOptionsIds[String(viewport)].length * 40
-                                                    )
-                                                }}
-                                            >
-                                                {selectProps.defaultOption && viewport === 1 ? (
+                                            {selectProps?.loading && !selectOptions.length ? (
+                                                <SelectOption
+                                                    id={'loading'}
+                                                    top={selectProps.defaultOption ? 40 : 0}
+                                                    disableSelecting={selectProps.disableSelecting}
+                                                    setDisableSelecting={selectProps.setDisableSelecting}
+                                                    selectedOption={selectProps.selectedOption}
+                                                    setSelectedOption={selectProps.setSelectedOption}
+                                                    loadingOption
+                                                >
+                                                    Loading items...
+                                                </SelectOption>
+                                            ) : null}
+                                            {selectProps.defaultOption && viewport === 1 && !_searchText(viewport) ? (
+                                                <SelectOption
+                                                    id={''}
+                                                    disableSelecting={selectProps.disableSelecting}
+                                                    setDisableSelecting={selectProps.setDisableSelecting}
+                                                    selectedOption={selectProps.selectedOption}
+                                                    setSelectedOption={selectProps.setSelectedOption}
+                                                    hide={selectProps.searchText}
+                                                    defaultOption
+                                                >
+                                                    {selectProps.defaultOptionText ?? 'Select a option'}
+                                                </SelectOption>
+                                            ) : null}
+
+                                            {sortedOptions.map(option => {
+                                                const indexOfShownOption = viewportOptionsIds[String(viewport)].indexOf(
+                                                    String(option[0])
+                                                )
+                                                return listTilesInView[String(viewport)].includes(
+                                                    String(indexOfShownOption)
+                                                ) ? (
                                                     <SelectOption
-                                                        id={''}
+                                                        key={option[0]}
+                                                        id={option[0]}
+                                                        top={
+                                                            (indexOfShownOption +
+                                                                (selectProps.defaultOption &&
+                                                                viewport === 1 &&
+                                                                !_searchText(viewport)
+                                                                    ? 1
+                                                                    : 0)) *
+                                                            40
+                                                        }
+                                                        mainSelectId={selectProps.mainSelectId ?? selectProps.selectId}
+                                                        parentSelectId={selectProps.selectId}
+                                                        selectOptionsIndex={index}
                                                         disableSelecting={selectProps.disableSelecting}
                                                         setDisableSelecting={selectProps.setDisableSelecting}
+                                                        multiSelect={selectProps.multiSelect}
                                                         selectedOption={selectProps.selectedOption}
                                                         setSelectedOption={selectProps.setSelectedOption}
-                                                        hide={selectProps.searchText}
-                                                        defaultOption
+                                                        hide={hideOption(option, viewport)}
+                                                        searchText={_searchText(viewport)}
                                                     >
-                                                        {selectProps.defaultOptionText ?? 'Select a option'}
+                                                        {option[1]}
                                                     </SelectOption>
-                                                ) : null}
-
-                                                {sortedOptions.map(option => {
-                                                    const indexOfShownOption = viewportOptionsIds[
-                                                        String(viewport)
-                                                    ].indexOf(String(option[0]))
-                                                    return listTilesInView[String(viewport)].includes(
-                                                        String(indexOfShownOption)
-                                                    ) ? (
-                                                        <SelectOption
-                                                            key={option[0]}
-                                                            id={option[0]}
-                                                            top={
-                                                                (indexOfShownOption +
-                                                                    (selectProps.defaultOption && viewport === 1
-                                                                        ? 1
-                                                                        : 0)) *
-                                                                40
-                                                            }
-                                                            mainSelectId={
-                                                                selectProps.mainSelectId ?? selectProps.selectId
-                                                            }
-                                                            parentSelectId={selectProps.selectId}
-                                                            selectOptionsIndex={index}
-                                                            disableSelecting={selectProps.disableSelecting}
-                                                            setDisableSelecting={selectProps.setDisableSelecting}
-                                                            multiSelect={selectProps.multiSelect}
-                                                            selectedOption={selectProps.selectedOption}
-                                                            setSelectedOption={selectProps.setSelectedOption}
-                                                            hide={hideOption(option, viewport)}
-                                                            searchText={
-                                                                selectProps.multiSelect &&
-                                                                selectProps.showSelectedParallel
-                                                                    ? {
-                                                                          1: searchTextUnselectedTail,
-                                                                          3: searchTextSelectedTail
-                                                                      }[viewport]
-                                                                    : searchText
-                                                            }
-                                                        >
-                                                            {option[1]}
-                                                        </SelectOption>
-                                                    ) : null
-                                                })}
-                                            </div>
+                                                ) : null
+                                            })}
                                         </div>
-                                    )
-                                })()}
+                                    </div>
+                                }
                             </div>
                         ) : (
                             <div key={viewport} className={'vertical-rule'} />

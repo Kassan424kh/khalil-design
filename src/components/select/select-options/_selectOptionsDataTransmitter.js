@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useStore } from '../../../hooks-store/store'
 import _ from 'underscore'
+import { useStore } from '../../../hooks-store/store'
 
 const SelectOptionsDataTransmitter = ({
     mainSelectId,
@@ -32,7 +32,8 @@ const SelectOptionsDataTransmitter = ({
     updatePosition,
     selectMouseEnter,
     updateOptionsProperties,
-    index
+    index,
+    loading
 }) => {
     const [disableSelecting, setDisableSelecting] = useState(false)
     const [{ selectProps }, dispatch] = useStore()
@@ -80,9 +81,11 @@ const SelectOptionsDataTransmitter = ({
             clearSelectedOptions: clearSelectedOptions,
             disableSelecting: disableSelecting,
             setDisableSelecting: setDisableSelecting,
-            lastUpdate: clicked,
+            lastUpdate: selectMouseEnter,
             sort: sort,
             index: index,
+
+            loading,
             ...(mainSelectId && parentSelectId
                 ? {
                       mainSelectId: mainSelectId,
@@ -90,18 +93,28 @@ const SelectOptionsDataTransmitter = ({
                   }
                 : {})
         })
-    }, [additionalFilterInformation, showSelectedParallel, clearSelectedOptions, disableSelecting, clicked, show])
+    }, [
+        additionalFilterInformation,
+        showSelectedParallel,
+        clearSelectedOptions,
+        disableSelecting,
+        clicked,
+        selectMouseEnter,
+        show,
+        loading,
+        headerText
+    ])
 
     const prevSelectedOption = useRef()
     useEffect(() => {
         if (selectedOption && !_.isEqual(selectedOption, prevSelectedOption.current)) {
             dispatch('UPDATE_SELECT_PROPS', {
                 selectedOption: selectedOption,
-                index: index
+                index: index,
             })
             prevSelectedOption.current = selectedOption
         }
-    }, [selectedOption])
+    }, [selectedOption, headerText])
 
     // set and update options
     useEffect(() => {

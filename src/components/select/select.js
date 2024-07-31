@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, {memo, useCallback, useEffect, useRef, useState} from 'react'
 import SelectOptionsDataTransmitter from './select-options/_selectOptionsDataTransmitter'
 import './styles.sass'
 import $ from 'jquery'
-import { useContainerDimensions } from '../../services/useContainerDimensions'
 import { v4 as uuidv4 } from 'uuid'
-import { useClickOutside } from '../../services/useClickOutside'
 import _ from 'underscore'
 import { useStore } from '../../hooks-store/store'
+import { useContainerDimensions } from '../../common/useContainerDimensions'
+import { useClickOutside } from '../../common/useClickOutside'
 
 /**
  * <b>options:</b> Should be a list of (Strings) e.g. ["1", ...], or object with keys and values of (Strings) e.g. {"0": "1", ...}
@@ -48,6 +48,7 @@ const Select = ({
     toggleAllOptions,
     selectAllOptions,
     enableSelectedStatusDot,
+    statusDotWithoutSelectOptions = false,
     showSelectedParallel,
     selectOptionsClassName,
     headerText,
@@ -63,6 +64,7 @@ const Select = ({
     defaultOptionText,
     sort,
     children,
+    loading,
     index = '0', // used only for submenus
     ...props
 }) => {
@@ -70,6 +72,7 @@ const Select = ({
 
     // hook store
     const [{ selectProps }, dispatch] = useStore()
+
     const { selectId: selectIdParentSelectElement } = selectProps['0'] ?? { selectId: uuidv4() }
     const { selectId: selectIdOnStore, show: showOnStore } = selectProps[index] ?? {
         show: false,
@@ -95,17 +98,15 @@ const Select = ({
     useEffect(() => {
         if (open) {
             setClick(Date.now())
-            setHover(Date.now())
+            dispatch('OPEN_SELECT', index)
         }
     }, [open])
 
     // close selectOptions window
     useEffect(() => {
         if (close) {
-            dispatch('CLOASE_ALL_SELECT')
+            dispatch('CLOSE_ALL_SELECT')
             dispatch('DELETE_ALL_SUB_SELECT')
-
-            return () => clearTimeout(t)
         }
     }, [close])
 
@@ -161,6 +162,13 @@ const Select = ({
     useEffect(() => {
         if (onActive) onActive(isOpen)
         showSelectOptionsRef.current = isOpen
+        if (!isOpen) {
+            const t = setTimeout(() => {
+                setClick(undefined)
+            }, 150)
+
+            return () => clearTimeout(t)
+        }
     }, [isOpen])
 
     // clear all selected options from outside
@@ -220,35 +228,33 @@ const Select = ({
         <div
             {...props}
             ref={ele => (myRef.current[0] = ele)}
-            className={`select disable-selecting ${className ? className : ''} ${isOpen ? ' active' : ''} ${
+            className={`select disable-selecting ${className ? className : ''}${isOpen ? ' active' : ''}${
                 _selectedOption.length &&
                 _options.filter(([_optionKey, _]) => _optionKey === _selectedOption[0]).length &&
                 enableSelectedStatusDot
-                    ? 'options-selected'
+                    ? ' options-selected'
                     : ''
-            }`}
+            }${statusDotWithoutSelectOptions && enableSelectedStatusDot ? ' show-dot' : ''}`}
             id={selectId}
             index={index}
             onMouseEnter={() => {
                 setSelectMouseEnter(true)
             }}
             onMouseMove={() => {
-                setSelectMouseEnter(true)
-
-                clearTimeout(hoverTimeout.current)
-                hoverTimeout.current = setTimeout(() => {
-                    setHover(Date.now())
-                }, 350)
+                setHover(Date.now())
             }}
             onMouseLeave={() => {
                 setSelectMouseEnter(false)
             }}
-            onMouseUp={() => {
-                setClick(Date.now())
+            onClick={() => {
                 dispatch('OPEN_SELECT', index)
+                setClick(Date.now())
+                setTimeout(() => {
+                    setClick(Date.now())
+                }, 50)
             }}
         >
-            <div ref={ele => (myRef.current[1] = ele)}>{children} </div>
+            <div>{children}</div>
             {click ? (
                 <SelectOptionsDataTransmitter
                     selectId={selectId}
@@ -296,6 +302,7 @@ const Select = ({
                     clearSelectedOptions={''}
                     sort={sort}
                     index={index}
+                    loading={loading}
                 />
             ) : null}
         </div>
