@@ -1,55 +1,116 @@
 @import "../../../../colors"
 
-.select-option
-    padding: 10px
-    color: rgba(0, 0, 0, .8)
-    background-color: transparent
-    transition: all 350ms cubic-bezier(.4, .2, 0, 1)
-    border-radius: 5px
-    display: flex
-    justify-content: flex-start
-    align-items: center
-    position: relative
-    cursor: pointer
-    overflow: hidden
+.select-option-container
+    position: absolute
+    top: 0
     width: 100%
-    box-sizing: border-box
+    min-height: max-content
+    height: max-content
+    max-height: max-content
 
-    > pre
-        padding-right: 10px
-        font-size: 14px
-        color: #888
+    .submenu-selector
+        pointer-events: inherit
+        display: inline
+
+        > div
+            display: contents
+
+    .select-option
+        padding: 0 15px
+        padding-left: 30px
+        color: rgba(0, 0, 0, .8)
+        background-color: transparent
+        transition-duration: 350ms
+        transition-timing-function: cubic-bezier(.4, .2, 0, 1)
+        transition-property: height, opacity
+        display: flex
+        align-items: center
+        position: relative
+        cursor: pointer
         overflow: hidden
+        width: calc(100% - 15px)
+        height: 40px
+        box-sizing: border-box
+        border: 1px solid rgba($blue-rgb, 0)
+        border-radius: 5px
 
-    &.default-option
-        > pre
-            color: #888
+        .option-content
+            display: flex
+            align-items: center
+            min-width: max-content
+            width: max-content
+            max-width: max-content
 
-    &.hide-option
-        height: 0
-        padding: 0 10px
-        opacity: 0
+            .option-text
+                font-size: 14px
+                color: rgba($black-rgb, .6)
+                position: relative
+                left: -15px
+                transition: left 350ms cubic-bezier(.4, .2, 0, 1), opacity 350ms cubic-bezier(.4, .2, 0, 1) 350ms
+                line-height: 0
+                overflow: inherit
 
-    .select-option-icon
-        transition: all 350ms cubic-bezier(.4, .2, 0, 1)
-        width: 25px
-        font-size: 20px
-        color: $blue
-        position: absolute
-        left: -20px
-        opacity: 0
+                > b
+                    color: rgba($yellow-rgb, .8)
+                    background: repeating-linear-gradient(45deg, rgba($yellow-rgb, .2) 1px, rgba($yellow-rgb, .2) 2px, transparent 2px, transparent 7px)
+                    border: 1px solid rgba($yellow-rgb, .2)
+                    border-radius: 5px
 
-    &:hover
-        > pre
-            color: $black
-        background-color: rgba(0, 0, 0, .02)
+            .select-option-icon
+                position: absolute
+                transition: left 350ms cubic-bezier(.4, .2, 0, 1), opacity 0 cubic-bezier(.4, .2, 0, 1) 0
+                width: 25px
+                font-size: 15px
+                color: $blue
+                left: -20px
+                opacity: 0
 
-    &.selected
-        padding-left: 25px
-        width: 100%
-        > pre
-            color: $black
+                &.submenu
+                    opacity: 1
+                    right: 12px
+                    left: auto
+                    color: $black
+                    left: auto
+                    font-size: 15px
+                    opacity: .8
+                    width: max-content
 
-        .select-option-icon
-            opacity: 1
-            left: 2.5px
+        &.default-option
+            .option-text
+                color: rgba($black-rgb, .6)
+
+        &.hide-option
+            opacity: 0
+            pointer-events: none
+
+            .option-text
+                opacity: 0
+                transition: left 350ms cubic-bezier(.4, .2, 0, 1), opacity 350ms cubic-bezier(.4, .2, 0, 1) 350ms
+
+            .select-option-icon
+                opacity: 0
+                transition: left 350ms cubic-bezier(.4, .2, 0, 1), opacity 350ms cubic-bezier(.4, .2, 0, 1) 350ms
+
+        &.selected
+
+            .option-text
+                color: $black
+                left: 0
+
+            .select-option-icon
+                opacity: 1
+                left: 7px
+
+                &.submenu
+                    opacity: .8
+                    right: 12px
+                    left: auto
+
+        &.hide-option
+            pointer-events: none
+
+        &:hover, &.hover-effect
+            background-color: $blue-light
+
+            .option-text
+                color: $blue

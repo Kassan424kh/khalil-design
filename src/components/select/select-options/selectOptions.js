@@ -1,714 +1,1004 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { defaultSelectOptionsData } from "../../../hooks-store/configs/selectOptionsHooksStore";
-import { useStore } from "../../../hooks-store/store";
-import { useContainerDimensions } from "../../../services/useContainerDimensions";
-import Button from "../../button/button";
-import TextField from "../../textfield/textfield";
-import SelectOption from "./select-option/selectOption";
-import "./styles.sass";
-import { useClickOutside } from "../../../services/useClickOutside";
-import $ from "jquery";
-import _ from "underscore";
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { initSelects } from '../../../hooks-store/configs/selectOptionsHooksStore'
+import { useStore } from '../../../hooks-store/store'
+import { getDimensions } from '../../../services/useContainerDimensions'
+import { charsWidth } from '../../../services/calcCharsWidth'
+import Button from '../../button/button'
+import TextField from '../../textfield/textfield'
+import SelectOption from './select-option/selectOption'
+import './styles.sass'
+import $ from 'jquery'
+import _ from 'underscore'
+import gsap from 'gsap'
+import { useClickOutside } from '../../../services/useClickOutside'
 
-const SelectOptions = () => {
-  const state = useStore()[0];
-  const [selectOptionsData, setSelectOptionsData] = useState(
-    defaultSelectOptionsData.selectOptions
-  );
-  const dispatch = useStore(false)[1];
+const SelectOptions = ({ index = '0' }) => {
+    const [state, dispatch] = useStore()
+    const { selectProps: selectPropsFromStore, selectOptions: selectOptionsFromStore } = state
+    const selectOptionsGetByIndex = selectOptionsFromStore[index]
+    const selectPropsGetByIndex = selectPropsFromStore[index]
+    const lengthAllSelects = Object.keys(selectPropsFromStore).length
+    const thisSelectIsActiveNow = lengthAllSelects - 1 <= parseInt(index)
+    const [selectProps, setSelectProps] = useState(initSelects.selectProps['0'])
+    const [selectOptions, setSelectOptions] = useState(initSelects.selectOptions['0'])
+    const [updateSelectPropsTimes, setUpdateSelectPropsTimes] = useState(0)
+    const [searchText, setSearchText] = useState('')
+    const [searchTextSelectedTail, setSearchTextSelectedTail] = useState('')
+    const [searchTextUnselectedTail, setSearchTextUnselectedTail] = useState('')
+    const _charsWidth = useState(charsWidth())[0]
+    const initListTilesInView = {
+        1: Object.keys([...Array(16)]), // key is the viewport on parallel view, item is list of options indexes can render in view
+        3: Object.keys([...Array(16)]) // same ^
+    }
+    const [listTilesInView, setListTilesInView] = useState(initListTilesInView)
 
-  const closeSelectOptions = () => {
-    dispatch("UPDATE_DATA", {
-      show: false,
-      lastUpdate: Date.now()
-    });
-  };
+    // handle select closing
+    const closeSelectOptions = () => {
+        if (index === '0') {
+            dispatch('CLOSE_SELECT', index)
+        } else dispatch('DELETE_SUB_SELECT', index)
+    }
 
-  const [allOptionsWasSelected, setAllOptionsWasSelected] = useState(false);
-  const [searchText, setSearchText] = useState("");
-  const [selectButtonProperties, setSelectButtonProperties] = useState(
-    defaultSelectOptionsData.selectOptions.selectButtonProperties
-  );
+    // check if option was selected
+    const wasSelected = option => {
+        return (
+            selectProps.selectedOption &&
+            (() => {
+                if (selectProps.selectedOption.length)
+                    return selectProps.multiSelect
+                        ? (() => {
+                              const foundSelectedOption = selectProps.selectedOption.filter(_option => {
+                                  return _option[0] === option[0]
+                              })[0]
+                              return foundSelectedOption ? foundSelectedOption[0] === option[0] : false
+                          })()
+                        : selectProps.selectedOption[0] === option[0]
+                else return false
+            })()
+        )
+    }
 
-  const [maxOptionTextWidth, setMaxOptionTextWidth] = useState(0);
-  const optionTextRefs = useRef({});
+    // finde optinos after modify search text
+    const myRef = useRef()
+    const foundOptions = useCallback(
+        (__searchText, option) => {
+            const optionWasSelected = wasSelected(option)
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      Object.entries(optionTextRefs.current).forEach(([key, value], index) => {
-        setMaxOptionTextWidth((oldWidth) =>
-          value && value.scrollWidth > oldWidth ? value.scrollWidth : oldWidth
-        );
-      });
-    }, 10);
-    return () => clearTimeout(t);
-  }, [selectOptionsData.options]);
+            if (selectProps.multiSelect && selectProps.showSelectedParallel && selectProps.filterOnly)
+                if (
+                    (!optionWasSelected && selectProps.filterOnly === 'selected') ||
+                    (optionWasSelected && selectProps.filterOnly === 'unselected')
+                )
+                    return false
 
-  useEffect(() => {
-    setMaxOptionTextWidth(0);
-    optionTextRefs.current = {};
-  }, [selectOptionsData.options]);
+            const regex = new RegExp(__searchText.toUpperCase(), 'g')
 
-  const [updateOffset, setUpdateOffset] = useState();
-  const updateOffsetTimeout = useRef();
-  useEffect(() => {
-    clearTimeout(updateOffsetTimeout.current);
+            const isOptionSubmenu = Array.isArray(option[1]) && option[1].length === 2
+            let optionText = isOptionSubmenu ? option[1][0] : option[1]
 
-    updateOffsetTimeout.current = setTimeout(() => {
-      setUpdateOffset(Date.now());
-    }, 100);
-    return () => clearTimeout(updateOffsetTimeout.current);
-  }, [selectOptionsData.options]);
-
-  const myRef = useRef();
-  const optionsProperties = useContainerDimensions({
-    ref: myRef,
-    duration: 150,
-    update: [selectOptionsData.options, maxOptionTextWidth, updateOffset]
-  });
-
-  useEffect(() => {
-    setAllOptionsWasSelected(
-      Object.entries(selectOptionsData.options).length ===
-        selectOptionsData.length
-    );
-  }, [selectOptionsData, selectOptionsData.options]);
-
-  useEffect(() => {
-    setAllOptionsWasSelected(
-      Object.entries(selectOptionsData.options ?? []).length ===
-        (selectOptionsData.selectedOption ?? []).length
-    );
-  }, [
-    selectOptionsData,
-    selectOptionsData.selectedOption,
-    selectOptionsData.options
-  ]);
-
-  const foundOptions = useCallback(
-    (searchText, option, searchEveryWare = false) => {
-      return !searchText
-        .toUpperCase()
-        .split(" ")
-        .filter((word) => word)
-        .some((r) => {
-          const optionWasSelected = selectOptionsData.selectedOption.filter(
-            (selectedOption) => selectedOption[0] === option[0]
-          ).length;
-
-          if (
-            selectOptionsData.multiSelect &&
-            selectOptionsData.showSelectedParallel &&
-            selectOptionsData.filterOnly
-          )
+            // return true if there are matching parts in the publisher name which is passed as additional filter information
             if (
-              (!optionWasSelected &&
-                selectOptionsData.filterOnly === "selected") ||
-              (optionWasSelected &&
-                selectOptionsData.filterOnly === "unselected")
+                selectPropsGetByIndex.additionalFilterInformation &&
+                option[0] in selectPropsGetByIndex.additionalFilterInformation
             )
-              return true;
+                optionText = selectPropsGetByIndex.additionalFilterInformation[option[0]]
 
-          // return true if there are matching parts in the publisher name which is passed as additional filter information
-          if (
-            state.selectOptions.additionalFilterInformation &&
-            option[0] in state.selectOptions.additionalFilterInformation
-          )
-            if (
-              state.selectOptions.additionalFilterInformation[option[0]]
-                .toString()
+            return !String(optionText ?? '')
                 .toUpperCase()
-                .split(" ")
-                .filter((word) => {
-                  if (searchEveryWare) {
-                    const regex = new RegExp(r, "g");
-                    return word && word.match(regex);
-                  } else {
-                    return word.startsWith(r) ? word : "";
-                  }
-                }).length
-            )
-              return true;
+                .match(regex)
+        },
+        [selectProps.selectedOption, searchText, searchTextSelectedTail, searchTextUnselectedTail]
+    )
 
-          // return true if there are matching parts of the media name
-          return option[1]
-            .toString()
-            .toUpperCase()
-            .split(" ")
-            .filter((word) => {
-              if (searchEveryWare) {
-                const regex = new RegExp(r, "g");
-                return word && word.match(regex);
-              } else {
-                return word.startsWith(r) ? word : "";
-              }
-            }).length;
-        });
-    },
-    [selectOptionsData.selectedOption]
-  );
+    const moveVertikal = (
+        optionsProperties,
+        topPosition,
+        bottomPosition = 15,
+        defaultPosition = 0,
+        effectUsage = false
+    ) => {
+        if (selectProps.selectButtonProperties?.offset) {
+            const // directions
+                directions = selectProps.openDirections,
+                directionTop = selectProps.openDirections.top,
+                directionBottom = selectProps.openDirections.bottom,
+                // window
+                windowHeight = window.innerHeight,
+                // select
+                selectHeight = selectProps.selectButtonProperties.height,
+                selectTop = selectProps.selectButtonProperties.offset.top,
+                selectBottom = selectProps.selectButtonProperties.offset.bottom,
+                // selectOptions
+                selectOptionsHeight = optionsProperties.height,
+                selectOptionsTop = optionsProperties.top,
+                selectOptionsBottom = optionsProperties.bottom
 
-  const stylePositionBetweenTopAndBottom = (
-    topHiddenNummber,
-    bottomHiddenNummber = 15,
-    defaultNumber = 0,
-    forEffects = false
-  ) => {
-    if (selectButtonProperties.offset) {
-      const // directions
-        directions = selectOptionsData.openDirections,
-        directionTop = selectOptionsData.openDirections.top,
-        directionBottom = selectOptionsData.openDirections.bottom,
-        // window
-        windowHeight = window.innerHeight,
-        // select
-        selectHeight = selectButtonProperties.height,
-        selectTop = selectButtonProperties.offset.top,
-        selectBottom = selectButtonProperties.offset.bottom,
-        // selectOptions
-        selectOptionsHeight = optionsProperties.height,
-        selectOptionsTop = optionsProperties.top,
-        selectOptionsBottom = optionsProperties.bottom;
-
-      if ((directions && directionTop && directionBottom) || !directions) {
-        if (
-          // show on bottom if there is place in top and bottom
-          selectTop - selectOptionsHeight > 0 &&
-          selectBottom + selectOptionsHeight < windowHeight
-        ) {
-          return topHiddenNummber;
-        } else if (
-          // show on bottom the window if bottom of selectElement is smaller then top of window
-          selectBottom - 15 <
-          0
-        ) {
-          return forEffects ? topHiddenNummber : 15;
-        } else if (
-          // show on top the window if top of selectElement is bigger then bottom of window
-          selectTop + 15 >
-          windowHeight
-        ) {
-          return forEffects
-            ? bottomHiddenNummber
-            : windowHeight - selectOptionsHeight - 15;
-        } else if (
-          // show on bottom if there is no place on top only if there is place on bottom
-          selectTop - selectOptionsHeight < 0 &&
-          selectBottom + selectOptionsHeight < windowHeight
-        ) {
-          return topHiddenNummber;
-        } else if (
-          // show on top if there is no more place on bottom only if there is a place on top
-          selectBottom - selectOptionsHeight < windowHeight &&
-          selectTop - selectOptionsHeight > 0
-        ) {
-          return bottomHiddenNummber;
-        } else {
-          // otherwise show on top
-          return topHiddenNummber;
-        }
-      } else if (directions && directionTop) {
-        if (
-          // show on top of screen if there is no place on top
-          selectTop - selectOptionsHeight <
-          0
-        ) {
-          return forEffects ? topHiddenNummber : 15;
-        } else if (
-          // show on bottom of screen if the top of selectElement bigger then the screen end
-          selectTop + 15 >
-          windowHeight
-        ) {
-          return forEffects
-            ? bottomHiddenNummber
-            : windowHeight - selectOptionsHeight - 15;
-        } else {
-          // otherwise show on top
-          return bottomHiddenNummber;
-        }
-      } else if (
-        (directions && directionBottom) ||
-        (directions && !directionTop && !directionBottom)
-      ) {
-        if (
-          // show on bottom of the screen if there is no place more on bottom
-          selectBottom + selectOptionsHeight >
-          windowHeight
-        ) {
-          return forEffects
-            ? bottomHiddenNummber
-            : windowHeight - selectOptionsHeight - 15;
-        } else if (
-          // show on top of the screen if the bottom of the selectElement smaller then the top of the screen
-          selectBottom + 15 <
-          0
-        ) {
-          return forEffects ? topHiddenNummber : 15;
-        } else {
-          // otherwise show on bottom
-          return topHiddenNummber;
-        }
-      } else {
-        return defaultNumber;
-      }
-    } else {
-      return 0;
-    }
-  };
-
-  const stylePositionBetweenRightAndLeft = (
-    leftHiddenNummber,
-    rightHiddenNummber = 15,
-    centerPosition = null,
-    forEffects = false
-  ) => {
-    if (selectButtonProperties.offset) {
-      const // directions
-        directions = selectOptionsData.openDirections,
-        directionLeft = selectOptionsData.openDirections.left,
-        directionRight = selectOptionsData.openDirections.right,
-        // window
-        windowWidth = window.innerWidth,
-        // select
-        selectWidth = selectButtonProperties.width,
-        selectLeft = selectButtonProperties.offset.left,
-        selectRight = selectButtonProperties.offset.right,
-        // selectOptions
-        selectOptionsWidth = optionsProperties.width,
-        selectOptionsLeft = optionsProperties.left,
-        selectOptionsRight = optionsProperties.right;
-
-      if (
-        // can in center Position full show then show it in center of the element
-        (directions && directionLeft && directionRight) ||
-        !directions
-      ) {
-        if (
-          selectLeft + selectWidth / 2 - selectOptionsWidth / 2 > 0 &&
-          selectRight - selectWidth / 2 + selectOptionsWidth / 2 < windowWidth
-        ) {
-          return centerPosition;
-        } else if (
-          // show selectOptions on left of the window if the right of the selectElement is too much scrolled to left
-          selectRight < 0
-        ) {
-          return forEffects ? leftHiddenNummber : 15;
-        } else if (
-          // show selectOptions on right of the window if the left of the selectElement is too much scrolled to right
-          selectLeft > windowWidth
-        ) {
-          return forEffects
-            ? rightHiddenNummber
-            : windowWidth - selectOptionsWidth - 15;
-        } else if (
-          // show selectOptions on right of selectElement if there is no place in the left Position
-          selectLeft - selectOptionsWidth < 0 &&
-          selectRight + selectOptionsWidth < windowWidth
-        ) {
-          return leftHiddenNummber;
-        } else if (
-          // show selectOptions on left of selectElement if there is no place in the right Position
-          selectRight + selectOptionsWidth > windowWidth &&
-          selectLeft - selectOptionsWidth > 0
-        ) {
-          return rightHiddenNummber;
-        } else if (
-          // show on left of screen if there is no place more
-          selectLeft + selectWidth / 2 - selectOptionsWidth / 2 <
-          0
-        ) {
-          return forEffects ? leftHiddenNummber : 15;
-        } else if (
-          // show on right of screen if there is no place more
-          selectRight - selectWidth / 2 + selectOptionsWidth / 2 >
-          windowWidth
-        ) {
-          if (
-            // show on left of screen if the selectOptions is bigger then the screen width
-            selectOptionsWidth > windowWidth
-          ) {
-            return forEffects ? leftHiddenNummber : 15;
-          } else {
-            return forEffects
-              ? leftHiddenNummber
-              : windowWidth - selectOptionsWidth - 15;
-          }
-        } else {
-          return centerPosition;
-        }
-      } else if (directions && directionLeft) {
-        // show selectOptions only in left position
-        if (selectLeft - selectOptionsWidth > 0) {
-          return selectLeft > windowWidth
-            ? forEffects
-              ? rightHiddenNummber
-              : windowWidth - selectOptionsWidth - 15 // show on right of the screen if the selectElement left position was bigger then the screen
-            : rightHiddenNummber; // show on left of the selectElement
-        } else if (selectRight < 0) {
-          // show on right of the screen if the selectElement right position was smaller then the screen beginn
-          return forEffects ? leftHiddenNummber : 15;
-        } else {
-          // show on right of the screen when there is no place for the selectOptions in the left position on the window
-          return forEffects ? rightHiddenNummber : 15;
-        }
-      } else if (directions && directionRight) {
-        // show selectOptions only in right position
-        if (selectRight + selectOptionsWidth < windowWidth) {
-          return selectRight < 0
-            ? forEffects
-              ? leftHiddenNummber
-              : 15 // show on right of the screen if the selectElement left position was bigger then the screen
-            : leftHiddenNummber; // show on left of the selectElement
-        } else if (selectLeft > windowWidth) {
-          // show on right of the screen if the selectElement right position was smaller then the screen beginn
-          return forEffects
-            ? rightHiddenNummber
-            : windowWidth - selectOptionsWidth - 15;
-        } else {
-          // show on right of the screen when there is no place for the selectOptions in the left position on the window
-          return forEffects
-            ? rightHiddenNummber
-            : windowWidth - selectOptionsWidth - 15;
-        }
-      } else if (directions && !selectLeft && !directionRight) {
-        return centerPosition;
-      } else {
-        if (
-          // show on left of screen if there is no place more
-          selectLeft + selectWidth / 2 - selectOptionsWidth / 2 <
-          0
-        ) {
-          return forEffects ? leftHiddenNummber : 15;
-        } else if (
-          // show on right of screen if there is no place more
-          selectRight - selectWidth / 2 + selectOptionsWidth / 2 >
-          windowWidth
-        ) {
-          if (
-            // show on left of screen if the selectOptions is bigger then the screen width
-            selectOptionsWidth > windowWidth
-          ) {
-            return forEffects ? leftHiddenNummber : 15;
-          } else {
-            return forEffects
-              ? leftHiddenNummber
-              : windowWidth - selectOptionsWidth - 15;
-          }
-        } else {
-          return centerPosition;
-        }
-      }
-    } else {
-      return centerPosition;
-    }
-  };
-
-  useEffect(() => {
-    setSelectButtonProperties({
-      ...selectOptionsData.selectButtonProperties
-    });
-  }, [selectOptionsData]);
-
-  useEffect(() => {
-    const _selectOptionsData = state.selectOptions;
-    if (_selectOptionsData) {
-      if (
-        selectOptionsData.selectId !== _selectOptionsData.selectId ||
-        !_selectOptionsData.show
-      ) {
-        setSearchText("");
-      }
-      setSelectOptionsData(_selectOptionsData);
-    }
-  }, [state.selectOptions]);
-
-  useClickOutside(myRef, (e) => {
-    const $selectOptions = $(".select");
-
-    // if the target of the click isn't the container nor a descendant of the container
-    if (
-      !$selectOptions.is(e.target) &&
-      $selectOptions.has(e.target).length === 0
-    ) {
-      closeSelectOptions();
-    }
-  });
-
-  return (
-    <div
-      ref={myRef}
-      className={`select-options disable-selecting ${
-        selectOptionsData.show ? "show" : ""
-      } ${selectOptionsData.enableSearch ? "with-search" : ""} ${
-        selectOptionsData.headerText ? "with-header-text" : ""
-      } ${selectOptionsData.className ?? ""} ${
-        selectOptionsData.showSelectedParallel ? "show-selected-parallel" : ""
-      } ${selectOptionsData.multiSelect ? "multi-select" : "single-select"}`}
-      style={{
-        pointerEvents: selectOptionsData.show ? "all" : "none",
-        top: stylePositionBetweenTopAndBottom(
-          `${
-            selectButtonProperties.offset
-              ? selectButtonProperties.offset.top +
-                selectButtonProperties.height
-              : 0
-          }px`,
-          `${
-            selectButtonProperties.offset
-              ? selectButtonProperties.offset.top - optionsProperties.height
-              : 0
-          }px`,
-          `${selectButtonProperties.top}px`
-        ),
-        left: stylePositionBetweenRightAndLeft(
-          `${
-            selectButtonProperties.offset
-              ? selectButtonProperties.offset.left +
-                selectButtonProperties.width
-              : 0
-          }px`,
-          `${
-            selectButtonProperties.offset
-              ? selectButtonProperties.offset.left - optionsProperties.width
-              : 0
-          }px`,
-
-          selectButtonProperties.offset
-            ? selectButtonProperties.offset.left -
-                optionsProperties.width / 2 +
-                selectButtonProperties.width / 2
-            : 0
-        ),
-        boxShadow: `${stylePositionBetweenRightAndLeft(
-          15,
-          -15,
-          0,
-          true
-        )}px ${stylePositionBetweenTopAndBottom(
-          15,
-          -15,
-          0,
-          true
-        )}px 50px rgba(0,0,0,.05)`,
-        transform: `translateX(${stylePositionBetweenRightAndLeft(
-          -15,
-          15,
-          0,
-          true
-        )}px) translateY(${stylePositionBetweenTopAndBottom(
-          -15,
-          15,
-          0,
-          true
-        )}px) scale(.99)`,
-        transition: `opacity 350ms cubic-bezier(.4, .2, 0, 1), transform 350ms cubic-bezier(.4, .2, 0, 1), top ${
-          selectOptionsData.show ? 350 : 0
-        }ms cubic-bezier(.4, .2, 0, 1), left ${
-          selectOptionsData.show ? 350 : 0
-        }ms cubic-bezier(.4, .2, 0, 1), box-shadow 350ms cubic-bezier(.4, .2, 0, 1)`,
-        minWidth: selectOptionsData.showSelectedParallel
-          ? `${
-              maxOptionTextWidth + 150 < 250 ? 250 : maxOptionTextWidth + 150
-            }px`
-          : "250px"
-      }}
-    >
-      <div>
-        {selectOptionsData.headerText ? (
-          <>
-            <div className="select-options-headline">
-              {selectOptionsData.headerText}
-            </div>
-            <span className={`select-options-headline-placeholder`} />
-          </>
-        ) : null}
-
-        <div className="actions">
-          {selectOptionsData.enableSearch ? (
-            <>
-              {selectOptionsData.enableSelectAllButton &&
-              selectOptionsData.multiSelect ? (
-                <>
-                  <Button
-                    className={"select-all-button"}
-                    leftIcon={"done_all"}
-                    onClick={() => {
-                      selectOptionsData.setSelectedOption(
-                        Object.entries(selectOptionsData.options).filter(
-                          (option) => {
-                            return searchText !== ""
-                              ? !foundOptions(searchText, option)
-                              : true;
-                          }
-                        )
-                      );
-                    }}
-                  />
-                  <Button
-                    className={"select-all-button"}
-                    leftIcon={"remove_done"}
-                    onClick={() => {
-                      selectOptionsData.setSelectedOption([]);
-                    }}
-                  />
-                </>
-              ) : null}
-              <TextField
-                inputRef={(r) => r && r.focus()}
-                className="select-options-search-field"
-                value={searchText}
-                placeholder={
-                  selectOptionsData.searchPlaceHolder ?? "finde options"
+            if ((directions && directionTop && directionBottom) || !directions) {
+                if (
+                    // show on bottom if there is place in top and bottom
+                    selectTop - selectOptionsHeight > 0 &&
+                    selectBottom + selectOptionsHeight < windowHeight
+                ) {
+                    return topPosition
+                } else if (
+                    // show on bottom the window if bottom of selectElement is smaller then top of window
+                    selectBottom - 15 <
+                    0
+                ) {
+                    return effectUsage ? topPosition : 15
+                } else if (
+                    // show on top the window if top of selectElement is bigger then bottom of window
+                    selectTop + 15 >
+                    windowHeight
+                ) {
+                    return effectUsage ? bottomPosition : windowHeight - selectOptionsHeight - 15
+                } else if (
+                    // show on bottom if there is no place on top only if there is place on bottom
+                    selectTop - selectOptionsHeight < 0 &&
+                    selectBottom + selectOptionsHeight < windowHeight
+                ) {
+                    return topPosition
+                } else if (
+                    // show on top if there is no more place on bottom only if there is a place on top
+                    selectBottom - selectOptionsHeight < windowHeight &&
+                    selectTop - selectOptionsHeight > 0
+                ) {
+                    return bottomPosition
+                } else {
+                    // otherwise show on top
+                    return topPosition
                 }
-                onChange={setSearchText}
-              />
-
-              {selectOptionsData.enableCloseButton &&
-              selectOptionsData.multiSelect ? (
-                <Button
-                  className={"close-button"}
-                  onClick={closeSelectOptions}
-                  outlined
-                  blue
-                >
-                  {selectOptionsData.closeButtonText ?? "done"}
-                </Button>
-              ) : null}
-            </>
-          ) : null}
-        </div>
-
-        <div className={`select-options-body`} data-cy={"select-options-body"}>
-          {(selectOptionsData.showSelectedParallel ? [1, 2, 3] : [1]).map(
-            (index) => {
-              return index !== 2 ? (
-                <div key={index} className={`content ${index}-ct`}>
-                  {selectOptionsData.showSelectedParallel ? (
-                    <div
-                      className={`empty-listview-background-image ${
-                        (selectOptionsData.selectedOption &&
-                          selectOptionsData.selectedOption.length !==
-                            Object.entries(selectOptionsData.options).length &&
-                          index === 1) ||
-                        (selectOptionsData.selectedOption.length && index === 3)
-                          ? "hide"
-                          : ""
-                      }`}
-                    >
-                      <span className={"material-symbols-outlined"}>
-                        {index === 3 ? "done_all" : "remove_done"}
-                      </span>
-                    </div>
-                  ) : null}
-
-                  {selectOptionsData.defaultOption && index === 1 ? (
-                    <SelectOption
-                      options={selectOptionsData.options}
-                      id={""}
-                      disableSelecting={selectOptionsData.disableSelecting}
-                      setDisableSelecting={
-                        selectOptionsData.setDisableSelecting
-                      }
-                      selectedOption={selectOptionsData}
-                      setShowOptions={selectOptionsData.setShowOptions}
-                      setSelectedOption={selectOptionsData.setSelectedOption}
-                      hide={selectOptionsData.searchText}
-                      defaultOption
-                    >
-                      {selectOptionsData.defaultOptionText ?? "Select a option"}
-                    </SelectOption>
-                  ) : null}
-                  <div>
-                    {(() => {
-                      const optionsListNotSorted = Object.entries(
-                        selectOptionsData.options
-                      );
-                      try {
-                        const DescSorted = _.sortBy(optionsListNotSorted, (o) =>
-                          o[1]?.toUpperCase()
-                        );
-
-                        switch (selectOptionsData.sort) {
-                          case "DESC":
-                            return DescSorted;
-                          case "ASC":
-                            return DescSorted.reverse();
-                          default:
-                            return optionsListNotSorted;
-                        }
-                      } catch (e) {
-                        return optionsListNotSorted;
-                      }
-                    })().map((option, oIndex) => {
-                      const wasSelected =
-                        selectOptionsData.selectedOption &&
-                        (() => {
-                          if (selectOptionsData.selectedOption.length)
-                            return selectOptionsData.multiSelect
-                              ? (() => {
-                                  const foundSelectedOption = selectOptionsData.selectedOption.filter(
-                                    (_option) => {
-                                      return _option[0] === option[0];
-                                    }
-                                  )[0];
-                                  return foundSelectedOption
-                                    ? foundSelectedOption[0] === option[0]
-                                    : false;
-                                })()
-                              : selectOptionsData.selectedOption[0] ===
-                                  option[0];
-                          else return false;
-                        })();
-
-                      return (
-                        <SelectOption
-                          options={selectOptionsData.options}
-                          textRef={(ref) =>
-                            (optionTextRefs.current[`${oIndex}`] = ref)
-                          }
-                          key={option[0]}
-                          id={option[0]}
-                          disableSelecting={selectOptionsData.disableSelecting}
-                          setDisableSelecting={
-                            selectOptionsData.setDisableSelecting
-                          }
-                          multiSelect={selectOptionsData.multiSelect}
-                          selectedOption={selectOptionsData.selectedOption}
-                          setShowOptions={closeSelectOptions}
-                          setSelectedOption={
-                            selectOptionsData.setSelectedOption
-                          }
-                          hide={
-                            searchText ||
-                            (selectOptionsData.showSelectedParallel &&
-                              ((wasSelected && index === 1) ||
-                                (!wasSelected && index === 3)))
-                              ? foundOptions(
-                                  searchText,
-                                  option,
-                                  selectOptionsData.searchEveryWare
-                                ) ||
-                                (selectOptionsData.showSelectedParallel &&
-                                  ((wasSelected && index === 1) ||
-                                    (!wasSelected && index === 3)))
-                              : false
-                          }
-                        >
-                          {option[1]}
-                        </SelectOption>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : (
-                <div key={index} className={"vertical-rule"} />
-              );
+            } else if (directions && directionTop) {
+                if (
+                    // show on top of screen if there is no place on top
+                    selectTop - selectOptionsHeight <
+                    0
+                ) {
+                    return effectUsage ? topPosition : 15
+                } else if (
+                    // show on bottom of screen if the top of selectElement bigger then the screen end
+                    selectTop + 15 >
+                    windowHeight
+                ) {
+                    return effectUsage ? bottomPosition : windowHeight - selectOptionsHeight - 15
+                } else {
+                    // otherwise show on top
+                    return bottomPosition
+                }
+            } else if ((directions && directionBottom) || (directions && !directionTop && !directionBottom)) {
+                if (
+                    // show on bottom of the screen if there is no place more on bottom
+                    selectBottom + selectOptionsHeight >
+                    windowHeight
+                ) {
+                    return effectUsage ? bottomPosition : windowHeight - selectOptionsHeight - 15
+                } else if (
+                    // show on top of the screen if the bottom of the selectElement smaller then the top of the screen
+                    selectBottom + 15 <
+                    0
+                ) {
+                    return effectUsage ? topPosition : 15
+                } else {
+                    // otherwise show on bottom
+                    return topPosition
+                }
+            } else {
+                return defaultPosition
             }
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
+        } else {
+            return 0
+        }
+    }
 
-export default SelectOptions;
+    const moveHorizontal = (
+        optionsProperties,
+        leftPosition,
+        rightPosition = 15,
+        centerPosition = null,
+        effectUsage = false
+    ) => {
+        if (selectProps.selectButtonProperties?.offset) {
+            const // directions
+                directions = selectProps.openDirections,
+                directionLeft = selectProps.openDirections.left,
+                directionRight = selectProps.openDirections.right,
+                // window
+                windowWidth = window.innerWidth,
+                // select
+                selectWidth = selectProps.selectButtonProperties.width,
+                selectLeft = selectProps.selectButtonProperties.offset.left,
+                selectRight = selectProps.selectButtonProperties.offset.right,
+                // selectOptions
+                selectOptionsWidth = optionsProperties.width,
+                selectOptionsLeft = optionsProperties.left,
+                selectOptionsRight = optionsProperties.right
+
+            if (
+                // can in center Position full show then show it in center of the element
+                (directions && directionLeft && directionRight) ||
+                !directions
+            ) {
+                if (
+                    selectLeft + selectWidth / 2 - selectOptionsWidth / 2 > 0 &&
+                    selectRight - selectWidth / 2 + selectOptionsWidth / 2 < windowWidth
+                ) {
+                    return centerPosition
+                } else if (
+                    // show selectOptions on left of the window if the right of the selectElement is too much scrolled to left
+                    selectRight < 0
+                ) {
+                    return effectUsage ? leftPosition : 15
+                } else if (
+                    // show selectOptions on right of the window if the left of the selectElement is too much scrolled to right
+                    selectLeft > windowWidth
+                ) {
+                    return effectUsage ? rightPosition : windowWidth - selectOptionsWidth - 15
+                } else if (
+                    // show selectOptions on right of selectElement if there is no place in the left Position
+                    selectLeft - selectOptionsWidth < 0 &&
+                    selectRight + selectOptionsWidth < windowWidth
+                ) {
+                    return leftPosition
+                } else if (
+                    // show selectOptions on left of selectElement if there is no place in the right Position
+                    selectRight + selectOptionsWidth > windowWidth &&
+                    selectLeft - selectOptionsWidth > 0
+                ) {
+                    return rightPosition
+                } else if (
+                    // show on left of screen if there is no place more
+                    selectLeft + selectWidth / 2 - selectOptionsWidth / 2 <
+                    0
+                ) {
+                    return effectUsage ? leftPosition : 15
+                } else if (
+                    // show on right of screen if there is no place more
+                    selectRight - selectWidth / 2 + selectOptionsWidth / 2 >
+                    windowWidth
+                ) {
+                    if (
+                        // show on left of screen if the selectOptions is bigger then the screen width
+                        selectOptionsWidth > windowWidth
+                    ) {
+                        return effectUsage ? leftPosition : 15
+                    } else {
+                        return effectUsage ? leftPosition : windowWidth - selectOptionsWidth - 15
+                    }
+                } else {
+                    return centerPosition
+                }
+            } else if (directions && directionLeft) {
+                // show selectOptions only in left position
+                if (selectLeft - selectOptionsWidth > 0) {
+                    return selectLeft > windowWidth
+                        ? effectUsage
+                            ? rightPosition
+                            : windowWidth - selectOptionsWidth - 15 // show on right of the screen if the selectElement left position was bigger then the screen
+                        : rightPosition // show on left of the selectElement
+                } else if (selectRight < 0) {
+                    // show on right of the screen if the selectElement right position was smaller then the screen beginn
+                    return effectUsage ? leftPosition : 15
+                } else {
+                    // show on right of the screen when there is no place for the selectOptions in the left position on the window
+                    return effectUsage ? rightPosition : 15
+                }
+            } else if (directions && directionRight) {
+                // show selectOptions only in right position
+                if (selectRight + selectOptionsWidth < windowWidth) {
+                    return selectRight < 0
+                        ? effectUsage
+                            ? leftPosition
+                            : 15 // show on right of the screen if the selectElement left position was bigger then the screen
+                        : leftPosition // show on left of the selectElement
+                } else if (selectLeft > windowWidth) {
+                    // show on right of the screen if the selectElement right position was smaller then the screen beginn
+                    return effectUsage ? rightPosition : windowWidth - selectOptionsWidth - 15
+                } else {
+                    // show on right of the screen when there is no place for the selectOptions in the left position on the window
+                    return effectUsage ? rightPosition : windowWidth - selectOptionsWidth - 15
+                }
+            } else if (directions && !selectLeft && !directionRight) {
+                return centerPosition
+            } else {
+                if (
+                    // show on left of screen if there is no place more
+                    selectLeft + selectWidth / 2 - selectOptionsWidth / 2 <
+                    0
+                ) {
+                    return effectUsage ? leftPosition : 15
+                } else if (
+                    // show on right of screen if there is no place more
+                    selectRight - selectWidth / 2 + selectOptionsWidth / 2 >
+                    windowWidth
+                ) {
+                    if (
+                        // show on left of screen if the selectOptions is bigger then the screen width
+                        selectOptionsWidth > windowWidth
+                    ) {
+                        return effectUsage ? leftPosition : 15
+                    } else {
+                        return effectUsage ? leftPosition : windowWidth - selectOptionsWidth - 15
+                    }
+                } else {
+                    return centerPosition
+                }
+            }
+        } else {
+            return centerPosition
+        }
+    }
+
+    // update select props
+    const prevLengthAllSelectOptions = useRef(1)
+    useEffect(() => {
+        setSelectProps(currentSelectOptionsData => {
+            if (
+                JSON.stringify({
+                    ...selectPropsGetByIndex,
+                    lastUpdate: 0,
+                    headerText: '',
+                    selectButtonProperties: {
+                        ...selectPropsGetByIndex.selectButtonProperties,
+                        offset: null
+                    }
+                }) !==
+                    JSON.stringify({
+                        ...currentSelectOptionsData,
+                        lastUpdate: 0,
+                        headerText: '',
+                        selectButtonProperties: {
+                            ...currentSelectOptionsData.selectButtonProperties,
+                            offset: null
+                        }
+                    }) ||
+                lengthAllSelects != prevLengthAllSelectOptions.current
+            ) {
+                if (selectProps.selectId !== selectPropsGetByIndex.selectId || !selectPropsGetByIndex.show) {
+                    setSearchText('')
+                }
+                prevLengthAllSelectOptions.current = lengthAllSelects
+
+                return selectPropsGetByIndex
+            }
+            return currentSelectOptionsData
+        })
+
+        return () => {
+            setSearchText('')
+        }
+    }, [selectPropsGetByIndex, lengthAllSelects])
+
+    const [optionsListWidth, setOptionsListWidth] = useState(0)
+    const calcOptionsListWidth = options => {
+        // get options-list width
+        let _width = 0
+        if (options.length) {
+            for (const _option of options) {
+                let _optionText = _option[1]
+                const isOptionSubmenu = Array.isArray(_optionText) && _optionText.length === 2
+                _optionText = String(isOptionSubmenu ? _optionText[0] : _optionText)
+                const _textWidth = _optionText
+                    .split('')
+                    .reduce(
+                        (width, char) => width + (Object.keys(_charsWidth).includes(char) ? _charsWidth[char] : 7),
+                        0
+                    )
+                if (_textWidth > _width) _width = _textWidth
+            }
+        }
+        setOptionsListWidth(_width)
+        return _width
+    }
+
+    // update options
+    const prevSelectOptions = useRef()
+    const options = selectOptionsGetByIndex?.options
+    useEffect(() => {
+        if (options && !_.isEqual(prevSelectOptions.current, options)) {
+            calcOptionsListWidth(options)
+            setSelectOptions(options)
+            setSortedOptions(sortOptions(options))
+            setListTilesInView(initListTilesInView)
+            prevSelectOptions.current = options
+        }
+    }, [options])
+
+    // set search field focused after change selector
+    const searchFieldRef = useRef()
+    useEffect(() => {
+        if (searchFieldRef.current && selectProps.show && selectProps.selectId) {
+            searchFieldRef.current.focus()
+        }
+    }, [searchFieldRef, selectProps.show])
+
+    const animateTimeout = useRef()
+    const prevData = useRef({
+        wasClosed: true,
+        showSelectedParallel: false,
+        x: 0,
+        y: 0,
+        lengthAllSelects: 0
+    })
+    const parsePixel = number => {
+        return number + 'px'
+    }
+
+    // animate other components before move the selectOptions window to another selector
+    useEffect(() => {
+        if (animateTimeout.current) clearTimeout(animateTimeout.current)
+
+        animateTimeout.current = setTimeout(
+            () => {
+                const $header = $(`.select-options[index="${index}"] .select-options-headline`)
+                const headerChildHeight = $header.children().first().prop('scrollHeight')
+                gsap.to(`.select-options[index="${index}"] .select-options-headline`, {
+                    minHeight: parsePixel(selectProps.headerText ? Math.max(headerChildHeight, 35) : 0),
+                    maxHeight: parsePixel(selectProps.headerText ? Math.max(headerChildHeight, 35) : 0),
+                    opacity: selectProps.headerText ? 1 : 0,
+                    marginBottom: parsePixel(selectProps.headerText ? -15 : 0),
+                    duration: 0.2
+                })
+
+                const $el = $(`.select-options[index="${index}"] .select-options-actions`)
+                const selectOptionsActionsScrollHeight = $el.prop('scrollHeight')
+                const wasShown = selectProps.show
+
+                const enableSelectAllButton =
+                    selectProps.multiSelect && selectProps.enableSearch && selectProps.enableSelectAllButton
+
+                gsap.to(`.select-options[index="${index}"] .disable-pointer-events-layer`, {
+                    pointerEvents: thisSelectIsActiveNow ? 'none' : 'auto',
+                    duration: 0
+                })
+
+                gsap.to(`.select-options[index="${index}"] .select-options-actions`, {
+                    minHeight: parsePixel(selectProps.enableSearch ? selectOptionsActionsScrollHeight : 0),
+                    maxHeight: parsePixel(selectProps.enableSearch ? selectOptionsActionsScrollHeight : 0),
+                    opacity: selectProps.enableSearch ? 1 : 0,
+                    paddingTop: parsePixel(selectProps.enableSearch ? 1 : 0),
+                    //pointerEvents: wasShown && selectProps.enableSearch && thisSelectIsActiveNow ? 'auto' : 'none',
+                    duration: 0.2,
+                    delay: 0.2
+                })
+
+                gsap.to(
+                    `.select-options[index="${index}"] .select-options-actions .select-options-search-field input`,
+                    {
+                        width: !enableSelectAllButton ? 'calc(100%)' : '100%',
+                        paddingLeft: parsePixel(enableSelectAllButton ? 95 : 10),
+                        duration: 0.2,
+                        delay: 0.2
+                    }
+                )
+
+                gsap.to(
+                    `.select-options[index="${index}"] .select-options-actions .select-options-search-field input`,
+                    {
+                        opacity: selectProps.showSelectedParallel ? 0 : 1,
+                        //pointerEvents: !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
+                        duration: 0.2,
+                        delay: 0.2
+                    }
+                )
+
+                gsap.to(
+                    `.select-options[index="${index}"] .select-options-actions .select-options-search-field .clear-button`,
+                    {
+                        opacity: selectProps.showSelectedParallel ? 0 : 1,
+                        //pointerEvents: !wasShown || selectProps.showSelectedParallel || !thisSelectIsActiveNow ? 'none' : 'auto',
+                        duration: 0.2,
+                        delay: 0.2
+                    }
+                )
+
+                gsap.to(
+                    `.select-options[index="${index}"] .select-options-actions .select-options-search-field .select-all-buttons`,
+                    {
+                        borderTopRightRadius: parsePixel(selectProps.showSelectedParallel ? 10 : 0),
+                        borderBottomRightRadius: parsePixel(selectProps.showSelectedParallel ? 10 : 0),
+                        //pointerEvents: wasShown && enableSelectAllButton && thisSelectIsActiveNow ? 'auto' : 'none',
+                        opacity: enableSelectAllButton ? 1 : 0,
+                        translateX: parsePixel(enableSelectAllButton ? 0 : -20),
+                        duration: 0.2,
+                        delay: 0.2,
+                        onComplete: () => {
+                            setUpdateSelectPropsTimes(_ => _ + 1)
+                        }
+                    }
+                )
+            },
+            selectProps.show ? 150 : 0
+        )
+
+        return () => clearTimeout(animateTimeout.current)
+    }, [selectProps, lengthAllSelects, selectOptions])
+
+    const getNextXY = () => {
+        const optionsProperties = getDimensions({
+            ref: myRef
+        })
+        const x = moveHorizontal(
+            optionsProperties,
+            `${
+                selectProps.selectButtonProperties?.offset
+                    ? selectProps.selectButtonProperties.offset.left + selectProps.selectButtonProperties.width
+                    : 0
+            }px`,
+            `${
+                selectProps.selectButtonProperties.offset
+                    ? selectProps.selectButtonProperties.offset.left - optionsProperties.width
+                    : 0
+            }px`,
+            selectProps.selectButtonProperties.offset
+                ? selectProps.selectButtonProperties.offset.left -
+                      optionsProperties.width / 2 +
+                      selectProps.selectButtonProperties.width / 2
+                : 0
+        )
+
+        const y = moveVertikal(
+            optionsProperties,
+            `${
+                selectProps.selectButtonProperties.offset
+                    ? selectProps.selectButtonProperties.offset.top + selectProps.selectButtonProperties.height
+                    : 0
+            }px`,
+            `${
+                selectProps.selectButtonProperties.offset
+                    ? selectProps.selectButtonProperties.offset.top - optionsProperties.height
+                    : 0
+            }px`,
+            `${selectProps.selectButtonProperties.top}px`
+        )
+        return { x, y }
+    }
+
+    // update selectOptions Component size and dimentions
+    const firstRenderTimeout = useRef()
+    const firstTimeRender = useRef(true)
+    useEffect(() => {
+        if (firstRenderTimeout.current) clearTimeout(firstRenderTimeout.current)
+        const {
+            x: prevX,
+            y: prevY,
+            showSelectedParallel: prevShowSelectedParallel,
+            wasClosed,
+            lengthAllSelects: prevLengthAllSelects
+        } = prevData.current
+
+        const selectLengthWasDownscalled = lengthAllSelects < prevLengthAllSelects
+
+        // min width 250px if optionsListWidth is smaller then that
+        const optionWidth = Math.max(optionsListWidth + 10, 250)
+
+        gsap.to(`.select-options[index="${index}"] .select-options-column .options-list`, {
+            width: optionWidth + 75,
+            duration: 0.2
+        })
+
+        firstRenderTimeout.current = setTimeout(() => {
+            let nextXY = getNextXY()
+            const { x, y } = nextXY
+            const distance = Math.sqrt(
+                Math.pow(parseFloat(prevX) - parseFloat(x), 2) + Math.pow(parseFloat(prevY) - parseFloat(y), 2)
+            )
+            const distanceToSeconds = Math.min(Math.max((distance / 50) * 0.04, 0.1), 0.25)
+
+            const _toggleSelectOptions = () => {
+                gsap.to(`.select-options[index="${index}"]`, {
+                    opacity: selectProps.show ? 1 : 0,
+                    pointerEvents: selectProps.show ? 'auto' : 'none',
+                    duration: selectProps.show ? distanceToSeconds : 0.05,
+                    onComplete: () => {
+                        prevData.current = {
+                            wasClosed: !selectProps.show,
+                            showSelectedParallel: selectProps.showSelectedParallel,
+                            x: x,
+                            y: y,
+                            lengthAllSelects: lengthAllSelects
+                        }
+                        firstTimeRender.current = false
+                    }
+                })
+            }
+
+            if (prevShowSelectedParallel || wasClosed || !selectProps.showSelectedParallel) {
+                gsap.to(`.select-options[index="${index}"] .select-options-column .options-list`, {
+                    width: optionWidth + 75,
+                    duration: 0,
+                    onComplete: () => {
+                        nextXY = getNextXY()
+                        const { x, y } = nextXY
+                        gsap.to(`.select-options[index="${index}"]`, {
+                            x: selectProps.show ? x : prevX,
+                            y: selectProps.show ? y : prevY,
+                            duration: 0.35,
+                            delay: 0.2,
+                            onComplete: () => {
+                                _toggleSelectOptions()
+                            }
+                        })
+                    }
+                })
+            } else {
+                gsap.to(`.select-options[index="${index}"]`, {
+                    x: selectProps.show ? x : prevX,
+                    y: selectProps.show ? y : prevY,
+                    delay: 0.2,
+                    duration: selectProps.show && !wasClosed ? distanceToSeconds : 0,
+                    onComplete: () => {
+                        _toggleSelectOptions()
+                    }
+                })
+            }
+        }, 150)
+
+        return () => clearTimeout(firstRenderTimeout.current)
+    }, [
+        updateSelectPropsTimes,
+        selectProps.show,
+        lengthAllSelects,
+        thisSelectIsActiveNow,
+        optionsListWidth,
+        selectPropsFromStore
+    ])
+
+    // change headline to empty after 1 second if the next one is empty
+    // this is for more stabile animation
+    const [headline, setHeadline] = useState(selectProps.headerText)
+    useEffect(() => {
+        const t = setTimeout(
+            () => {
+                setHeadline(selectProps.headerText)
+            },
+            selectProps.headerText ? 0 : 1000
+        )
+        return () => clearTimeout(t)
+    }, [selectProps.headerText])
+
+    // sort options function
+    const [sortedOptions, setSortedOptions] = useState([])
+    const sortOptions = _options => {
+        try {
+            const DescSorted = _.sortBy(_options, o => String(o[1]).toUpperCase())
+
+            switch (selectProps.sort) {
+                case 'DESC':
+                    return DescSorted
+                case 'ASC':
+                    return DescSorted.reverse()
+                default:
+                    return _options
+            }
+        } catch (e) {
+            return _options
+        }
+    }
+
+    // check if option should hide `only with parallel view`
+    const hideOption = (option, viewport) => {
+        const _searchText =
+            selectProps.multiSelect && selectProps.showSelectedParallel
+                ? {
+                      1: searchTextUnselectedTail,
+                      3: searchTextSelectedTail
+                  }[viewport]
+                : searchText
+
+        return _searchText ? foundOptions(_searchText, option) : false
+    }
+
+    // this handler is used to preduce performance lag if there is a large list of options
+    // it would be claculated wich options are in view, a list of indexes would be saved in `listTilesInView`
+    // and used later to allow option to be renderd or not
+    const handleScrollingOptionsList = (e, viewport, viewportOptionsIds) => {
+        const _scrollTop = $(e.target).scrollTop() // px
+        const _height = $(e.target).height() // px
+        const _optionHeight = 40 // px
+        const _cacheExtent = 5 * 40
+        const _dimensions = {
+            top: Math.round(_scrollTop),
+            bottom: Math.round(_scrollTop + _height)
+        }
+
+        setListTilesInView(currentListTilesInView => {
+            currentListTilesInView[viewport] = [...Array(viewportOptionsIds.length).keys()]
+                .filter(oIndex => {
+                    const _optionDimensions = {
+                        top: oIndex * _optionHeight,
+                        bottom: oIndex * _optionHeight + _optionHeight
+                    }
+                    return (
+                        _optionDimensions.top >= _dimensions.top - _cacheExtent &&
+                        _optionDimensions.bottom <= _dimensions.bottom + _cacheExtent
+                    )
+                })
+                .map(String)
+
+            return { ...currentListTilesInView }
+        })
+    }
+
+    // hide options
+    const [viewportOptionsIds, setViewportOptionsIds] = useState({ 1: [], 3: [] })
+    const viewportOptionsIdsTimeout = useRef()
+    useEffect(() => {
+        if (viewportOptionsIdsTimeout.current) clearTimeout(viewportOptionsIdsTimeout.current)
+        viewportOptionsIdsTimeout.current = setTimeout(() => {
+            const nextViewportOptionsIds = { 1: [], 3: [] }
+
+            for (const option of sortedOptions) {
+                const optionId = String(option[0])
+                const optionWasSelected = wasSelected(option)
+                if (selectProps.multiSelect && selectProps.showSelectedParallel) {
+                    const pushToViewport = !optionWasSelected ? '1' : '3'
+
+                    if (!hideOption(option, pushToViewport)) nextViewportOptionsIds[pushToViewport].push(optionId)
+                } else {
+                    if (!hideOption(option, '1')) nextViewportOptionsIds['1'].push(optionId)
+                }
+            }
+
+            setViewportOptionsIds(nextViewportOptionsIds)
+        }, 50)
+        return () => clearTimeout(viewportOptionsIdsTimeout.current)
+    }, [
+        sortedOptions,
+        selectProps.selectedOption,
+        selectProps.multiSelect,
+        selectProps.showSelectedParallel,
+        searchText,
+        searchTextSelectedTail,
+        searchTextUnselectedTail
+    ])
+
+    // reset options view after modifysearchText
+    const resetListTileInViewsTimeout = useRef()
+    useEffect(() => {
+        if (resetListTileInViewsTimeout.current) clearTimeout(resetListTileInViewsTimeout.current)
+        resetListTileInViewsTimeout.current = setTimeout(() => {
+            handleScrollingOptionsList({ target: '.options-list' }, '1', viewportOptionsIds['1'])
+        }, 50)
+        return () => clearTimeout(resetListTileInViewsTimeout.current)
+    }, [searchText, searchTextSelectedTail, searchTextUnselectedTail, viewportOptionsIds, selectProps.selectedOption])
+
+    return (
+        <div
+            ref={myRef}
+            className={`select-options disable-selecting${
+                selectProps.headerText || selectProps.enableSearch ? ' show-gradient-effect' : ''
+            } ${selectProps.className ?? ''}${selectProps.showSelectedParallel ? ' show-selected-parallel' : ''}${
+                selectProps.multiSelect ? ' multi-select' : ' single-select'
+            }${selectProps.headerText ? ' with-header-text' : ''}${
+                selectProps.enableSearch
+                    ? ` with-search${selectProps.enableSelectAllButton ? ' with-select-all-buttons' : ''}`
+                    : ''
+            }`}
+            index={index}
+        >
+            <div>
+                <div className={`select-options-headline`} index={index}>
+                    <span>{headline}</span>
+                </div>
+
+                <div className={`select-options-actions`} index={index}>
+                    <TextField
+                        inputRef={
+                            selectProps.showSelectedParallel || !selectProps.enableSearch || !thisSelectIsActiveNow
+                                ? null
+                                : r => r && r.focus()
+                        }
+                        className={`select-options-search-field`}
+                        beforeComponent={
+                            <div className={'select-all-buttons'}>
+                                <Button
+                                    className={'select-all-button'}
+                                    leftIcon={'done_all'}
+                                    onClick={() => {
+                                        selectProps.setSelectedOption(
+                                            selectOptions.filter(option => {
+                                                const _searchedText = selectProps.showSelectedParallel
+                                                    ? searchTextUnselectedTail
+                                                    : searchText
+
+                                                return Boolean(_searchedText)
+                                                    ? !foundOptions(_searchedText, option) || wasSelected(option)
+                                                    : true
+                                            })
+                                        )
+                                    }}
+                                />
+                                <Button
+                                    className={'select-all-button'}
+                                    leftIcon={'remove_done'}
+                                    onClick={() => {
+                                        selectProps.setSelectedOption(
+                                            selectProps.showSelectedParallel && searchTextSelectedTail !== ''
+                                                ? selectProps.selectedOption.filter(_selectedOption =>
+                                                      foundOptions(searchTextSelectedTail, _selectedOption)
+                                                  )
+                                                : []
+                                        )
+                                    }}
+                                />
+                            </div>
+                        }
+                        afterComponent={
+                            <Button
+                                className={'clear-button'}
+                                leftIcon={'backspace'}
+                                onClick={() => {
+                                    setSearchText('')
+                                }}
+                            />
+                        }
+                        value={searchText}
+                        placeholder={selectProps.searchPlaceHolder ?? 'finde options'}
+                        onChange={setSearchText}
+                    />
+                    <Button
+                        className={'close-button'}
+                        leftIcon={'close'}
+                        onClick={() => {
+                            closeSelectOptions()
+                        }}
+                    />
+                </div>
+                <div
+                    className={`select-options-body${!selectProps.headerText ? ' header-text-is-not-enabled' : ''}`}
+                    data-cy={'select-options-body'}
+                >
+                    {(selectProps.showSelectedParallel ? [1, 2, 3] : [1]).map(viewport => {
+                        return viewport !== 2 ? (
+                            <div className={'select-options-column'}>
+                                {selectProps.showSelectedParallel ? (
+                                    <TextField
+                                        className="search-field-parallel-view"
+                                        inputRef={
+                                            viewport === 3 || !selectProps.enableSearch || !thisSelectIsActiveNow
+                                                ? null
+                                                : r => (searchFieldRef.current = r)
+                                        }
+                                        value={viewport === 1 ? searchTextUnselectedTail : searchTextSelectedTail}
+                                        placeholder={selectProps.searchPlaceHolder ?? 'finde options'}
+                                        onChange={_searchText => {
+                                            if (viewport === 1) {
+                                                setSearchTextUnselectedTail(_searchText)
+                                                setSearchTextSelectedTail('')
+                                            } else {
+                                                setSearchTextSelectedTail(_searchText)
+                                                setSearchTextUnselectedTail('')
+                                            }
+                                        }}
+                                        afterComponent={
+                                            <Button
+                                                className={'clear-button'}
+                                                leftIcon={'backspace'}
+                                                onClick={() => {
+                                                    setSearchText('')
+                                                    if (viewport === 3) {
+                                                        setSearchTextSelectedTail('')
+                                                    } else {
+                                                        setSearchTextUnselectedTail('')
+                                                    }
+                                                }}
+                                            />
+                                        }
+                                    />
+                                ) : null}
+
+                                {selectProps.showSelectedParallel ? (
+                                    <div
+                                        className={`empty-listview-background-image ${
+                                            (selectProps.selectedOption &&
+                                                selectProps.selectedOption.length !== selectOptions.length &&
+                                                viewport === 1) ||
+                                            (selectProps.selectedOption.length && viewport === 3)
+                                                ? 'hide'
+                                                : ''
+                                        }`}
+                                    >
+                                        <span className={'material-symbols-outlined'}>
+                                            {viewport === 3 ? 'done_all' : 'remove_done'}
+                                        </span>
+                                    </div>
+                                ) : null}
+
+                                {(() => {
+                                    return (
+                                        <div
+                                            key={viewport}
+                                            className={`options-list ${viewport}-ct select-index-${index}`}
+                                            onScroll={e => {
+                                                handleScrollingOptionsList(
+                                                    e,
+                                                    String(viewport),
+                                                    viewportOptionsIds[String(viewport)]
+                                                )
+                                            }}
+                                        >
+                                            <div
+                                                style={{
+                                                    minHeight: parsePixel(
+                                                        viewportOptionsIds[String(viewport)].length * 40
+                                                    )
+                                                }}
+                                            >
+                                                {selectProps.defaultOption && viewport === 1 ? (
+                                                    <SelectOption
+                                                        id={''}
+                                                        disableSelecting={selectProps.disableSelecting}
+                                                        setDisableSelecting={selectProps.setDisableSelecting}
+                                                        selectedOption={selectProps.selectedOption}
+                                                        setSelectedOption={selectProps.setSelectedOption}
+                                                        hide={selectProps.searchText}
+                                                        defaultOption
+                                                    >
+                                                        {selectProps.defaultOptionText ?? 'Select a option'}
+                                                    </SelectOption>
+                                                ) : null}
+
+                                                {sortedOptions.map(option => {
+                                                    const indexOfShownOption = viewportOptionsIds[
+                                                        String(viewport)
+                                                    ].indexOf(String(option[0]))
+                                                    return listTilesInView[String(viewport)].includes(
+                                                        String(indexOfShownOption)
+                                                    ) ? (
+                                                        <SelectOption
+                                                            key={option[0]}
+                                                            id={option[0]}
+                                                            top={
+                                                                (indexOfShownOption +
+                                                                    (selectProps.defaultOption && viewport === 1
+                                                                        ? 1
+                                                                        : 0)) *
+                                                                40
+                                                            }
+                                                            mainSelectId={
+                                                                selectProps.mainSelectId ?? selectProps.selectId
+                                                            }
+                                                            parentSelectId={selectProps.selectId}
+                                                            selectOptionsIndex={index}
+                                                            disableSelecting={selectProps.disableSelecting}
+                                                            setDisableSelecting={selectProps.setDisableSelecting}
+                                                            multiSelect={selectProps.multiSelect}
+                                                            selectedOption={selectProps.selectedOption}
+                                                            setSelectedOption={selectProps.setSelectedOption}
+                                                            hide={hideOption(option, viewport)}
+                                                            searchText={
+                                                                selectProps.multiSelect &&
+                                                                selectProps.showSelectedParallel
+                                                                    ? {
+                                                                          1: searchTextUnselectedTail,
+                                                                          3: searchTextSelectedTail
+                                                                      }[viewport]
+                                                                    : searchText
+                                                            }
+                                                        >
+                                                            {option[1]}
+                                                        </SelectOption>
+                                                    ) : null
+                                                })}
+                                            </div>
+                                        </div>
+                                    )
+                                })()}
+                            </div>
+                        ) : (
+                            <div key={viewport} className={'vertical-rule'} />
+                        )
+                    })}
+                </div>
+            </div>
+            <div
+                className="disable-pointer-events-layer"
+                onClick={() => {
+                    dispatch('DELETE_SUB_SELECTS_UP_TARGET_INDEX', index)
+                }}
+            />
+        </div>
+    )
+}
+
+export default SelectOptions

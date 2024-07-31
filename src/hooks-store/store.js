@@ -4,7 +4,7 @@ let globalState = {}
 let listeners = []
 let actions = {}
 
-export const useStore = (shouldListen = true) => {
+const _useStore = (shouldListen = true) => {
     const setState = useState(globalState)[1]
 
     const dispatch = (actionIdentifier, payload) => {
@@ -25,6 +25,12 @@ export const useStore = (shouldListen = true) => {
     }, [setState, shouldListen])
 
     return [globalState, dispatch]
+}
+
+export const useStore = () => {
+    const state = _useStore()[0]
+    const dispatch = _useStore(false)[1]
+    return [state, dispatch]
 }
 
 export const initStore = (userActions, initialState) => {

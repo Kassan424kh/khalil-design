@@ -8,8 +8,7 @@ import { useStore } from "../../hooks-store/store";
 import Theme from "../../_themes";
 
 const Nav = (props) => {
-    const dispatch = useStore(false)[1];
-    const state = useStore()[0];
+    const [state, dispatch] = useStore()
     const myRef = useRef();
     const [firstTimeLoading, setFirstTimeLoading] = useState(true);
     const [pinned, setPinned] = useState(
@@ -93,7 +92,7 @@ const Nav = (props) => {
     });
 
     const closeSelectOptions = () => {
-        dispatch("UPDATE_DATA", {
+        dispatch("UPDATE_SELECT_PROPS", {
             show: false,
             lastUpdate: Date.now()
         });

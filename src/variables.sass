@@ -1,10 +1,20 @@
+@import "colors"
+
 $margin: 20px
 $padding: 10px
-$text-color: #333
+$text-color: $black
 $background-color: rgba(0, 0, 0, .05)
 $buttons-border-radius: 5px
 
-$font-family: 'Ubuntu', sans-serif
+$border-none: 0
+$border-extra-small: 4
+$border-small: 8
+$border-medium: 12
+$border-larg: 16
+$border-extra-large: 28
+$border-full: 10em
+
+$font-family: 'Roboto', sans-serif
 
 $durationNumber: 550
 $duration: $durationNumber + ms
@@ -19,3 +29,10 @@ $animationCurve: cubic-bezier(0.76, 0, 0.24, 1)
     -ms-user-select: none
     user-select: none
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0)
+
+
+@mixin blur
+    @include disable-selecting
+    opacity: .5
+    pointer-events: none
+    overflow: hidden

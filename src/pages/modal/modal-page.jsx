@@ -1,7 +1,7 @@
+import React, { useState } from "react";
 import "./styles.sass";
 import FloatingActionButtons from "../../components/floating-action-buttons/floating-action-buttons";
 import Modal from "../../components/modal/modal";
-import { useState } from "react";
 
 const ModalPage = () => {
     const [show, setShow] = useState(true);

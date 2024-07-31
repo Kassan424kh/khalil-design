@@ -9,13 +9,13 @@
   .textfield-input
     box-sizing: content-box
     width: calc(100% - 21px)
-    border: 1px solid $border-color
-    background-color: $background-color
+    border: 1px solid rgba($blue-rgb, .15)
+    background-color: rgba($blue-light-rgb, .5)
     padding: 0 10px
-    line-height: 40px
-    border-radius: 10px
+    line-height: 40.5px
+    border-radius: 5px
     font-size: 15px
-    color: $black
+    color: $blue
     transition: all 250ms cubic-bezier(.4, .2, 0, 1)
     font-weight: 300
     font-family: $font-family
@@ -38,23 +38,23 @@
         padding-right: 52px
 
     &:focus
-      border: 1px solid rgba($base-color-rgb, .8)
-      background-color: rgba($base-color-accent-rgb, .03)
-      color: $black
+      border: 1px solid rgba($blue-rgb, .8)
+      background-color: rgba($blue-light-rgb, .2)
+      color: $blue-dark
 
   .icon-button
     position: absolute
     padding: 0 !important
     height: 43px
     width: 43px
-    transform: scale(.8)
+    transform: scale(1)
 
-    .button
-      background-color: $white !important
+    .tv-tool-button
+      background-color: $white
       border: 1px solid rgba($text-field-button-border-color, $text-field-button-border-alpha)
 
     > span
-      color: rgba($base-color-rgb, .7) !important
+      color: rgba($blue-rgb, .7)
       font-size: 20px
 
     &.only-icon
@@ -71,7 +71,12 @@
 
   &.is-invalid
     .textfield-input
+      color: $red
+      background-color: rgba($red-light-rgb, .2)
       border-color: $red !important
+    .tv-tool-button
+      span
+        color: $red !important
 
   .textfield-invalid-feedback-text
     color: $red
@@ -79,11 +84,3 @@
     left: 0
     transform: translateY(200%)
     font-size: 12px
-    display: flex
-    justify-content: center
-    align-items: center
-
-
-    > span
-      padding-right: 5px
-      font-size: 12px

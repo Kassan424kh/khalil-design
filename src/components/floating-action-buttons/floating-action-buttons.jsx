@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useClickOutside } from "../../services/useClickOutside";
 import Button from "../button/button";
 import "./styles.sass";

@@ -1,40 +1,47 @@
 @import "colors"
 @import "variables"
 
-@font-face
-  font-family: 'ep-stellari-display'
-  src: url('/fonts/ep-stellari-display.ttf')
+//@font-face
+//  font-family: 'ep-stellari-display'
+//  src: url('/fonts/ep-stellari-display.ttf')
 
 *
   margin: 0
+  font-family: $font-family
+
   box-sizing: border-box
+
+  &:before, &:after
+    box-sizing: border-box
 
   ::-webkit-scrollbar
     cursor: pointer
-    width: 8px
-    height: 8px
-    background: rgba($black-rgb, .0)
+    width: 12px
+    height: 12px
+    background: rgba($black-rgb, .05)
 
   ::-webkit-scrollbar-thumb
-      background: rgba($black-rgb, .2)
-      border-radius: 2px
+    background: $scroll-bar-color
+    border-radius: 2px
 
-  &:after, &:before
-    box-sizing: border-box
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button
+    -webkit-appearance: none
+    margin: 0
 
   &:focus
     outline: none
 
   &::selection
-    background: $selection-color
-    color: $black
+    background: $blue-light
+    color: $blue
 
   &::-moz-selection
-    background: $selection-color
-    color: $black
+    background: $blue-light
+    color: $blue
 
-  &:focus
-    outline: none
+html
+  background-color: #232324
 
 
 // set color of text input blinking cursor
@@ -44,30 +51,16 @@ textarea,
   caret-color: $black
 
 .material-symbols-outlined
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48
+  font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 50
 
-
-#root, .App
+body
+  caret-color: transparent
   background-color: $white
-
-.App
-  font-family: $font-family
+  overflow: hidden
+  position: relative
+  border-radius: 20px
+  width: 100vw
   height: 100vh
-  width: 100%
-  display: flex
-  flex-direction: column
-  justify-content: center
-  align-items: center 
-  gap: 50px
-  padding: 50px
 
-  .another-position
-    height: 100%
-    width: 300%
-    display: flex
-    justify-content: center
-    align-items: center
-    
-
-.paper-effect
-  position: absolute
+  > iframe
+    pointer-events: none

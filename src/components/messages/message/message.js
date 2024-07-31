@@ -13,7 +13,7 @@ const Message = (props) => {
         setBottomPositionOnMessagesHover
     ] = useState(20);
 
-    const [state, dispatch] = useStore(false);
+    const [state, dispatch] = useStore();
 
     const messageProperties = useContainerDimensions({
         ref: myRef,

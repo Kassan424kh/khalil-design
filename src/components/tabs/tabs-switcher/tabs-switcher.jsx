@@ -1,4 +1,4 @@
-import { useReducer, useRef, useState, useEffect } from "react";
+import React, { useReducer, useRef, useState, useEffect } from "react";
 import "./styles.sass";
 import $ from "jquery";
 
