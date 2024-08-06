@@ -112,16 +112,6 @@ $gradient-background-effect: url("../../../images/table-gradient-background-imag
         justify-content: center
         align-items: center
 
-        &:after
-            width: 85%
-            height: 2px
-            content: ""
-            display: block
-            background: rgba($white-rgb, .3)
-            position: absolute
-            border-radius: 5px
-            bottom: 0
-
         > span
             width: 100%
 
@@ -148,7 +138,7 @@ $gradient-background-effect: url("../../../images/table-gradient-background-imag
 
             &.with-search
                 &:before
-                    background: linear-gradient(180deg, rgba($white-rgb, .7) 0, $background-color 1340px), $gradient-background-effect
+                    background: linear-gradient(180deg, rgba($white-rgb, .7) 0, $background-color 130px), $gradient-background-effect
                     background-repeat: no-repeat
                     background-position: left center
                     background-size: 250%
@@ -185,11 +175,9 @@ $gradient-background-effect: url("../../../images/table-gradient-background-imag
                 align-items: center
                 position: absolute
                 border-radius: 10px
-                border: 1px solid rgba($black-rgb, .75) !important
-                background-color: $white
+                border: 1px solid transparent
                 overflow: hidden
                 z-index: 22
-                background: repeating-linear-gradient(45deg, rgba($black-rgb, .05) 1px, rgba($black-rgb, .05) 2px, transparent 2px, transparent 7px), $white
 
                 .select-all-button
                     padding: 19px 20px !important
@@ -203,9 +191,9 @@ $gradient-background-effect: url("../../../images/table-gradient-background-imag
                     z-index: 21
                     opacity: 1
                     position: relative
-                    border-width: 0
                     border-radius: 0
                     border-color: transparent !important
+                    border-right-color: rgba($black-rgb, .75) !important
 
                     &:active
                         box-shadow: 0 0 10px $background-color
@@ -217,9 +205,6 @@ $gradient-background-effect: url("../../../images/table-gradient-background-imag
                         line-height: 40px
                         padding: 0
                         color: $black
-
-                    &:first-child
-                        border-right-color: rgba($black-rgb, .75) !important
 
             &.hide
                 opacity: 0
@@ -270,7 +255,7 @@ $gradient-background-effect: url("../../../images/table-gradient-background-imag
             color: $black
             font-weight: normal
             line-height: 0
-            background: repeating-linear-gradient(45deg, rgba($green-rgb, .15) 1px, rgba($green-rgb, .15) 2px, transparent 2px, transparent 7px), $white
+            background: transparent
 
             .button-icon
                 font-size: 15px
@@ -412,7 +397,7 @@ $gradient-background-effect: url("../../../images/table-gradient-background-imag
                 bottom: 0
                 width: 1px
                 padding: 0 1px
-                background: linear-gradient(180deg, transparent 60px, rgba($blue-rgb, .2) calc(50% + 60px), transparent 100%)
+                background: linear-gradient(180deg, transparent 60px, rgba($black-rgb, .1) calc(50% + 60px), transparent 100%)
 
         &.with-header-text
             .options-list

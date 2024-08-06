@@ -18,11 +18,13 @@
     cursor: pointer
     width: 12px
     height: 12px
+    border-radius: 100px
     background: rgba($black-rgb, .05)
 
   ::-webkit-scrollbar-thumb
-    background: $scroll-bar-color
-    border-radius: 2px
+    background: rgba($black-rgb, .2)
+    border-radius: 100px
+    cursor: pointer
 
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button
@@ -42,7 +44,6 @@
 
 html
   background-color: #232324
-
 
 // set color of text input blinking cursor
 input,
