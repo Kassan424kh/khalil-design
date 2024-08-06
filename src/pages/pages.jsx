@@ -11,6 +11,7 @@ import SelectPage from "./select/select-page";
 import TextfieldPage from "./textfield/textfield-page";
 import RichTextfieldPage from "./rich-textfield/rich-textfield-page";
 import Start from "./start/start";
+import CalendarTable, { dummy_calendar_table_data } from "../components/calendartable/calendartable";
 
 const Pages = () => {
     return (
@@ -31,6 +32,24 @@ const Pages = () => {
                 exact
                 path={"/floating-action-buttons"}
                 element={<FloatingActionButtonsPage />}
+            />
+            <Route
+                exact
+                path={"/calendartable"}
+                element={<CalendarTable 
+                    data={dummy_calendar_table_data}
+                    onClick={(e) => {
+                        console.log(e)
+                    }}
+                    
+                    contextMenuOptions={
+                        [
+                            "asdfasdf",
+                            "asdfasdf1",
+                            "asdfasdf2",
+                        ]
+                    }
+                    />}
             />
             <Route path="*" element={<Error404Page />} />
         </Routes>
