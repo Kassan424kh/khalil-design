@@ -12,6 +12,7 @@ import TextfieldPage from "./textfield/textfield-page";
 import RichTextfieldPage from "./rich-textfield/rich-textfield-page";
 import Start from "./start/start";
 import CalendarTable, { dummy_calendar_table_data } from "../components/calendartable/calendartable";
+import TreeTablePage from "./tree-table/tree-table-page";
 
 const Pages = () => {
     return (
@@ -27,6 +28,11 @@ const Pages = () => {
                 exact
                 path={"/rich-textfield"}
                 element={<RichTextfieldPage />}
+            />
+            <Route
+                exact
+                path={"/tree-table"}
+                element={<TreeTablePage />}
             />
             <Route
                 exact
