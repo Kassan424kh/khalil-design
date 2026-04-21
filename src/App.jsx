@@ -51,6 +51,7 @@ export default function App() {
     return (
         <div className="App">
             <Pages />
+            <Messages />
             <SelectOptions />
             {Object.keys(selectProps).length > 1
                 ? Object.keys(selectProps).map((_, selectOptionsIndex) =>

@@ -6,7 +6,10 @@ import Tabs from "./tabs/tabs-page";
 import ButtonPage from "./button/button-page";
 import InfosCardPage from "./infos-card/infos-card-page";
 import FloatingActionButtonsPage from "./floating-action-buttons/floating-action-buttons-page";
+import ControlsPage from "./controls/controls-page";
+import MessagesPage from "./messages/messages-page";
 import ModalPage from "./modal/modal-page";
+import NavPage from "./nav/nav-page";
 import SelectPage from "./select/select-page";
 import TextfieldPage from "./textfield/textfield-page";
 import RichTextfieldPage from "./rich-textfield/rich-textfield-page";
@@ -17,11 +20,14 @@ import TreeTablePage from "./tree-table/tree-table-page";
 const Pages = () => {
     return (
         <Routes>
-            <Route exact path={"/"} element={<SelectPage />} />
+            <Route exact path={"/"} element={<Start />} />
             <Route exact path={"/tabs"} element={<Tabs />} />
             <Route exact path={"/button"} element={<ButtonPage />} />
+            <Route exact path={"/controls"} element={<ControlsPage />} />
             <Route exact path={"/infos-card"} element={<InfosCardPage />} />
+            <Route exact path={"/messages"} element={<MessagesPage />} />
             <Route exact path={"/modal"} element={<ModalPage />} />
+            <Route exact path={"/nav"} element={<NavPage />} />
             <Route exact path={"/select"} element={<SelectPage />} />
             <Route exact path={"/textfield"} element={<TextfieldPage />} />
             <Route
