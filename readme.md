@@ -235,7 +235,7 @@ import Modal from './src/components/modal/modal'
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `show` | `bool` | — | Controls whether the modal is rendered and opened. |
-| `headline` | `string` | `Copy Past Forecast Columns` | Modal headline text. |
+| `headline` | `string` | `Copy Paste Forecast Columns` | Modal headline text. |
 | `children` | `node` | — | Modal body content. |
 | `cancelIcon` | `string` | `clear` | Material symbol used for the cancel button. |
 | `onCancel` | `func` | — | Called when the cancel button is clicked. |

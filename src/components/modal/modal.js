@@ -47,7 +47,7 @@ const Modal = ({
     >
       <div className={`modal-content`}>
         <div className={"modal-headline"}>
-          {headline ?? "Copy Past Forecast Columns"}
+          {headline ?? "Copy Paste Forecast Columns"}
         </div>
 
         <div className={"modal-body"}>{children}</div>
