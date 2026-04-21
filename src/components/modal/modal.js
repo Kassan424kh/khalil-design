@@ -63,7 +63,7 @@ const Modal = ({
             {cancelText ?? "Cancel"}
           </Button>
           <Button
-            className={"cancle-button"}
+            className={"cancel-button"}
             loading={submitLoading}
             leftIcon={submitIcon ?? "check"}
             green
