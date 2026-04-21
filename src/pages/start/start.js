@@ -12,7 +12,7 @@ const components = [
     {
         name: 'Checkbox',
         description: 'Checkbox control with indeterminate and label-position variants.',
-        path: '/button',
+        path: '/controls',
         snippet: '<Checkbox checked={checked} onCheck={setChecked}>\n  Accept terms\n</Checkbox>'
     },
     {
@@ -36,31 +36,31 @@ const components = [
     {
         name: 'Switcher',
         description: 'Binary switcher with left and right icon states.',
-        path: '/textfield',
+        path: '/controls',
         snippet: '<Switcher value={enabled} onSwitch={setEnabled} />'
     },
     {
         name: 'Headline',
         description: 'Inline-editable heading with reset, save, and validation states.',
-        path: '/textfield',
+        path: '/controls',
         snippet: '<Headline text=\"Campaign\" editable h2 onSubmit={save} />'
     },
     {
         name: 'PaginationBar',
         description: 'Paging control for tables with rows-per-page selection.',
-        path: '/tree-table',
+        path: '/controls',
         snippet: '<PaginationBar currentPage={1} pagesLength={10} setCurrentPage={setPage} />'
     },
     {
         name: 'Messages',
         description: 'Global hooks-store driven toast and alert stack.',
-        path: '/modal',
+        path: '/messages',
         snippet: 'dispatch(\'ADD_NEW_MESSAGE\', { message: \'Saved\', type: \'SUCCESS\' })'
     },
     {
         name: 'Nav',
         description: 'Collapsible application sidebar with pin and theme controls.',
-        path: '/tabs',
+        path: '/nav',
         snippet: '<Nav user=\"Khalil\" onStatusChange={console.log} />'
     },
     {
@@ -142,7 +142,7 @@ const Start = () => {
                 <h1 className={'start-page__title'}>Khalil Design</h1>
                 <p className={'start-page__subtitle'}>A React UI component library built with React 17, SASS, and GSAP</p>
                 <p className={'start-page__intro'}>
-                    Browse the component library below. Some app-level components share the closest existing demo page.
+                    Browse the component library below. Shared demo pages are used only where multiple related components belong together.
                 </p>
             </header>
             <div className={'start-page__grid'}>
