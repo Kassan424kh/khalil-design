@@ -5,63 +5,99 @@ import './styles.sass'
 const components = [
     {
         name: 'Button',
-        description: 'Flexible button with variants, colours, icons, and loading state.',
+        description: 'Flexible button with variants, colors, icons, and loading state.',
         path: '/button',
-        snippet: '<Button primary green onClick={fn}>\n  Save\n</Button>'
+        snippet: '<Button primary green>\n  Save\n</Button>'
+    },
+    {
+        name: 'Checkbox',
+        description: 'Checkbox control with indeterminate and label-position variants.',
+        path: '/button',
+        snippet: '<Checkbox checked={checked} onCheck={setChecked}>\n  Accept terms\n</Checkbox>'
     },
     {
         name: 'Select',
-        description: 'Configurable dropdown with multi-select, search, and sort support.',
+        description: 'Configurable dropdown with multi-select, search, and sorting.',
         path: '/select',
-        snippet: '<Select options={[\'A\', \'B\']} onSelect={fn}>\n  <button>Pick</button>\n</Select>'
+        snippet: '<Select options={[\'A\', \'B\']} onSelect={fn}>\n  <Button outlined>Choose</Button>\n</Select>'
     },
     {
         name: 'TextField',
-        description: 'Text / number / textarea input with validation and icon buttons.',
+        description: 'Text, number, and textarea inputs with validation support.',
         path: '/textfield',
-        snippet: '<TextField\n  value={val}\n  onChange={setVal}\n/>'
+        snippet: '<TextField value={value} onChange={setValue} />'
     },
     {
         name: 'Modal',
-        description: 'Animated overlay dialog with headline, body, cancel and submit actions.',
+        description: 'Animated modal dialog with cancel and submit actions.',
         path: '/modal',
-        snippet: '<Modal\n  show={open}\n  headline="Confirm"\n  onCancel={close}\n  onSubmit={save}\n/>'
+        snippet: '<Modal show={open} onCancel={close} onSubmit={save} />'
+    },
+    {
+        name: 'Switcher',
+        description: 'Binary switcher with left and right icon states.',
+        path: '/textfield',
+        snippet: '<Switcher value={enabled} onSwitch={setEnabled} />'
+    },
+    {
+        name: 'Headline',
+        description: 'Inline-editable heading with reset, save, and validation states.',
+        path: '/textfield',
+        snippet: '<Headline text=\"Campaign\" editable h2 onSubmit={save} />'
+    },
+    {
+        name: 'PaginationBar',
+        description: 'Paging control for tables with rows-per-page selection.',
+        path: '/tree-table',
+        snippet: '<PaginationBar currentPage={1} pagesLength={10} setCurrentPage={setPage} />'
+    },
+    {
+        name: 'Messages',
+        description: 'Global hooks-store driven toast and alert stack.',
+        path: '/modal',
+        snippet: 'dispatch(\'ADD_NEW_MESSAGE\', { message: \'Saved\', type: \'SUCCESS\' })'
+    },
+    {
+        name: 'Nav',
+        description: 'Collapsible application sidebar with pin and theme controls.',
+        path: '/tabs',
+        snippet: '<Nav user=\"Khalil\" onStatusChange={console.log} />'
     },
     {
         name: 'Tabs',
-        description: 'Tabbed navigation component for switching between views.',
+        description: 'Tabbed navigation for switching between content panels.',
         path: '/tabs',
         snippet: '<Tabs />'
     },
     {
         name: 'FloatingActionButtons',
-        description: 'FAB component providing quick-access floating actions.',
+        description: 'Floating stack of quick action buttons.',
         path: '/floating-action-buttons',
-        snippet: '<FloatingActionButtons />'
+        snippet: '<FloatingActionButtons actionButtons={actions} />'
     },
     {
         name: 'InfosCard',
-        description: 'Information card for displaying summary metrics or status.',
+        description: 'Information card for showing mapped label and value details.',
         path: '/infos-card',
-        snippet: '<InfosCard />'
+        snippet: '<InfosCard infosObject={info} translationObject={labels} />'
     },
     {
         name: 'RichTextField',
-        description: 'Draft.js based rich text editor with formatting toolbar.',
+        description: 'Draft.js based rich text editor with optional controls.',
         path: '/rich-textfield',
-        snippet: '<RichTextField\n  editorState={state}\n  onChange={setState}\n/>'
+        snippet: '<RichTextField value={value} onChange={setValue} />'
     },
     {
         name: 'TreeTable',
-        description: 'Hierarchical data table with expand / collapse of nested rows.',
+        description: 'Hierarchical data table with expandable nested rows.',
         path: '/tree-table',
-        snippet: '<TreeTable data={rows} />'
+        snippet: '<TreeTable data={rows} setExpandAllRows={setExpandAllRows} />'
     },
     {
         name: 'CalendarTable',
-        description: 'Calendar / schedule table with context menu support.',
+        description: 'Calendar-style table with month, week, and day views.',
         path: '/calendartable',
-        snippet: '<CalendarTable\n  data={entries}\n  onClick={fn}\n  contextMenuOptions={[\'Edit\']}\n/>'
+        snippet: '<CalendarTable data={entries} onClick={fn} contextMenuOptions={[\'Edit\']} />'
     }
 ]
 
@@ -71,7 +107,7 @@ const ComponentCard = ({ name, description, path, snippet }) => (
         <p className="component-card__description">{description}</p>
         <pre className="component-card__snippet"><code>{snippet}</code></pre>
         <Link className="component-card__link" to={path}>
-            View demo →
+            Open demo →
         </Link>
     </div>
 )
@@ -105,10 +141,13 @@ const Start = () => {
             <header className={'start-page__header'}>
                 <h1 className={'start-page__title'}>Khalil Design</h1>
                 <p className={'start-page__subtitle'}>A React UI component library built with React 17, SASS, and GSAP</p>
+                <p className={'start-page__intro'}>
+                    Browse the component library below. Some app-level components share the closest existing demo page.
+                </p>
             </header>
             <div className={'start-page__grid'}>
                 {components.map(c => (
-                    <ComponentCard key={c.path} {...c} />
+                    <ComponentCard key={c.name} {...c} />
                 ))}
             </div>
         </div>

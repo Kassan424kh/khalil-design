@@ -17,7 +17,7 @@ import TreeTablePage from "./tree-table/tree-table-page";
 const Pages = () => {
     return (
         <Routes>
-            <Route exact path={"/"} element={<SelectPage />} />
+            <Route exact path={"/"} element={<Start />} />
             <Route exact path={"/tabs"} element={<Tabs />} />
             <Route exact path={"/button"} element={<ButtonPage />} />
             <Route exact path={"/infos-card"} element={<InfosCardPage />} />
